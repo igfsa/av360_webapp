@@ -1,0 +1,56 @@
+a:hover {
+  text-decoration: none;
+}
+
+.menu{
+  font-size: larger;
+  height: 10vh;
+  width: 100vw;
+  padding-left: 5%;
+  padding-right: 5%;
+  background-color: var(--secondary);
+}
+
+.btn {
+  border: 0;
+  background-color: transparent;
+  color: var(--primary);
+}
+
+.ico {
+  height: 3em;
+  width: 3em;
+}
+
+.titulo{
+  color: var(--dark);
+}
+
+.offcanvas-header {
+  background-color: var(--primary);
+  padding: 2rem;
+}
+
+.offcanvas-body {
+  background-color: var(--light);
+  padding: 0;
+}
+
+.nav-link {
+  width: 100%;
+
+  a,
+  span {
+    display: inline-block;
+    width: inherit;
+    padding: 1rem 3rem;
+    text-align: left;
+  }
+}
+
+li {
+  padding: 1rem 3rem;
+  color: var(--text);
+  border-top: 0.1rem solid var(--primary);
+}
+

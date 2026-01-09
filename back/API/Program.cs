@@ -13,6 +13,15 @@ using Application.DTOs;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Allowlocalhost",
+        policy => policy
+            .WithOrigins("http://localhost:4200") // seu front-end
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -60,6 +69,8 @@ builder.Services.AddScoped<ICriterioService, CriterioService>();
 builder.Services.AddScoped<ICriterioPersist, CriterioPersist>();
 
 var app = builder.Build();
+
+app.UseCors("Allowlocalhost");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -1,0 +1,34 @@
+<div class="">
+  <table id="main-table" class="table table-striped text-center">
+    <thead class="table-dark">
+      <tr>
+        <th>#</th>
+        <th>Nome</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (alunos && alunos.length){
+        @for (aluno of alunosFiltrados; track aluno; let a = $index){
+          <tr>
+            <td>{{aluno.id}}</td>
+            <td>{{aluno.nome}}</td>
+            <td>
+              <button type="button" class="btn-editar btn btn-primary btn-sm mr-2">Editar</button>
+              <button type="button" class="btn-excluir btn btn-danger btn-sm">Excluir</button>
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+    <tfoot >
+      @if (!alunos.length){
+        <tr>
+          <td colspan="8" class="text-center">
+            <h4>Nenhum evento encontrado!</h4>
+          </td>
+        </tr>
+      }
+    </tfoot>
+  </table>
+</div>

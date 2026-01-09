@@ -1,1 +1,80 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Importing Bootstrap SCSS file. */
+@use 'bootstrap/scss/bootstrap';
+
+:root{
+
+  --primary: #8B5CF6;
+  --secondary: #A78BFA;
+  --dark: #4C1D95;
+  --light: #EDE9FE;
+
+  --accent: #06B6D4;
+
+  --text: #1F2937;
+  --background: #FAFAFE;
+
+}
+
+html{
+  font-size: 62.5%;
+  background-color: var(--background);
+  color: var(--text);
+}
+
+body{
+  font-size: 1.6rem;
+  background-color: var(--back);
+  font-family: 'Raleway', sans-serif;
+  color: var(--text);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6{
+  color: var(--dark);
+}
+
+a{
+  text-decoration: none;
+  color: var(--primary);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+p{
+  color: var(--text);
+  text-align: justify;
+}
+
+.container {
+  margin: 10vh auto 15vh;
+  padding:  5%;
+  // max-width: 100vw;
+  // opacity: 0;
+  // animation: opacity-increase 2s normal ease-in 1 forwards;
+}
+
+.table th {
+  background-color: var(--dark);
+}
+
+.btn{
+  font-size: 1.6rem !important;
+  background-color: var(--primary);
+  color: var(--text);
+}
+
+.btn:hover{
+  background-color: var(--secondary);
+}
+
+.tooltip .tooltip-inner {
+  font-size: 200%;
+}

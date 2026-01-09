@@ -1,0 +1,36 @@
+<div class="">
+  <table id="main-table" class="table table-striped text-center">
+    <thead class="table-dark">
+      <tr>
+        <th>#</th>
+        <th>Cod</th>
+        <th>Nota Máxima</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (turmas && turmas.length){
+        @for (turma of turmasFiltradas; track turma; let t = $index){
+          <tr>
+            <td>{{turma.id}}</td>
+            <td>{{turma.cod}}</td>
+            <td>{{turma.notaMax}}</td>
+            <td>
+              <button type="button" class="btn-editar btn btn-primary btn-sm mr-2">Editar</button>
+              <button type="button" class="btn-excluir btn btn-danger btn-sm">Excluir</button>
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+    <tfoot >
+      @if (!turmas.length){
+        <tr>
+          <td colspan="8" class="text-center">
+            <h4>Nenhum evento encontrado!</h4>
+          </td>
+        </tr>
+      }
+    </tfoot>
+  </table>
+</div>
