@@ -53,6 +53,11 @@ p{
   text-align: justify;
 }
 
+th,
+td {
+  text-align: left;
+}
+
 .container {
   margin: 10vh auto 15vh;
   padding:  5%;
@@ -67,13 +72,13 @@ p{
 
 .btn{
   font-size: 1.6rem !important;
-  background-color: var(--primary);
-  color: var(--text);
+  // background-color: var(--primary);
+  // color: var(--text);
 }
 
-.btn:hover{
-  background-color: var(--secondary);
-}
+// .btn:hover{
+//   background-color: var(--secondary);
+// }
 
 .tooltip .tooltip-inner {
   font-size: 200%;

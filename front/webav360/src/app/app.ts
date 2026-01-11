@@ -5,13 +5,14 @@ import { TurmasComponent } from './turmas/turmas.component';
 import { AlunosComponent } from './alunos/alunos.component';
 import { NavComponent } from './nav/nav.component';
 
+
 @Component({
   selector: 'app-root',
   imports: [
     RouterOutlet,
     TurmasComponent,
     AlunosComponent,
-    NavComponent
+    NavComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'

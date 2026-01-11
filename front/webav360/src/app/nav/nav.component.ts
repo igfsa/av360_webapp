@@ -13,7 +13,7 @@ export class NavComponent {
 	closeResult = '';
 
   // ngBootstrap function to open off canvas in the right side of screen
-	openEnd(content: TemplateRef<any>) {
-		this.offcanvasService.open(content, { position: 'end' });
+	openStart(content: TemplateRef<any>) {
+		this.offcanvasService.open(content, { position: 'start' });
 	}
 }

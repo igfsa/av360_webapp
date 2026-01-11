@@ -1,5 +1,12 @@
 <header>
   <nav class="menu fixed-top d-flex align-items-center justify-content-between bg-gradient-x">
+
+    <button class="btn" (click)="openStart(content)">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="ico bi bi-list" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+      </svg>
+    </button>
+
     <a class="navbar-brand" routerLink="" routerLinkActive="active">
       <h1 class = "titulo display-3" >av360web</h1>
     </a>
@@ -19,11 +26,5 @@
         </ul>
       </div>
     </ng-template>
-
-    <button class="btn" (click)="openEnd(content)">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="ico bi bi-list" viewBox="0 0 16 16">
-        <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
-      </svg>
-    </button>
   </nav>
 </header>

@@ -1,21 +1,29 @@
 <div class="">
-  <table id="main-table" class="table table-striped text-center">
+  <div class="row p-1 w-100">
+    <div class="col-10">
+      <input type="text" class="form-control w-100 h-100" style = "font-size: 1.6rem;" placeholder="Buscar" [(ngModel)]="filtroLista">
+    </div>
+    <div class="col-2 p-0">
+      <button id="btn-buscar" class="btn btn-outline-success w-100" >Buscar</button>
+    </div>
+  </div>
+  <table id="main-table" class="table table-striped text-center table-hover">
     <thead class="table-dark">
       <tr>
-        <th>#</th>
+        <th style = 'width: 10%; text-align: center;'>#</th>
         <th>Cod</th>
         <th>Nota Máxima</th>
-        <th>Ações</th>
+        <th style = 'width: 20%; text-align: center;'>Ações</th>
       </tr>
     </thead>
     <tbody>
       @if (turmas && turmas.length){
         @for (turma of turmasFiltradas; track turma; let t = $index){
           <tr>
-            <td>{{turma.id}}</td>
+            <td style= 'text-align: center'>{{turma.id}}</td>
             <td>{{turma.cod}}</td>
             <td>{{turma.notaMax}}</td>
-            <td>
+            <td style= 'text-align: center'>
               <button type="button" class="btn-editar btn btn-primary btn-sm mr-2">Editar</button>
               <button type="button" class="btn-excluir btn btn-danger btn-sm">Excluir</button>
             </td>
