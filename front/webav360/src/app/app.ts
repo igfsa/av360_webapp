@@ -1,21 +1,20 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
-import { TurmasComponent } from './turmas/turmas.component';
-import { AlunosComponent } from './alunos/alunos.component';
-import { NavComponent } from './nav/nav.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
+import { NavComponent } from './Components/nav/nav.component';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   imports: [
     RouterOutlet,
-    TurmasComponent,
-    AlunosComponent,
     NavComponent,
+    NgbModule
   ],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrls: ['./app.scss']
 })
 export class App {
   protected readonly title = signal('webav360');

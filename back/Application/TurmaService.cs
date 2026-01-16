@@ -4,16 +4,13 @@ using Application.Contracts;
 using Application.DTOs;
 using Domain.Entities;
 using Persistence.Contracts;
-using Persistence;
-using Google.Protobuf.WellKnownTypes;
-using Mysqlx;
 
 namespace Application.Services;
 
 public class TurmaService : ITurmaService
 {
     private readonly IGeralPersist _geralPersist;
-    private ITurmaPersist _TurmaPersist;
+    private ITurmaPersist _turmaPersist;
     private IAlunoPersist _alunoPersist;
     private IAlunoTurmaPersist _alunoTurmaPersist;
     private readonly IMapper _mapper;
@@ -25,7 +22,7 @@ public class TurmaService : ITurmaService
                         IMapper mapper)
     {
         _geralPersist = geralPersist;
-        _TurmaPersist = TurmaPersist;
+        _turmaPersist = TurmaPersist;
         _alunoPersist = alunoPersist;
         _alunoTurmaPersist = alunoTurmaPersist;
         _mapper = mapper;
@@ -36,10 +33,10 @@ public class TurmaService : ITurmaService
     {
         try
         {
-            var Turmas = await _TurmaPersist.GetAllTurmasAsync();
-            if (Turmas == null) return null;
+            var turmas= await _turmaPersist.GetAllTurmasAsync();
+            if (turmas== null) return null;
 
-            var resultado = _mapper.Map<IEnumerable<TurmaDTO>>(Turmas);
+            var resultado = _mapper.Map<IEnumerable<TurmaDTO>>(turmas);
 
             return resultado;
         }
@@ -52,7 +49,7 @@ public class TurmaService : ITurmaService
     {
         try
         {
-            var Turma = await _TurmaPersist.GetTurmaIdAsync(Id);
+            var Turma = await _turmaPersist.GetTurmaIdAsync(Id);
             if (Turma == null) return null;
 
             var resultado = _mapper.Map<TurmaDTO>(Turma);
@@ -64,14 +61,14 @@ public class TurmaService : ITurmaService
             throw new Exception(ex.Message);
         }
     }
-    public async Task<IEnumerable<AlunoDTO>> GetTurmaAluno(int turmaId)
+    public async Task<IEnumerable<TurmaDTO>> GetTurmasAluno(int turmaId)
     {
         try
         {
-            var alunos = await _alunoTurmaPersist.GetTurmaAlunoIdAsync(turmaId);
+            var alunos = await _alunoTurmaPersist.GetTurmasAlunoIdAsync(turmaId);
             if (alunos == null) return null;
 
-            var resultado = _mapper.Map<IEnumerable<AlunoDTO>>(alunos);
+            var resultado = _mapper.Map<IEnumerable<TurmaDTO>>(alunos);
 
             return resultado;
         }
@@ -92,7 +89,7 @@ public class TurmaService : ITurmaService
 
             if (await _geralPersist.SaveChangesAsync())
             {
-                var TurmaRetorno = await _TurmaPersist.GetTurmaIdAsync(Turma.Id);
+                var TurmaRetorno = await _turmaPersist.GetTurmaIdAsync(Turma.Id);
 
                 return _mapper.Map<TurmaDTO>(TurmaRetorno);
             }
@@ -110,12 +107,13 @@ public class TurmaService : ITurmaService
             // Aluno aluno = await _alunoTurmaPersist.GetValidaAlunoTurma(alunoId, turmaId);
             // return _mapper.Map<AlunoDTO>(aluno);
             Aluno aluno = await _alunoTurmaPersist.GetValidaAlunoTurma(turmaId, alunoId);
-            if( aluno != null)
+            Turma turma = await _turmaPersist.GetTurmaIdAsync(turmaId);
+            if( aluno != null && turma != null)
             {
                 AlunoTurma at = new()
                 {
                     TurmaId = turmaId,
-                    AlunoId = alunoId
+                    AlunoId = alunoId,
                 };
 
                 _geralPersist.Add(at);
@@ -142,7 +140,7 @@ public class TurmaService : ITurmaService
     {
         try
         {
-            var Turma = await _TurmaPersist.GetTurmaIdAsync(TurmaId);
+            var Turma = await _turmaPersist.GetTurmaIdAsync(TurmaId);
             if (Turma == null) return null;
 
             model.Id = Turma.Id;
@@ -153,7 +151,7 @@ public class TurmaService : ITurmaService
 
             if (await _geralPersist.SaveChangesAsync())
             {
-                var TurmaRetorno = await _TurmaPersist.GetTurmaIdAsync(TurmaId);
+                var TurmaRetorno = await _turmaPersist.GetTurmaIdAsync(TurmaId);
 
                 return _mapper.Map<TurmaDTO>(TurmaRetorno);
             }

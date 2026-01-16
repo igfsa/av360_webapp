@@ -10,7 +10,7 @@ public class TurmaDTO
 {
     public int Id { get; set; }
     [StringLength(30)]
-    public string Cod { get; set; }
+    public required string Cod { get; set; }
     [Column(TypeName = "decimal(5,2)")]
     public decimal NotaMax { get; set; } = 0;
     [JsonIgnore]

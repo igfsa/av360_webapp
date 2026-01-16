@@ -15,24 +15,23 @@ public class AlunoTurmaPersist : IAlunoTurmaPersist
         _context = context;
     }
 
-    public async Task<Turma[]> GetAlunoTurmaIdAsync(int alunoId)
+    public async Task<Aluno[]> GetAlunosTurmaIdAsync(int turmaId)
     {
-        IQueryable<Turma> query = _context.AlunoTurma
+        return await _context.Alunos
             .AsNoTracking()
-            .Where(at => at.AlunoId == alunoId)
-            .Select(at => at.Turma)
-            .OrderBy(a => a.Cod);
-        return await query.ToArrayAsync();
-        
+            .Where(a => _context.AlunoTurma
+                .Any(at => at.TurmaId == turmaId && at.AlunoId == a.Id))
+            .OrderBy(a => a.Nome)
+            .ToArrayAsync();
     }
-    public async Task<Aluno[]> GetTurmaAlunoIdAsync(int turmaId)
+    public async Task<Turma[]> GetTurmasAlunoIdAsync(int alunoId)
     {
-        IQueryable<Aluno> query = _context.AlunoTurma
+        return await _context.Turmas
             .AsNoTracking()
-            .Where(at => at.TurmaId == turmaId)            
-            .Select(at => at.Aluno)
-            .OrderBy(a => a.Nome);
-        return await query.ToArrayAsync();
+            .Where(t => _context.AlunoTurma
+                .Any(at => at.AlunoId == alunoId && at.TurmaId == t.Id))
+            .OrderBy(t => t.Cod)
+            .ToArrayAsync();
     }
     public async Task<Aluno> GetValidaAlunoTurma(int turmaId, int alunoId)
     {

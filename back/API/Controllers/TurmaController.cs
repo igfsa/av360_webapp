@@ -62,14 +62,14 @@ namespace API.Controllers
 
         }
 
-        [HttpGet("{turmaId:int}", Name = "ObterTurmaAluno")]
-        [ActionName("GetTurmaAluno")]
-        public async Task<ActionResult<IEnumerable<AlunoDTO>>> GetTurmaAluno(int turmaId)
+        [HttpGet("{alunoId:int}", Name = "ObterTurmasAluno")]
+        [ActionName("GetTurmasAluno")]
+        public async Task<ActionResult<IEnumerable<TurmaDTO>>> GetTurmasAluno(int alunoId)
         {
 
             try
             {
-                var alunos = await _turmaService.GetTurmaAluno(turmaId);
+                var alunos = await _turmaService.GetTurmasAluno(alunoId);
                 if (alunos is null)
                 {
                     return NotFound();

@@ -1,21 +1,27 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+
+import { AlunoService } from '../../Service/Aluno.service';
+import { Aluno } from '../../Models/Aluno';
 
 @Component({
   selector: 'app-alunos',
+  standalone: true,
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    RouterLink
    ],
   templateUrl: './alunos.component.html',
-  styleUrls: ['./alunos.component.scss', '../app.scss'],
+  styleUrls: ['./alunos.component.scss', '../../app.scss'],
 })
 export class AlunosComponent implements OnInit {
+  public loaded = false;
 
-  public alunos: any  = [];
-  public alunosFiltrados : any = [];
+  public alunos: Aluno[]  = [];
+  public alunosFiltrados : Aluno[] = [];
   private _filtroLista: string = '';
 
   public get filtroLista() {
@@ -27,7 +33,7 @@ export class AlunosComponent implements OnInit {
     this.alunosFiltrados = this.filtroLista ? this.filtrarAlunos(this.filtroLista) : this.alunos;
   }
 
-  filtrarAlunos(filtrarPor: string): any {
+  public filtrarAlunos(filtrarPor: string): Aluno[] {
     filtrarPor = filtrarPor.toLocaleLowerCase();
     return this.alunos.filter(
       (aluno: { nome: string; }) => aluno.nome.toLocaleLowerCase().indexOf(filtrarPor) !== -1
@@ -37,15 +43,16 @@ export class AlunosComponent implements OnInit {
   Id: string = '';
   Nome: string = '';
 
-  constructor(private http :HttpClient) { }
+  constructor(private alunoService: AlunoService){}
 
   ngOnInit() {
     void this.getAlunos();
+    this.loaded = true;
   }
 
   public getAlunos (): void{
-    this.http.get('http://localhost:5074/api/Aluno/GetAllAlunos').subscribe({
-      next: (a) =>
+    this.alunoService.getAlunos().subscribe({
+      next: (a: Aluno[]) =>
       {
         this.alunos = a;
         this.alunosFiltrados = this.alunos;

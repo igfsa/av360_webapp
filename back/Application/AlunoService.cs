@@ -59,14 +59,14 @@ public class AlunoService : IAlunoService
             throw new Exception(ex.Message);
         }
     }
-    public async Task<IEnumerable<TurmaDTO>> GetAlunoTurma(int alunoId)
+    public async Task<IEnumerable<AlunoDTO>> GetAlunosTurma(int turmaId)
     {
         try
         {
-            var turmas = await _alunoTurmaPersist.GetAlunoTurmaIdAsync(alunoId);
+            var turmas = await _alunoTurmaPersist.GetAlunosTurmaIdAsync(turmaId);
             if (turmas == null) return null;
 
-            var resultado = _mapper.Map<IEnumerable<TurmaDTO>>(turmas);
+            var resultado = _mapper.Map<IEnumerable<AlunoDTO>>(turmas);
 
             return resultado;
         }

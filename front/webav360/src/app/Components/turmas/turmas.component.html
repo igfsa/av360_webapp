@@ -1,0 +1,61 @@
+<div class="container">
+  <div>
+    <h1 class = "col-10">Turmas</h1>
+  </div>
+  <div class="row p-1 w-100">
+    <div class="col-8">
+      <input type="text" class="form-control w-100 h-100" style = "font-size: 1.6rem;" placeholder="Buscar" [(ngModel)]="filtroLista">
+    </div>
+      <button id="btn-buscar" type="button" class="btn btn-light col-2" >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+          <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+        </svg>
+        Buscar
+      </button>
+      <button type="button" class="btn-editar btn btn-success btn-sm mr-2 col-2" >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+        </svg>
+      Adicionar Turma
+    </button>
+  </div>
+  <table id="main-table" class="table table-striped text-center table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th style = 'width: 10%; text-align: center;'>#</th>
+        <th>Cod</th>
+        <th>Nota Máxima</th>
+        <th style = 'width: 20%; text-align: center;'>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (turmas && turmas.length){
+        @for (turma of turmasFiltradas; track turma; let t = $index){
+          <tr>
+            <td style= 'text-align: center'>{{turma.id}}</td>
+            <td>{{turma.cod}}</td>
+            <td>{{turma.notaMax}}</td>
+            <td style= 'text-align: center'>
+              <button type="button" class="btn-editar btn btn-primary btn-sm mr-2 " [routerLink]="['/AlunosTurma', turma.id]" routerLinkActive="active">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                  <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+                  <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+                </svg>
+                Editar
+              </button>
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+    <tfoot >
+      @if (!turmas.length){
+        <tr>
+          <td colspan="8" class="text-center">
+            <h4>Nenhum evento encontrado!</h4>
+          </td>
+        </tr>
+      }
+    </tfoot>
+  </table>
+</div>

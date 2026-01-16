@@ -11,7 +11,7 @@ public class AlunoDTO
     [StringLength (100)]
     public string Nome { get; set; }
     [JsonIgnore]
-    public IEnumerable<Turma>? Turma { get; set; }
+    public IEnumerable<TurmaDTO>? Turmas { get; set; }
     [JsonIgnore]
     public IEnumerable<NotaFinalDTO>? NotasFinais { get; set; }
     [JsonIgnore]

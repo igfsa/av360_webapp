@@ -2,20 +2,26 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+
+import { Turma } from '../../Models/Turma';
+import { TurmaService } from '../../Service/Turma.service';
 
 @Component({
   selector: 'app-turmas',
+  standalone: true,
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    RouterLink
    ],
   templateUrl: './turmas.component.html',
-  styleUrls: ['./turmas.component.scss', '../app.scss'],
+  styleUrls: ['./turmas.component.scss', '../../app.scss'],
 })
 export class TurmasComponent implements OnInit {
 
-  public turmas: any  = [];
-  public turmasFiltradas : any = [];
+  public turmas: Turma[] = [];
+  public turmasFiltradas : Turma[] = [];
   private _filtroLista: string = '';
 
   public get filtroLista() {
@@ -27,7 +33,7 @@ export class TurmasComponent implements OnInit {
     this.turmasFiltradas = this.filtroLista ? this.filtrarTurmas(this.filtroLista) : this.turmas;
   }
 
-  filtrarTurmas(filtrarPor: string): any {
+  public filtrarTurmas(filtrarPor: string): any {
     filtrarPor = filtrarPor.toLocaleLowerCase();
     return this.turmas.filter(
       (turma: { cod: string; }) => turma.cod.toLocaleLowerCase().indexOf(filtrarPor) !== -1
@@ -38,15 +44,15 @@ export class TurmasComponent implements OnInit {
   cod: string = '';
   notaMax: string = '';
 
-  constructor(private http :HttpClient) { }
+  constructor(private turmaService: TurmaService) { }
 
   ngOnInit() {
     void this.getTurmas();
   }
 
   public getTurmas (): void{
-    this.http.get('http://localhost:5074/api/Turma/GetAllTurmas').subscribe({
-      next: (t) =>
+    this.turmaService.getTurmas().subscribe({
+      next: (t: Turma[]) =>
       {
         this.turmas = t;
         this.turmasFiltradas = this.turmas;

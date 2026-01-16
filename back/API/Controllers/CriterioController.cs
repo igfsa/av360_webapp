@@ -38,7 +38,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("{id:int}", Name = "ObterCriterioId")]
+        [HttpGet("{id:int}", Name = "GetCriterioId")]
         [ActionName("GetId")]
         public async Task<ActionResult<CriterioDTO>> Get(int id)
         {
@@ -60,8 +60,8 @@ namespace API.Controllers
 
         }
 
-        [HttpGet("{turmaId:int}", Name = "ObterCriterioTurma")]
-        [ActionName("ObterCriterioTurma")]
+        [HttpGet("{turmaId:int}", Name = "GetCriteriosTurma")]
+        [ActionName("GetCriteriosTurma")]
         public async Task<ActionResult<CriterioDTO>> GetCriterioTurma(int turmaId)
         {
 
