@@ -21,7 +21,7 @@
       </tr>
     </thead>
     <tbody>
-      @if (criterios && criterios.length){
+      @if (criteriosFiltrados && criterios.length){
         @for (criterio of criteriosFiltrados; track criterio; let a = $index){
           <tr>
             <td style= 'text-align: center'>{{criterio.id}}</td>
@@ -39,7 +39,7 @@
       }
     </tbody>
     <tfoot >
-      @if (!criterios.length){
+      @if (!criteriosFiltrados.length){
         <tr>
           <td colspan="8" class="text-center">
             <h4>Nenhum evento encontrado!</h4>

@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, Input, OnInit, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute } from '@angular/router';
+import { forkJoin, switchMap } from 'rxjs';
+import { Router } from 'express';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
 
 import { AlunoService } from '../../Service/Aluno.service';
 import { Aluno } from '../../Models/Aluno';
@@ -9,7 +12,8 @@ import { TurmaService } from '../../Service/Turma.service';
 import { Turma } from '../../Models/Turma';
 import { CriterioService } from '../../Service/Criterio.service';
 import { Criterio } from '../../Models/Criterio';
-import { forkJoin, switchMap } from 'rxjs';
+import { TurmaEditarModalComponent } from './Modals/turma_editar.component';
+import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
 
 @Component({
   selector: 'app-alunos-turma',
@@ -23,7 +27,9 @@ import { forkJoin, switchMap } from 'rxjs';
   styleUrls: ['./alunos_turma.component.scss', '../../app.scss'],
 })
 export class AlunoTurmaComponent implements OnInit {
-  public loaded = false;
+
+	private modalService = inject(NgbModal);
+  @Input() turmaEditar!: Turma;
 
   public alunos: Aluno[]  = [];
   public alunosFiltrados : Aluno[] = [];
@@ -72,10 +78,14 @@ export class AlunoTurmaComponent implements OnInit {
     private alunoService: AlunoService,
     private turmaService: TurmaService,
     private criterioService: CriterioService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef,
+    private turmaRealTime: TurmaRealTime,
   ){}
 
   ngOnInit(): void {
+    this.turmaRealTime.connect()
+
     this.route.paramMap
       .pipe(
         switchMap(params => {
@@ -97,8 +107,21 @@ export class AlunoTurmaComponent implements OnInit {
         this.criterios = criterios;
         this.criteriosFiltrados = criterios;
 
-        this.loaded = true;
+        this.cdr.detectChanges();
       });
+
+      this.turmaRealTime.onTurmaAtualizada((turmaId) => {
+        if (this.turma?.id === turmaId) {
+          this.reloadTurma();
+        }
+      });
+  }
+
+  reloadTurma() {
+  this.turmaService.getTurmaId(this.turma.id)
+    .subscribe(t => {
+      this.turma = t;
+    });
   }
 
   public getAlunosTurma (id: number): void{
@@ -131,5 +154,25 @@ export class AlunoTurmaComponent implements OnInit {
       },
       error: (e) => console.log(e)
     })
+  }
+
+  public editarTurma (): void{
+    const ref = this.modalService.open(TurmaEditarModalComponent, {
+      size: 'lg',
+      backdrop: 'static'
+    });
+
+    ref.componentInstance.turma = this.turma;
+
+    ref.result.then((turmaEditada: Turma) => {
+      if (!turmaEditada) return;
+
+      this.turmaService.putTurma(turmaEditada).subscribe({
+        next: (t) => {
+          this.turma = t;
+      console.log('Retorno da API:', t);
+        }
+      });
+    }).catch(() => {});
   }
 }
