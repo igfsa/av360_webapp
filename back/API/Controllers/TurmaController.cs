@@ -13,11 +13,14 @@ namespace API.Controllers
     {
         private readonly ITurmaService _turmaService;
         private readonly IAlunoService _alunoService;
+        private ITurmaNotifier _turmaNotifier;
         public TurmaController(ITurmaService turmaService,
-                            IAlunoService alunoService)
+                            IAlunoService alunoService,
+                            ITurmaNotifier turmaNotifier)
         {
             _turmaService = turmaService;
             _alunoService = alunoService;
+            _turmaNotifier = turmaNotifier;
         }
 
         [HttpGet]
@@ -95,6 +98,7 @@ namespace API.Controllers
                 {
                    return NoContent(); 
                 }
+                await _turmaNotifier.TurmaAtualizadaAsync(model.Id);
                 return Ok(Turma);
             }
             catch (Exception ex)
@@ -138,6 +142,7 @@ namespace API.Controllers
                 {
                    return NoContent(); 
                 }
+                await _turmaNotifier.TurmaAtualizadaAsync(model.Id);
                 return Ok(turma);
             }
             catch (Exception ex)

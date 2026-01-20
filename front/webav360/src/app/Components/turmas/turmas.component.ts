@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -44,7 +44,10 @@ export class TurmasComponent implements OnInit {
   cod: string = '';
   notaMax: string = '';
 
-  constructor(private turmaService: TurmaService) { }
+  constructor(
+    private turmaService: TurmaService,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit() {
     void this.getTurmas();
@@ -56,6 +59,8 @@ export class TurmasComponent implements OnInit {
       {
         this.turmas = t;
         this.turmasFiltradas = this.turmas;
+
+        this.cdr.detectChanges();
       },
       error: (e) => console.log(e)
     })

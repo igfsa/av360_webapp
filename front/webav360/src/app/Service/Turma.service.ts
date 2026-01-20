@@ -22,4 +22,9 @@ export class TurmaService {
   public getTurmasAluno(id: number): Observable<Turma[]> {
     return this.http.get<Turma[]>(`${baseURL}Turma/GetTurmaAlunos/${id}`);
   }
+
+  public putTurma (turma: Turma): Observable<Turma>{
+    return this.http.put<Turma>(`${baseURL}Turma/Put/${turma.id}`, turma);
+  }
+
 }

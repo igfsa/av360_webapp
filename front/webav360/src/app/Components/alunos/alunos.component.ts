@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -43,7 +43,10 @@ export class AlunosComponent implements OnInit {
   Id: string = '';
   Nome: string = '';
 
-  constructor(private alunoService: AlunoService){}
+  constructor(
+    private alunoService: AlunoService,
+    private cdr: ChangeDetectorRef
+  ){}
 
   ngOnInit() {
     void this.getAlunos();
@@ -56,6 +59,8 @@ export class AlunosComponent implements OnInit {
       {
         this.alunos = a;
         this.alunosFiltrados = this.alunos;
+
+        this.cdr.detectChanges();
       },
       error: (e) => console.log(e)
     })

@@ -36,6 +36,7 @@
     "@fortawesome/fontawesome-svg-core": "^7.1.0",
     "@fortawesome/free-brands-svg-icons": "^7.1.0",
     "@fortawesome/free-solid-svg-icons": "^7.1.0",
+    "@microsoft/signalr": "^10.0.0",
     "@ng-bootstrap/ng-bootstrap": "^20.0.0",
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.3.8",
@@ -44,7 +45,7 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular/build": "^21.0.5",
+    "@angular/build": "^20.3.14",
     "@angular/cli": "^21.0.5",
     "@angular/compiler-cli": "^21.0.8",
     "@angular/localize": "^21.0.8",

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CriterioService } from '../../Service/Criterio.service';
@@ -41,7 +41,10 @@ export class CriteriosComponent implements OnInit {
   Id: string = '';
   Nome: string = '';
 
-  constructor(private criterioService: CriterioService){}
+  constructor(
+    private criterioService: CriterioService,
+    private cdr: ChangeDetectorRef
+  ){}
 
   ngOnInit() {
     void this.getCriterios();
@@ -53,6 +56,8 @@ export class CriteriosComponent implements OnInit {
       {
         this.criterios = a;
         this.criteriosFiltrados = this.criterios;
+
+        this.cdr.detectChanges();
       },
       error: (e) => console.log(e)
     })

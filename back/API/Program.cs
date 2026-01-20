@@ -10,6 +10,8 @@ using Persistence.Context;
 using Persistence.Contracts;
 using Domain.Entities;
 using Application.DTOs;
+using API.Hubs;
+using API.Notifier;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +27,6 @@ builder.Services.AddCors(options =>
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 builder.Services.AddControllers()
@@ -47,6 +48,8 @@ builder.Services.AddControllers()
 // });
 
 // Configurando string de conexão. Usadas variáveis de ambiente locais.
+
+builder.Services.AddSignalR();
 
 string mySqlConnection = (
     "Server=" + Environment.GetEnvironmentVariable("DB_AV360_SERVER") +
@@ -75,6 +78,7 @@ builder.Services.AddScoped<IAlunoPersist, AlunoPersist>();
 
 builder.Services.AddScoped<ITurmaService, TurmaService>();
 builder.Services.AddScoped<ITurmaPersist, TurmaPersist>();
+builder.Services.AddScoped<ITurmaNotifier, TurmaNotifier>();
 
 builder.Services.AddScoped<IAlunoTurmaPersist, AlunoTurmaPersist>();
 
@@ -95,6 +99,8 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/openapi/v1.json", "v1");
     });
 }
+
+app.MapHub<TurmaHub>("/hubs/turma");
 
 app.UseHttpsRedirection();
 
