@@ -11,6 +11,7 @@ public class CriterioService : ICriterioService
 {
     private readonly IGeralPersist _geralPersist;
     private ICriterioPersist _criterioPersist;
+    private ICriterioTurmaPersist _criterioTurmaPersist;
     private readonly ITurmaService _turmaService;
 
     private readonly IMapper _mapper;
@@ -18,12 +19,15 @@ public class CriterioService : ICriterioService
     public CriterioService(IGeralPersist geralPersist,
                         ICriterioPersist criterioPersist, 
                         ITurmaService turmaService,
-                        IMapper mapper)
+                        IMapper mapper,
+                        ICriterioTurmaPersist criterioTurmaPersist)
     {
         _geralPersist = geralPersist;
         _criterioPersist = criterioPersist;
         _turmaService = turmaService;
         _mapper = mapper;
+        _criterioTurmaPersist = criterioTurmaPersist;
+        
     }
 
     #region get
@@ -64,7 +68,7 @@ public class CriterioService : ICriterioService
     {
         try
         {
-            var criterios = await _criterioPersist.GetCriteriosTurmaAsync(turmaId);
+            var criterios = await _criterioTurmaPersist.GetCriteriosTurmaIdAsync(turmaId);
             if (criterios == null) return null;
 
             var resultado = _mapper.Map<IEnumerable<CriterioDTO>>(criterios);

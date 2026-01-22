@@ -32,14 +32,4 @@ public class CriterioPersist : ICriterioPersist
 
         return await query.FirstOrDefaultAsync();
     }
-    public async Task<Criterio[]> GetCriteriosTurmaAsync(int turmaId)
-    {
-        IQueryable<Criterio> query = _context.Criterios;
-
-        query = query.AsNoTracking()
-                        .Where(c => c.TurmaId == turmaId)
-                        .OrderBy(a => a.Nome);
-
-        return await query.ToArrayAsync();
-    }
 }

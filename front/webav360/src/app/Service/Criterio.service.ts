@@ -12,15 +12,15 @@ export class CriterioService {
   constructor(private http :HttpClient) { }
 
   public getCriterios(): Observable<Criterio[]> {
-    return this.http.get<Criterio[]>(`${baseURL}Criterio/GetAllCriterios`);
+    return this.http.get<Criterio[]>(`${baseURL}api/Criterio/GetAllCriterios`);
   }
 
   public getCriterioId(id: number): Observable<Criterio[]> {
-    return this.http.get<Criterio[]>(`${baseURL}Criterio/GetId/${id}`);
+    return this.http.get<Criterio[]>(`${baseURL}api/Criterio/GetId/${id}`);
   }
 
   public getCriteriosTurma(id: number): Observable<Criterio[]> {
-    return this.http.get<Criterio[]>(`${baseURL}Criterio/GetCriteriosTurma/${id}`);
+    return this.http.get<Criterio[]>(`${baseURL}api/Criterio/GetCriteriosTurma/${id}`);
   }
 
 }

@@ -21,7 +21,8 @@ builder.Services.AddCors(options =>
         policy => policy
             .WithOrigins("http://localhost:4200") // seu front-end
             .AllowAnyHeader()
-            .AllowAnyMethod());
+            .AllowAnyMethod()
+            .AllowCredentials());
 });
 
 // Add services to the container.
@@ -80,10 +81,12 @@ builder.Services.AddScoped<ITurmaService, TurmaService>();
 builder.Services.AddScoped<ITurmaPersist, TurmaPersist>();
 builder.Services.AddScoped<ITurmaNotifier, TurmaNotifier>();
 
-builder.Services.AddScoped<IAlunoTurmaPersist, AlunoTurmaPersist>();
-
 builder.Services.AddScoped<ICriterioService, CriterioService>();
 builder.Services.AddScoped<ICriterioPersist, CriterioPersist>();
+builder.Services.AddScoped<ICriterioNotifier, CriterioNotifier>();
+
+builder.Services.AddScoped<IAlunoTurmaPersist, AlunoTurmaPersist>();
+builder.Services.AddScoped<ICriterioTurmaPersist, CriterioTurmaPersist>();
 
 var app = builder.Build();
 
@@ -100,8 +103,6 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.MapHub<TurmaHub>("/hubs/turma");
-
 app.UseHttpsRedirection();
 
 app.UseRouting();
@@ -109,6 +110,8 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<TurmaHub>("/hubs/turma");
 
 app.UseEndpoints(endpoints =>
 {

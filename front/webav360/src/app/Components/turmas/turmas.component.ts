@@ -1,11 +1,13 @@
-import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { Turma } from '../../Models/Turma';
 import { TurmaService } from '../../Service/Turma.service';
+import { TurmaCriarModalComponent } from './modals/turma_criar.component';
+import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
 
 @Component({
   selector: 'app-turmas',
@@ -19,6 +21,8 @@ import { TurmaService } from '../../Service/Turma.service';
   styleUrls: ['./turmas.component.scss', '../../app.scss'],
 })
 export class TurmasComponent implements OnInit {
+
+	private modalService = inject(NgbModal);
 
   public turmas: Turma[] = [];
   public turmasFiltradas : Turma[] = [];
@@ -46,23 +50,49 @@ export class TurmasComponent implements OnInit {
 
   constructor(
     private turmaService: TurmaService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private turmaRealTime: TurmaRealTime,
   ) { }
 
   ngOnInit() {
-    void this.getTurmas();
+    this.getTurmas();
+    this.turmaRealTime.connect();
+
+    this.turmaRealTime.turmaAtualizada$
+      .subscribe(id => {
+        if (id) {
+          this.getTurmas();
+        }
+      });
   }
 
   public getTurmas (): void{
-    this.turmaService.getTurmas().subscribe({
-      next: (t: Turma[]) =>
-      {
-        this.turmas = t;
+    this.turmaService.getTurmas().subscribe((turmas) => {
+        this.turmas = turmas;
         this.turmasFiltradas = this.turmas;
 
         this.cdr.detectChanges();
-      },
-      error: (e) => console.log(e)
-    })
+      })
+  }
+
+  public adicionarTurma (): void{
+    const ref = this.modalService.open(TurmaCriarModalComponent, {
+      size: 'lg',
+      backdrop: 'static'
+    });
+
+    ref.result.then((turmaEditada: Turma) => {
+      if (!turmaEditada) return;
+
+    this.turmaService.postTurma(turmaEditada)
+      .subscribe({
+        next: turma => {
+          console.log('Turma criada:', turma);
+        },
+        error: err => {
+          console.error('Erro ao criar turma', err);
+        }
+      });
+    }).catch(() => {});
   }
 }

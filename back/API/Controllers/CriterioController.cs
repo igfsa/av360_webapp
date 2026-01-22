@@ -12,10 +12,14 @@ namespace API.Controllers
     public class CriterioController : ControllerBase
     {
         private readonly ICriterioService _criterioService;
+        private readonly ICriterioNotifier _criterioNotifier;
 
-        public CriterioController(ICriterioService criterioService)
+        public CriterioController(
+                            ICriterioService criterioService,
+                            ICriterioNotifier criterioNotifier)
         {
             _criterioService = criterioService;
+            _criterioNotifier = criterioNotifier;
         }
 
         [HttpGet]
@@ -93,6 +97,7 @@ namespace API.Controllers
                 {
                    return NoContent(); 
                 }
+                await _criterioNotifier.CriterioAtualizadoAsync(model.Id);
                 return Ok(criterio);
             }
             catch (Exception ex)
@@ -113,6 +118,7 @@ namespace API.Controllers
                 {
                    return NoContent(); 
                 }
+                await _criterioNotifier.CriterioAtualizadoAsync(model.Id);
                 return Ok(criterio);
             }
             catch (Exception ex)

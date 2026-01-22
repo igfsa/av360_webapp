@@ -1,10 +1,10 @@
-import { ChangeDetectorRef, Component, inject, Input, OnInit, TemplateRef } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute } from '@angular/router';
-import { forkJoin, switchMap } from 'rxjs';
-import { Router } from 'express';
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
+import { forkJoin  } from 'rxjs';
+
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
 
 import { AlunoService } from '../../Service/Aluno.service';
 import { Aluno } from '../../Models/Aluno';
@@ -84,76 +84,38 @@ export class AlunoTurmaComponent implements OnInit {
   ){}
 
   ngOnInit(): void {
-    this.turmaRealTime.connect()
+    const turmaId = Number(this.route.snapshot.paramMap.get('id'));
 
-    this.route.paramMap
-      .pipe(
-        switchMap(params => {
-          const turmaId = Number(params.get('id'));
+    this.loadData(turmaId);
 
-          return forkJoin({
-            alunos: this.alunoService.getAlunosTurma(turmaId),
-            turma: this.turmaService.getTurmaId(turmaId),
-            criterios: this.criterioService.getCriteriosTurma(turmaId)
-          });
-        })
-      )
-      .subscribe(({ alunos, turma, criterios }) => {
-        this.alunos = alunos;
-        this.alunosFiltrados = alunos;
+    this.turmaRealTime.connect()?.then(() => {
+      this.turmaRealTime.acessarTurma(turmaId);
+    });
 
-        this.turma = turma;
-
-        this.criterios = criterios;
-        this.criteriosFiltrados = criterios;
-
-        this.cdr.detectChanges();
-      });
-
-      this.turmaRealTime.onTurmaAtualizada((turmaId) => {
-        if (this.turma?.id === turmaId) {
-          this.reloadTurma();
+    this.turmaRealTime.turmaAtualizada$
+      .subscribe(id => {
+        if (id === turmaId) {
+          this.loadData(turmaId);
         }
       });
   }
 
-  reloadTurma() {
-  this.turmaService.getTurmaId(this.turma.id)
-    .subscribe(t => {
-      this.turma = t;
+  public loadData(turmaId: number) {
+    forkJoin({
+      alunos: this.alunoService.getAlunosTurma(turmaId),
+      criterios: this.criterioService.getCriteriosTurma(turmaId),
+      turma: this.turmaService.getTurmaId(turmaId)
+    }).subscribe(({ alunos, criterios, turma }) => {
+      this.turma = turma;
+
+      this.alunos = alunos;
+      this.alunosFiltrados = alunos
+
+      this.criterios = criterios;
+      this.criteriosFiltrados = criterios;
+
+      this.cdr.detectChanges();
     });
-  }
-
-  public getAlunosTurma (id: number): void{
-    this.alunoService.getAlunosTurma(id).subscribe({
-      next: (a: Aluno[]) =>
-      {
-        this.alunos = a;
-        this.alunosFiltrados = this.alunos;
-      },
-      error: (e) => console.log(e)
-    })
-  }
-
-  public getTurma (id: number): void{
-    this.turmaService.getTurmaId(id).subscribe({
-      next: (t: Turma) =>
-      {
-        this.turma = t;
-      },
-      error: (e) => console.log(e)
-    })
-  }
-
-  public getCriteriosTurma (id: number): void{
-    this.criterioService.getCriteriosTurma(id).subscribe({
-      next: (c: Criterio[]) =>
-      {
-        this.criterios = c;
-        this.criteriosFiltrados = this.criterios;
-      },
-      error: (e) => console.log(e)
-    })
   }
 
   public editarTurma (): void{
@@ -167,10 +129,11 @@ export class AlunoTurmaComponent implements OnInit {
     ref.result.then((turmaEditada: Turma) => {
       if (!turmaEditada) return;
 
+      console.log(turmaEditada)
+
       this.turmaService.putTurma(turmaEditada).subscribe({
         next: (t) => {
           this.turma = t;
-      console.log('Retorno da API:', t);
         }
       });
     }).catch(() => {});

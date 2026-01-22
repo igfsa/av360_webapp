@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Application.Contracts;
-public interface ITurmaNotifier
+public interface ICriterioNotifier
 {
-    Task TurmaAtualizadaAsync(int turmaId);    
+    Task CriterioAtualizadoAsync(int CriterioId);
 }

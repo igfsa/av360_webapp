@@ -1,24 +1,18 @@
 <div class="container">
-  <div>
-    <h1 class = "col-10">Turmas</h1>
-  </div>
-  <div class="row p-1 w-100">
+  <div class="row m-2">
     <div class="col-8">
-      <input type="text" class="form-control w-100 h-100" style = "font-size: 1.6rem;" placeholder="Buscar" [(ngModel)]="filtroLista">
+      <h1>Turmas</h1>
     </div>
-      <button id="btn-buscar" type="button" class="btn btn-light col-2" >
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-          <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-        </svg>
-        Buscar
-      </button>
-      <button type="button" class="btn-editar btn btn-success btn-sm mr-2 col-2" >
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
-        </svg>
-      Adicionar Turma
+    <button id="btn-buscar" class="btn btn-success col-4" (click)="adicionarTurma();">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+      </svg>
+      Adicionar
     </button>
   </div>
+
+  <input type="text" class="form-control w-100 h-100 m-2" style = "font-size: 1.6rem;" placeholder="Filtrar" [(ngModel)]="filtroLista">
+
   <table id="main-table" class="table table-striped text-center table-hover">
     <thead class="table-dark">
       <tr>

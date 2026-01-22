@@ -13,15 +13,15 @@ export class AlunoService {
   constructor(private http :HttpClient) { }
 
   public getAlunos(): Observable<Aluno[]> {
-    return this.http.get<Aluno[]>(`${baseURL}Aluno/GetAllAlunos`);
+    return this.http.get<Aluno[]>(`${baseURL}api/Aluno/GetAllAlunos`);
   }
 
   public getAlunoId(id: number): Observable<Aluno[]> {
-    return this.http.get<Aluno[]>(`${baseURL}Aluno/GetId/${id}`);
+    return this.http.get<Aluno[]>(`${baseURL}api/Aluno/GetId/${id}`);
   }
 
   public getAlunosTurma(id: number): Observable<Aluno[]> {
-    return this.http.get<Aluno[]>(`${baseURL}Aluno/GetAlunosTurma/${id}`);
+    return this.http.get<Aluno[]>(`${baseURL}api/Aluno/GetAlunosTurma/${id}`);
   }
 }
 

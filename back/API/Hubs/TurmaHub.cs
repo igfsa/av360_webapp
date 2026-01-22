@@ -12,4 +12,10 @@ public class TurmaHub : Hub
     {
         await Clients.All.SendAsync("TurmaAtualizada", turmaId);
     }
+
+    [HubMethodName("AcessarTurma")]
+    public async Task AcessarTurma(int turmaId)
+    {
+        await Groups.AddToGroupAsync(Context.ConnectionId, $"Turma-{turmaId}");
+    }
 }

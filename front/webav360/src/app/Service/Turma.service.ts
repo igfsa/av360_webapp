@@ -12,19 +12,23 @@ export class TurmaService {
   constructor(private http :HttpClient) { }
 
   public getTurmas (): Observable<Turma[]>{
-    return this.http.get<Turma[]>(`${baseURL}Turma/GetAllTurmas`);
+    return this.http.get<Turma[]>(`${baseURL}api/Turma/GetAllTurmas`);
   }
 
   public getTurmaId(id: number): Observable<Turma> {
-    return this.http.get<Turma>(`${baseURL}Turma/GetId/${id}`);
+    return this.http.get<Turma>(`${baseURL}api/Turma/GetId/${id}`);
   }
 
   public getTurmasAluno(id: number): Observable<Turma[]> {
-    return this.http.get<Turma[]>(`${baseURL}Turma/GetTurmaAlunos/${id}`);
+    return this.http.get<Turma[]>(`${baseURL}api/Turma/GetTurmaAlunos/${id}`);
   }
 
   public putTurma (turma: Turma): Observable<Turma>{
-    return this.http.put<Turma>(`${baseURL}Turma/Put/${turma.id}`, turma);
+    return this.http.put<Turma>(`${baseURL}api/Turma/Put/${turma.id}`, turma);
+  }
+
+  public postTurma (turma: Turma): Observable<Turma>{
+    return this.http.post<Turma>(`${baseURL}api/Turma/Post`, turma);
   }
 
 }
