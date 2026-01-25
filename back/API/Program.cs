@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Application.Contracts;
 using Application.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using AutoMapper;
 
@@ -87,6 +88,8 @@ builder.Services.AddScoped<ICriterioNotifier, CriterioNotifier>();
 
 builder.Services.AddScoped<IAlunoTurmaPersist, AlunoTurmaPersist>();
 builder.Services.AddScoped<ICriterioTurmaPersist, CriterioTurmaPersist>();
+
+Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 var app = builder.Build();
 

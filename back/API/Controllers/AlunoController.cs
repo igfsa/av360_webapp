@@ -33,7 +33,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError,
+                return StatusCode(StatusCodes.Status500InternalServerError,
                 $"Erro ao tentar buscar aluno. Erro: {ex.Message}");
             }
         }
@@ -54,7 +54,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError,
+                return StatusCode(StatusCodes.Status500InternalServerError,
                 $"Erro ao tentar buscar aluno. Erro: {ex.Message}");
             }
 
@@ -76,7 +76,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError,
+                return StatusCode(StatusCodes.Status500InternalServerError,
                 $"Erro ao tentar buscar aluno. Erro: {ex.Message}");
             }
 
@@ -97,7 +97,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError,
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     $"Erro ao tentar adicionar aluno. Erro: {ex.Message}");
             }
         }

@@ -12,5 +12,6 @@ public interface ITurmaService
     Task<TurmaDTO> Add(TurmaDTO turma);
     Task<AlunoDTO> AddTurmaAluno(int alunoId, int turmaId);
     Task<TurmaDTO> AddTurmaCriterio(TurmaCriterioDTO model);
+    Task<CsvImportResultDTO> ImportarAlunosAsync( int turmaId, CsvImportRequestDTO dto);
     Task<TurmaDTO> Update(int turmaId, TurmaDTO turma);
 }

@@ -38,7 +38,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError,
+                return StatusCode(StatusCodes.Status500InternalServerError,
                 $"Erro ao tentar buscar critérios. Erro: {ex.Message}");
             }
         }
@@ -59,7 +59,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError,
+                return StatusCode(StatusCodes.Status500InternalServerError,
                 $"Erro ao tentar buscar critério. Erro: {ex.Message}");
             }
 
@@ -78,7 +78,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError,
+                return StatusCode(StatusCodes.Status500InternalServerError,
                 $"Erro ao tentar buscar critério. Erro: {ex.Message}");
             }
 

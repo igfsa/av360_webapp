@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore;
 
 using Application.Contracts;
 using Application.DTOs;
-using Persistence.Context;
-using Domain.Entities;
 
 namespace API.Controllers
 {
@@ -14,17 +12,14 @@ namespace API.Controllers
     {
         private readonly ITurmaService _turmaService;
         private readonly IAlunoService _alunoService;
-        private readonly ICriterioService _criterioService;
         private ITurmaNotifier _turmaNotifier;
         public TurmaController(ITurmaService turmaService,
                             IAlunoService alunoService,
-                            ICriterioService criterioService,
                             ITurmaNotifier turmaNotifier)
         {
             _turmaService = turmaService;
             _alunoService = alunoService;
             _turmaNotifier = turmaNotifier;
-            _criterioService = criterioService;
         }
 
         [HttpGet]
@@ -42,7 +37,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError,
+                return StatusCode(StatusCodes.Status500InternalServerError,
                 $"Erro ao tentar buscar Turma. Erro: {ex.Message}");
             }
         }
@@ -63,7 +58,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError,
+                return StatusCode(StatusCodes.Status500InternalServerError,
                 $"Erro ao tentar buscar Turma. Erro: {ex.Message}");
             }
 
@@ -85,7 +80,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError,
+                return StatusCode(StatusCodes.Status500InternalServerError,
                 $"Erro ao tentar buscar aluno. Erro: {ex.Message}");
             }
 
@@ -129,7 +124,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError,
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     $"Erro ao tentar adicionar Turma. Erro: {ex.Message}");
             }
         }
@@ -153,7 +148,25 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError,
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    $"Erro ao tentar adicionar Turma. Erro: {ex.Message}");
+            }
+        }
+        [HttpPost("{turmaId:int}", Name = "ImportAlunosTurma")]
+        [ActionName("ImportAlunosTurma")]
+        public async Task<ActionResult<CsvImportResultDTO>> ImportAlunosTurma(int turmaId, string colunaNome, IFormFile file)
+        {
+            var dto = new CsvImportRequestDTO();
+            dto.Arquivo = file;
+            dto.ColunaNome = colunaNome;
+            try
+            { 
+                var result = await _turmaService.ImportarAlunosAsync(turmaId, dto);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     $"Erro ao tentar adicionar Turma. Erro: {ex.Message}");
             }
         }
