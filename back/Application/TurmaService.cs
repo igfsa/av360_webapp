@@ -4,6 +4,9 @@ using Application.Contracts;
 using Application.DTOs;
 using Domain.Entities;
 using Persistence.Contracts;
+using System.Net.Sockets;
+using Persistence;
+using Mysqlx;
 
 namespace Application.Services;
 
@@ -150,32 +153,34 @@ public class TurmaService : ITurmaService
             throw new Exception(ex.Message);
         }
     }    
-    public async Task<CriterioDTO> AddTurmaCriterio(int criterioId, int turmaId)
+    public async Task<TurmaDTO> AddTurmaCriterio(TurmaCriterioDTO model)
     {
         try
         {
-            Criterio criterio = await _criterioTurmaPersist.GetValidaCriterioTurma(turmaId, criterioId);
-            Turma turma = await _turmaPersist.GetTurmaIdAsync(turmaId);
-            if( criterio != null && turma != null)
-            {
-                CriterioTurma ct = new()
-                {
-                    TurmaId = turmaId,
-                    CriterioId = criterioId,
-                };
+            var criteriosAtuais = await _criterioTurmaPersist.
+                GetCriteriosByIdTurmaIdAsync(model.turmaId);
 
-                _geralPersist.Add(ct);
-                                
-                if (await _geralPersist.SaveChangesAsync())
+            // Remover os que não estão mais selecionados
+            var paraRemover = criteriosAtuais
+                .Where(tc => !model.criterioIds.Contains(tc.CriterioId));
+
+            _geralPersist.DeleteRange(paraRemover);
+
+            var idsAtuais = criteriosAtuais.Select(tc => tc.CriterioId).ToHashSet();
+
+            var paraAdicionar = model.criterioIds
+                .Where(id => !idsAtuais.Contains(id))
+                .Select(id => new CriterioTurma
                 {
-                    return _mapper.Map<CriterioDTO>(criterio);
-                }
-                throw new Exception("Erro");
-            }
-            else
-            {
-                return null;
-            }
+                    TurmaId = model.turmaId,
+                    CriterioId = id
+                });
+
+            _geralPersist.AddRangeAsync(paraAdicionar);
+            await _geralPersist.SaveChangesAsync();
+
+            return await GetTurmaById(model.turmaId);
+
         }
         catch (Exception ex)
         {

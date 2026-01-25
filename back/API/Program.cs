@@ -112,6 +112,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapHub<TurmaHub>("/hubs/turma");
+app.MapHub<CriterioHub>("/hubs/criterio");
 
 app.UseEndpoints(endpoints =>
 {

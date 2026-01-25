@@ -1,9 +1,14 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CriterioService } from '../../Service/Criterio.service';
 import { Criterio } from '../../Models/Criterio';
 import { RouterLink } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { CriterioCriarModalComponent } from './Modals/criterio_criar.component';
+import { CriterioRealTime } from '../../Service/CriterioRealTime.service';
+import { CriterioEditarModalComponent } from './Modals/criterio_editar.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-criterios',
@@ -17,6 +22,8 @@ import { RouterLink } from '@angular/router';
   styleUrls: ['./criterios.component.scss', '../../app.scss'],
 })
 export class CriteriosComponent implements OnInit {
+
+	private modalService = inject(NgbModal);
 
   public criterios: Criterio[]  = [];
   public criteriosFiltrados : Criterio[] = [];
@@ -43,24 +50,90 @@ export class CriteriosComponent implements OnInit {
 
   constructor(
     private criterioService: CriterioService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private criterioRealTime: CriterioRealTime,
   ){}
 
   ngOnInit() {
-    void this.getCriterios();
+    this.getCriterios();
+    this.criterioRealTime.connect();
+
+    this.criterioRealTime.criterioAtualizado$
+      .subscribe(id => {
+        if (id) {
+          this.getCriterios();
+        }
+      });
   }
 
   public getCriterios (): void{
-    this.criterioService.getCriterios().subscribe({
-      next: (a: Criterio[]) =>
-      {
-        this.criterios = a;
+    this.criterioService.getCriterios().subscribe((criterios) => {
+        this.criterios = criterios;
         this.criteriosFiltrados = this.criterios;
 
         this.cdr.detectChanges();
-      },
-      error: (e) => console.log(e)
-    })
+      })
   }
 
+  public adicionarCriterio (): void{
+    const ref = this.modalService.open(CriterioCriarModalComponent, {
+      size: 'lg',
+      backdrop: 'static'
+    });
+
+    ref.result.then((criterioEditado: Criterio) => {
+      if (!criterioEditado) return;
+
+    this.criterioService.postCriterio(criterioEditado)
+      .subscribe({
+        next: criterio => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Sucesso',
+            text: `Critério ${criterio.nome} criado com sucesso!`
+          });
+        },
+        error: (err) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: err.error?.message ?? `Erro ao criar critério ${criterioEditado.nome}`
+          });
+        }
+      });
+    }).catch(() => {});
+  }
+
+    public editarCriterio (criterio: Criterio): void{
+      const ref = this.modalService.open(CriterioEditarModalComponent, {
+        size: 'lg',
+        backdrop: 'static'
+      });
+
+      ref.componentInstance.criterio = criterio;
+
+      ref.result.then((criterioEditado: Criterio) => {
+        if (!criterioEditado) return;
+
+        console.log(criterioEditado)
+
+        this.criterioService.putCriterio(criterioEditado).subscribe({
+          next: (c) => {
+            criterio = c;
+            Swal.fire({
+              icon: 'success',
+              title: 'Sucesso',
+              text: `Critério ${c.nome} editado com sucesso!`
+            });
+          },
+          error: (err) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Erro',
+              text: err.error?.message ?? `Erro ao editar critério ${criterioEditado.nome}`
+            });
+          }
+        });
+      }).catch(() => {});
+    }
 }

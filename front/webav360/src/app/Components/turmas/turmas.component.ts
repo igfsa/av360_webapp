@@ -6,8 +6,9 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { Turma } from '../../Models/Turma';
 import { TurmaService } from '../../Service/Turma.service';
-import { TurmaCriarModalComponent } from './modals/turma_criar.component';
+import { TurmaCriarModalComponent } from './Modals/turma_criar.component';
 import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-turmas',
@@ -87,10 +88,18 @@ export class TurmasComponent implements OnInit {
     this.turmaService.postTurma(turmaEditada)
       .subscribe({
         next: turma => {
-          console.log('Turma criada:', turma);
+          Swal.fire({
+            icon: 'success',
+            title: 'Sucesso',
+            text: `Turma ${turma.cod} criada com sucesso!`
+          });
         },
-        error: err => {
-          console.error('Erro ao criar turma', err);
+        error: (err) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: err.error?.message ?? `Erro ao criar turma ${turmaEditada.cod}`
+          });
         }
       });
     }).catch(() => {});

@@ -11,6 +11,6 @@ public interface ITurmaService
     Task<IEnumerable<TurmaDTO>> GetTurmasCriterio(int criterioId);
     Task<TurmaDTO> Add(TurmaDTO turma);
     Task<AlunoDTO> AddTurmaAluno(int alunoId, int turmaId);
-    Task<CriterioDTO> AddTurmaCriterio(int criterioId, int turmaId);
+    Task<TurmaDTO> AddTurmaCriterio(TurmaCriterioDTO model);
     Task<TurmaDTO> Update(int turmaId, TurmaDTO turma);
 }

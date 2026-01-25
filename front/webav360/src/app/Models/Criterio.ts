@@ -5,3 +5,9 @@ export interface Criterio {
   nome: string;
   // turmas: Turma[];
 }
+
+export function createEmptyCriterio(): Criterio {
+  return {
+    id: 0,
+    nome: ``
+  }}

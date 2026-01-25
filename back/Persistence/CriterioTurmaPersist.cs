@@ -24,6 +24,14 @@ public class CriterioTurmaPersist : ICriterioTurmaPersist
             .OrderBy(c => c.Nome)
             .ToArrayAsync();
     }
+    public async Task<CriterioTurma[]> GetCriteriosByIdTurmaIdAsync(int turmaId)
+    {
+        return await _context.CriterioTurma
+            .AsNoTracking()
+            .Where(ct => _context.Criterios
+                .Any(c => ct.TurmaId == turmaId && ct.CriterioId == c.Id))
+            .ToArrayAsync();
+    }
     public async Task<Turma[]> GetTurmasCriterioIdAsync(int criterioId)
     {
         return await _context.Turmas

@@ -23,4 +23,12 @@ export class CriterioService {
     return this.http.get<Criterio[]>(`${baseURL}api/Criterio/GetCriteriosTurma/${id}`);
   }
 
+  public putCriterio (criterio: Criterio): Observable<Criterio>{
+    return this.http.put<Criterio>(`${baseURL}api/Criterio/Put/${criterio.id}`, criterio);
+  }
+
+  public postCriterio (criterio: Criterio): Observable<Criterio>{
+    return this.http.post<Criterio>(`${baseURL}api/Criterio/Post`, criterio);
+  }
+
 }

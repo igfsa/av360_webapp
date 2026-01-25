@@ -2,26 +2,23 @@ import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { Turma } from '../../../Models/Turma';
+import { Criterio } from '../../../Models/Criterio';
 
 
 @Component({
-  selector: 'app-turma-editar-modal',
+  selector: 'app-criterio-editar-modal',
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
     <div class="modal-header">
-      <h4 class="modal-title" style = "font-size: 2.4rem;">Turma {{ turma.cod }}</h4>
+      <h4 class="modal-title" style = "font-size: 2.4rem;">Critério </h4>
+      <span> {{ criterio.nome }}</span>
     </div>
 
     <div class="modal-body">
       <div class="input-group mb-3 row">
         <span class="input-group-text col-2" id="basic-addon1" style = "font-size: 1.6rem;">Código: </span>
-        <input type="text" class="form-control" [(ngModel)]="turmaEdit.cod" aria-label="Cod" aria-describedby="basic-addon1" style = "font-size: 1.6rem;">
-      </div>
-      <div class="input-group mb-3 row" >
-        <span class="input-group-text col-2" id="basic-addon1" style = "font-size: 1.6rem;">Nota Máxima: </span>
-        <input type="decimal" class="form-control" [(ngModel)]="turmaEdit.notaMax" aria-label="Cod" aria-describedby="basic-addon1" style = "font-size: 1.6rem;">
+        <input type="text" class="form-control" [(ngModel)]="criterioEdit.nome" aria-label="Nome" aria-describedby="basic-addon1" style = "font-size: 1.6rem;">
       </div>
     </div>
 
@@ -31,19 +28,19 @@ import { Turma } from '../../../Models/Turma';
     </div>
   `
 })
-export class TurmaEditarModalComponent implements OnInit {
+export class CriterioEditarModalComponent implements OnInit {
 
-  @Input() turma!: Turma;
+  @Input() criterio!: Criterio;
 
-  turmaEdit!: Turma;
+  criterioEdit!: Criterio;
 
   constructor(public modal: NgbActiveModal) {}
 
   ngOnInit(): void {
-    this.turmaEdit = { ...this.turma };
+    this.criterioEdit = { ...this.criterio };
   }
 
   salvar(): void {
-    this.modal.close(this.turmaEdit);
+    this.modal.close(this.criterioEdit);
   }
 }

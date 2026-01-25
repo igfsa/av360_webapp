@@ -11,7 +11,7 @@ import { createEmptyTurma, Turma } from '../../../Models/Turma';
   imports: [CommonModule, FormsModule],
   template: `
   <div class="modal-header">
-    <h4 class="modal-title" style = "font-size: 2.4rem;">Turma {{ novaTurma.cod }}</h4>
+    <h4 class="modal-title" style = "font-size: 2.4rem;">Nova Turma</h4>
   </div>
 
   <div class="modal-body">

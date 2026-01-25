@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Application.Contracts;
 using Application.DTOs;
 using Persistence.Context;
+using Domain.Entities;
 
 namespace API.Controllers
 {
@@ -72,10 +73,7 @@ namespace API.Controllers
             try
             {
                 var criterios = await _criterioService.GetCriteriosTurma(turmaId);
-                if (criterios is null)
-                {
-                    return NotFound();
-                }
+
                 return Ok(criterios);
             }
             catch (Exception ex)
@@ -97,12 +95,12 @@ namespace API.Controllers
                 {
                    return NoContent(); 
                 }
-                await _criterioNotifier.CriterioAtualizadoAsync(model.Id);
+                await _criterioNotifier.CriterioAtualizadoAsync(criterio.Id);
                 return Ok(criterio);
             }
             catch (Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError,
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     $"Erro ao tentar adicionar critério. Erro: {ex.Message}");
             }
         }

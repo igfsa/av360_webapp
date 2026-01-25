@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Application.Contracts;
 using Application.DTOs;
 using Persistence.Context;
+using Domain.Entities;
 
 namespace API.Controllers
 {
@@ -106,7 +107,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError,
+                return StatusCode(StatusCodes.Status500InternalServerError,
                 $"Erro ao tentar buscar criterio. Erro: {ex.Message}");
             }
 
@@ -148,7 +149,7 @@ namespace API.Controllers
                     return BadRequest($"Aluno {aluno.Nome} já existe na turma {turma.Cod}.");
                 }
                 await _turmaNotifier.TurmaAtualizadaAsync(turmaId);
-                return Ok($"Aluno {aluno.Nome} adicionado na turma {turma.Cod}.");
+                return Ok(turma);
             }
             catch (Exception ex)
             {
@@ -157,22 +158,15 @@ namespace API.Controllers
             }
         }
 
-        [HttpPost("{criterioId:int}", Name = "AddCriterioTurma")]
-        [ActionName("PostCriterioTurma")]
-        public async Task<ActionResult<CriterioDTO>> PostCriterioTurma(int criterioId, int turmaId)
+        [HttpPut("", Name = "PutCriterioTurma")]
+        [ActionName("PutCriterioTurma")]
+        public async Task<ActionResult<TurmaDTO>> PutCriterioTurma(TurmaCriterioDTO model)
         {
             try
             {
-                var criterio = await _criterioService.GetCriterioById(criterioId);
-                var turma = await _turmaService.GetTurmaById(turmaId);
-                var addTurma = await _turmaService.AddTurmaCriterio(criterioId, turmaId);
-                
-                if (addTurma == null) 
-                {
-                    return BadRequest($"Criterio {criterio.Nome} já existe na turma {turma.Cod}.");
-                }
-                await _turmaNotifier.TurmaAtualizadaAsync(turmaId);
-                return Ok($"Criterio {criterio.Nome} adicionado na turma {turma.Cod}.");
+                var turma = await _turmaService.AddTurmaCriterio(model);
+                await _turmaNotifier.TurmaAtualizadaAsync(model.turmaId);
+                return Ok(turma);
             }
             catch (Exception ex)
             {

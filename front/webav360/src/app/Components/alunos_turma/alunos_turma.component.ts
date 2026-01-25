@@ -1,10 +1,10 @@
 import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { forkJoin  } from 'rxjs';
-
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
+import Swal from 'sweetalert2';
 
 import { AlunoService } from '../../Service/Aluno.service';
 import { Aluno } from '../../Models/Aluno';
@@ -13,6 +13,7 @@ import { Turma } from '../../Models/Turma';
 import { CriterioService } from '../../Service/Criterio.service';
 import { Criterio } from '../../Models/Criterio';
 import { TurmaEditarModalComponent } from './Modals/turma_editar.component';
+import { TurmaCriterioModalComponent } from './Modals/turma_criterio_add.component';
 import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
 
 @Component({
@@ -21,7 +22,6 @@ import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
   imports: [
     CommonModule,
     FormsModule,
-    RouterLink
    ],
   templateUrl: './alunos_turma.component.html',
   styleUrls: ['./alunos_turma.component.scss', '../../app.scss'],
@@ -34,10 +34,12 @@ export class AlunoTurmaComponent implements OnInit {
   public alunos: Aluno[]  = [];
   public alunosFiltrados : Aluno[] = [];
   public criterios: Criterio[]  = [];
+  public criteriosGlobais: Criterio[]  = [];
   public criteriosFiltrados : Criterio[] = [];
   private _filtroAlunos: string = '';
   private _filtroCriterios: string = '';
   public turma!: Turma;
+  public criterioIds: number[] = [];
 
   public get filtroAlunos() {
     return this._filtroAlunos
@@ -104,15 +106,18 @@ export class AlunoTurmaComponent implements OnInit {
     forkJoin({
       alunos: this.alunoService.getAlunosTurma(turmaId),
       criterios: this.criterioService.getCriteriosTurma(turmaId),
-      turma: this.turmaService.getTurmaId(turmaId)
-    }).subscribe(({ alunos, criterios, turma }) => {
+      turma: this.turmaService.getTurmaId(turmaId),
+      criteriosGlobais: this.criterioService.getCriterios()
+    }).subscribe(({ alunos, criterios, turma, criteriosGlobais }) => {
       this.turma = turma;
 
       this.alunos = alunos;
-      this.alunosFiltrados = alunos
+      this.alunosFiltrados = alunos;
 
       this.criterios = criterios;
       this.criteriosFiltrados = criterios;
+
+      this.criteriosGlobais = criteriosGlobais;
 
       this.cdr.detectChanges();
     });
@@ -123,19 +128,64 @@ export class AlunoTurmaComponent implements OnInit {
       size: 'lg',
       backdrop: 'static'
     });
-
     ref.componentInstance.turma = this.turma;
 
     ref.result.then((turmaEditada: Turma) => {
       if (!turmaEditada) return;
 
-      console.log(turmaEditada)
-
       this.turmaService.putTurma(turmaEditada).subscribe({
         next: (t) => {
           this.turma = t;
+          Swal.fire({
+            icon: 'success',
+            title: 'Sucesso',
+            text: `Turma ${turmaEditada.cod} salva com sucesso!`
+          });
+        },
+        error: (err) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: err.error?.message ?? `Erro ao salvar turma ${turmaEditada.cod}`
+          });
         }
       });
     }).catch(() => {});
+  }
+
+    public adicionarCriterioTurma (): void{
+    const ref = this.modalService.open(TurmaCriterioModalComponent, {
+      size: 'lg',
+      backdrop: 'static'
+    });
+
+    ref.componentInstance.turma = this.turma;
+    ref.componentInstance.criteriosTurma = this.criterios;
+    ref.componentInstance.criterios = this.criteriosGlobais;
+
+    ref.result.then((cts: number[]) =>{
+      if (!cts) return;
+
+      this.turmaService.putCriterioTurma({
+        turmaId: this.turma.id,
+        criterioIds: cts
+      }).subscribe(({
+        next: () => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Sucesso',
+            text: `Critérios da turma ${this.turma.cod} alterados com sucesso!`
+          });
+        },
+        error: (err) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: err.error?.message ?? `Erro ao alterar critérios da turma ${this.turma.cod}`
+          });
+        }
+      }))
+    });
+
   }
 }

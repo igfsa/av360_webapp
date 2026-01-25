@@ -16,6 +16,10 @@ public class GeralPersist : IGeralPersist
     {
         _context.AddAsync(entity);
     }
+    public void AddRangeAsync<T>(IEnumerable<T> entityArray) where T : class
+    {
+        _context.AddRangeAsync(entityArray);
+    }
 
     public void Update<T>(T entity) where T : class
     {
@@ -27,7 +31,7 @@ public class GeralPersist : IGeralPersist
         _context.Remove(entity);
     }
 
-    public void DeleteRange<T>(T[] entityArray) where T : class
+    public void DeleteRange<T>(IEnumerable<T> entityArray) where T : class
     {
         _context.RemoveRange(entityArray);
     }
