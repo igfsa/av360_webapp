@@ -27,6 +27,7 @@ import { createEmptyTurma, Turma } from '../../../Models/Turma';
 
   <div class="modal-footer">
     <button class="btn btn-secondary btn-danger" (click)="modal.dismiss()">Cancelar</button>
+    <button class="btn btn-secondary btn-success" (click)="salvarImport()">Salvar e Importar</button>
     <button class="btn btn-secondary btn-success" (click)="salvar()">Salvar</button>
   </div>
   `
@@ -41,7 +42,10 @@ export class TurmaCriarModalComponent implements OnInit {
   }
 
   salvar(): void {
-    console.log(this.novaTurma)
-    this.modal.close(this.novaTurma);
+    this.modal.close({Turma: this.novaTurma, ImportAlunos: false});
+  }
+
+  salvarImport(): void {
+    this.modal.close({Turma: this.novaTurma, ImportAlunos:  true});
   }
 }

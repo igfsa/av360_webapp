@@ -33,19 +33,14 @@ public class AlunoTurmaPersist : IAlunoTurmaPersist
             .OrderBy(t => t.Cod)
             .ToArrayAsync();
     }
-    public async Task<Aluno> GetValidaAlunoTurma(int turmaId, int alunoId)
+    public async Task<Aluno?> GetExisteAlunoTurma(int turmaId, int alunoId)
+    // Retorna um Aluno caso exista o AlunoTurma
     {
-        if (await _context.AlunoTurma.AnyAsync(at => at.TurmaId == turmaId && at.AlunoId == alunoId))
-        {
+        if (await _context.AlunoTurma.AnyAsync(at => at.TurmaId == turmaId && at.AlunoId == alunoId)){
+            return await _context.Alunos
+                .AsNoTracking().
+                FirstOrDefaultAsync(a => a.Id == alunoId);
+        }else{
             return null;
-        }
-        else 
-        {
-            IQueryable<Aluno> query = _context.Alunos;
-
-            query = query.AsNoTracking().OrderBy(a => a.Id)
-                            .Where(a => a.Id == alunoId);
-            return await query.FirstOrDefaultAsync();
-        }
-    }
+    }}
 }

@@ -92,9 +92,9 @@ public class TurmaService : ITurmaService
     }}
     public async Task<AlunoDTO> AddTurmaAluno(int alunoId, int turmaId){
         try{
-            Aluno aluno = await _alunoTurmaPersist.GetValidaAlunoTurma(turmaId, alunoId);
+            Aluno aluno = await _alunoTurmaPersist.GetExisteAlunoTurma(turmaId, alunoId);
             Turma turma = await _turmaPersist.GetTurmaIdAsync(turmaId);
-            if( aluno != null && turma != null){
+            if( aluno == null && turma != null){
                 AlunoTurma at = new(){
                     TurmaId = turmaId,
                     AlunoId = alunoId,
@@ -115,7 +115,6 @@ public class TurmaService : ITurmaService
         try{
             var criteriosAtuais = await _criterioTurmaPersist.
                 GetCriteriosByIdTurmaIdAsync(model.turmaId);
-            // Remover os que não estão mais selecionados
             var paraRemover = criteriosAtuais
                 .Where(tc => !model.criterioIds.Contains(tc.CriterioId));
             _geralPersist.DeleteRange(paraRemover);
@@ -174,14 +173,7 @@ public class TurmaService : ITurmaService
                 };
                 _geralPersist.Add(aluno);
                 await _geralPersist.SaveChangesAsync();
-                if (await _alunoTurmaPersist.GetValidaAlunoTurma(aluno.Id, turmaId) != null){
-                    AlunoTurma at = new(){
-                        TurmaId = turmaId,
-                        AlunoId = aluno.Id,
-                    };
-                    _geralPersist.Add(at);
-                    await _geralPersist.SaveChangesAsync();
-                }
+                await AddTurmaAluno(aluno.Id, turmaId);
                 resultado.Sucesso++;
             }
             catch (Exception ex){

@@ -6,5 +6,5 @@ public interface IAlunoTurmaPersist
 {
     Task<Aluno[]> GetAlunosTurmaIdAsync(int turmaId);
     Task<Turma[]> GetTurmasAlunoIdAsync(int alunoId);
-    Task<Aluno> GetValidaAlunoTurma(int turmaId, int alunoId);
+    Task<Aluno> GetExisteAlunoTurma(int turmaId, int alunoId);
 }

@@ -15,6 +15,8 @@ import { Criterio } from '../../Models/Criterio';
 import { TurmaEditarModalComponent } from './Modals/turma_editar.component';
 import { TurmaCriterioModalComponent } from './Modals/turma_criterio_add.component';
 import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
+import { TurmaImportModalComponent } from '../turmas/Modals/turma_import.component';
+import { ImportAlunos } from '../../Models/TurmaImport';
 
 @Component({
   selector: 'app-alunos-turma',
@@ -153,7 +155,7 @@ export class AlunoTurmaComponent implements OnInit {
     }).catch(() => {});
   }
 
-    public adicionarCriterioTurma (): void{
+  public adicionarCriterioTurma (): void{
     const ref = this.modalService.open(TurmaCriterioModalComponent, {
       size: 'lg',
       backdrop: 'static'
@@ -186,6 +188,38 @@ export class AlunoTurmaComponent implements OnInit {
         }
       }))
     });
+  }
 
+  public importAlunos(): void{
+    const ref = this.modalService.open(TurmaImportModalComponent, {
+      size: 'lg',
+      backdrop: 'static'
+    });
+
+    ref.componentInstance.turma = this.turma;
+
+    ref.result.then((ImportAlunos: ImportAlunos) => {
+      if (!ImportAlunos) return;
+
+    this.turmaService.postImportarAlunos(ImportAlunos)
+      .subscribe({
+        next: imported => {
+          Swal.fire({
+            icon: 'info',
+            title: 'Sucesso',
+            text: `${imported.total} alunos da turma ${this.turma.cod} processados!
+                  ${imported.sucesso} importados com sucesso.
+                  ${imported.falhas} com falha.`
+          });
+        },
+        error: (err) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: err.error?.message ?? `Erro ao importar alunos para a turma ${this.turma.cod}`
+          });
+        }
+      });
+    }).catch(() => {});
   }
 }

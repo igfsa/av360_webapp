@@ -9,6 +9,8 @@ import { TurmaService } from '../../Service/Turma.service';
 import { TurmaCriarModalComponent } from './Modals/turma_criar.component';
 import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
 import Swal from 'sweetalert2';
+import { ImportAlunos } from '../../Models/TurmaImport';
+import { TurmaImportModalComponent } from './Modals/turma_import.component';
 
 @Component({
   selector: 'app-turmas',
@@ -76,32 +78,66 @@ export class TurmasComponent implements OnInit {
       })
   }
 
-  public adicionarTurma (): void{
+  public adicionarTurma(): void{
     const ref = this.modalService.open(TurmaCriarModalComponent, {
       size: 'lg',
       backdrop: 'static'
     });
-
-    ref.result.then((turmaEditada: Turma) => {
-      if (!turmaEditada) return;
-
-    this.turmaService.postTurma(turmaEditada)
-      .subscribe({
-        next: turma => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Sucesso',
-            text: `Turma ${turma.cod} criada com sucesso!`
-          });
-        },
-        error: (err) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: err.error?.message ?? `Erro ao criar turma ${turmaEditada.cod}`
-          });
-        }
-      });
+    var turmaRes: Turma;
+    ref.result.then(({Turma, ImportAlunos}) => {
+      if (!Turma) return;
+      this.turmaService.postTurma(Turma)
+        .subscribe({
+          next: turma => {
+            turmaRes = turma;
+            Swal.fire({
+              icon: 'success',
+              title: 'Sucesso',
+              text: `Turma ${turma.cod} criada com sucesso!`
+            }).then(() => {
+              if (ImportAlunos)
+                this.ImportarAlunos(turma);
+            })
+          },
+          error: (err) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Erro',
+              text: err.error?.message ?? `Erro ao criar turma ${Turma.cod}`
+            });
+          }
+        });
     }).catch(() => {});
+  }
+
+  public ImportarAlunos(turma: Turma){
+    const refImport = this.modalService.open(TurmaImportModalComponent, {
+      size: 'lg',
+      backdrop: 'static',
+    });
+    refImport.componentInstance.turma = turma;
+    refImport.result.then((ImportAlunos: ImportAlunos) => {
+      if (!ImportAlunos) return;
+      ImportAlunos.turmaId = turma.id;
+      this.turmaService.postImportarAlunos(ImportAlunos)
+        .subscribe({
+          next: imported => {
+            Swal.fire({
+              icon: 'info',
+              title: 'Sucesso',
+              text: `${imported.total} alunos da turma ${turma.cod} processados!
+                    ${imported.sucesso} importados com sucesso.
+                    ${imported.falhas} com falha.`
+            });
+          },
+          error: (err) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Erro',
+              text: err.error?.message ?? `Erro ao importar alunos para a turma ${turma.cod}`
+            });
+          }
+        });
+      }).catch(() => {});
   }
 }

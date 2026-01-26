@@ -154,14 +154,11 @@ namespace API.Controllers
         }
         [HttpPost("{turmaId:int}", Name = "ImportAlunosTurma")]
         [ActionName("ImportAlunosTurma")]
-        public async Task<ActionResult<CsvImportResultDTO>> ImportAlunosTurma(int turmaId, string colunaNome, IFormFile file)
+        public async Task<ActionResult<CsvImportResultDTO>> ImportAlunosTurma([FromForm] CsvImportRequestDTO dto)
         {
-            var dto = new CsvImportRequestDTO();
-            dto.Arquivo = file;
-            dto.ColunaNome = colunaNome;
             try
             { 
-                var result = await _turmaService.ImportarAlunosAsync(turmaId, dto);
+                var result = await _turmaService.ImportarAlunosAsync(dto.TurmaId, dto);
                 return Ok(result);
             }
             catch (Exception ex)
