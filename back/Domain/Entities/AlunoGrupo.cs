@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities;
 
-public class AlunoTurma
+public class AlunoGrupo
 {
     public int AlunoId { get; set; }
-    public int TurmaId { get; set; }
+    public int GrupoId { get; set; }
 }

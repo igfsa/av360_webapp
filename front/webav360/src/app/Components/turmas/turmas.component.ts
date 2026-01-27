@@ -81,7 +81,8 @@ export class TurmasComponent implements OnInit {
   public adicionarTurma(): void{
     const ref = this.modalService.open(TurmaCriarModalComponent, {
       size: 'lg',
-      backdrop: 'static'
+      backdrop: 'static',
+      centered: true
     });
     var turmaRes: Turma;
     ref.result.then(({Turma, ImportAlunos}) => {
@@ -114,6 +115,7 @@ export class TurmasComponent implements OnInit {
     const refImport = this.modalService.open(TurmaImportModalComponent, {
       size: 'lg',
       backdrop: 'static',
+      centered: true
     });
     refImport.componentInstance.turma = turma;
     refImport.result.then((ImportAlunos: ImportAlunos) => {

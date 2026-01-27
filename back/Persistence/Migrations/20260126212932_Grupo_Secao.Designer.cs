@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence.Context;
 
@@ -11,9 +12,11 @@ using Persistence.Context;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(APIContext))]
-    partial class APIContextModelSnapshot : ModelSnapshot
+    [Migration("20260126212932_Grupo_Secao")]
+    partial class Grupo_Secao
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -149,17 +152,17 @@ namespace Persistence.Migrations
                     b.Property<int>("GrupoId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SessaoId")
+                    b.Property<int>("SecaoId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AlunoId");
 
-                    b.HasIndex("SessaoId", "AvaliadorId")
+                    b.HasIndex("SecaoId", "AvaliadorId")
                         .IsUnique();
 
-                    b.HasIndex("SessaoId", "DeviceHash")
+                    b.HasIndex("SecaoId", "DeviceHash")
                         .IsUnique();
 
                     b.ToTable("NotasFinais");
@@ -195,7 +198,7 @@ namespace Persistence.Migrations
                     b.ToTable("NotasParciais");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Sessao", b =>
+            modelBuilder.Entity("Domain.Entities.Secao", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -220,7 +223,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Sessoes");
+                    b.ToTable("Secoes");
                 });
 
             modelBuilder.Entity("Domain.Entities.Turma", b =>

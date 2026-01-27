@@ -8,7 +8,6 @@ using Application.DTOs;
 using Application.Helpers;
 using Domain.Entities;
 using Persistence.Contracts;
-using System.Text;
 
 namespace Application.Services;
 
@@ -56,10 +55,9 @@ public class TurmaService : ITurmaService
     public async Task<IEnumerable<TurmaDTO>> GetTurmasAluno(int alunoId){
         try{
             var turmas = await _alunoTurmaPersist.GetTurmasAlunoIdAsync(alunoId);
-            if (turmas == null) return null;
-
+            if (turmas == null) 
+                return null;
             var resultado = _mapper.Map<IEnumerable<TurmaDTO>>(turmas);
-
             return resultado;
         }
         catch (Exception ex){

@@ -69,8 +69,10 @@ var mapper_config = builder.Services.AddAutoMapper(cfg =>
 {
     cfg.LicenseKey = Environment.GetEnvironmentVariable("AUTOMAPPER_KEY");
     cfg.CreateMap<Aluno, AlunoDTO>().ReverseMap();
-    cfg.CreateMap<Turma, TurmaDTO>().ReverseMap();
     cfg.CreateMap<Criterio, CriterioDTO>().ReverseMap();
+    cfg.CreateMap<Grupo, GrupoDTO>().ReverseMap();
+    cfg.CreateMap<Sessao, SessaoDTO>().ReverseMap();
+    cfg.CreateMap<Turma, TurmaDTO>().ReverseMap();
 });
 
 builder.Services.AddScoped<IGeralPersist, GeralPersist>();
@@ -78,16 +80,23 @@ builder.Services.AddScoped<IGeralPersist, GeralPersist>();
 builder.Services.AddScoped<IAlunoService, AlunoService>();
 builder.Services.AddScoped<IAlunoPersist, AlunoPersist>();
 
-builder.Services.AddScoped<ITurmaService, TurmaService>();
-builder.Services.AddScoped<ITurmaPersist, TurmaPersist>();
-builder.Services.AddScoped<ITurmaNotifier, TurmaNotifier>();
-
 builder.Services.AddScoped<ICriterioService, CriterioService>();
 builder.Services.AddScoped<ICriterioPersist, CriterioPersist>();
 builder.Services.AddScoped<ICriterioNotifier, CriterioNotifier>();
 
+builder.Services.AddScoped<IGrupoService, GrupoService>();
+builder.Services.AddScoped<IGrupoPersist, GrupoPersist>();
+
+builder.Services.AddScoped<ISessaoService, SessaoService>();
+builder.Services.AddScoped<ISessaoPersist, SessaoPersist>();
+
+builder.Services.AddScoped<ITurmaService, TurmaService>();
+builder.Services.AddScoped<ITurmaPersist, TurmaPersist>();
+builder.Services.AddScoped<ITurmaNotifier, TurmaNotifier>();
+
 builder.Services.AddScoped<IAlunoTurmaPersist, AlunoTurmaPersist>();
 builder.Services.AddScoped<ICriterioTurmaPersist, CriterioTurmaPersist>();
+builder.Services.AddScoped<IAlunoGrupoPersist, AlunoGrupoPersist>();
 
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 

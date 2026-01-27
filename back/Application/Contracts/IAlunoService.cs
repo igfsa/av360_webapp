@@ -7,6 +7,7 @@ public interface IAlunoService
     Task<IEnumerable<AlunoDTO>> GetAlunos();
     Task <AlunoDTO> GetAlunoById(int Id);
     Task<IEnumerable<AlunoDTO>> GetAlunosTurma(int turmaId);
+    Task<IEnumerable<AlunoDTO>> GetAlunosGrupo(int grupoId);
     Task<AlunoDTO> Add(AlunoDTO model);
     Task<AlunoDTO> Update(int alunoId, AlunoDTO model);
 }

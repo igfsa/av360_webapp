@@ -10,13 +10,11 @@ public class AlunoTurmaPersist : IAlunoTurmaPersist
 {
     private readonly APIContext _context;
 
-    public AlunoTurmaPersist(APIContext context)
-    {
+    public AlunoTurmaPersist(APIContext context) {
         _context = context;
     }
 
-    public async Task<Aluno[]> GetAlunosTurmaIdAsync(int turmaId)
-    {
+    public async Task<Aluno[]> GetAlunosTurmaIdAsync(int turmaId) {
         return await _context.Alunos
             .AsNoTracking()
             .Where(a => _context.AlunoTurma
@@ -24,8 +22,7 @@ public class AlunoTurmaPersist : IAlunoTurmaPersist
             .OrderBy(a => a.Nome)
             .ToArrayAsync();
     }
-    public async Task<Turma[]> GetTurmasAlunoIdAsync(int alunoId)
-    {
+    public async Task<Turma[]> GetTurmasAlunoIdAsync(int alunoId) {
         return await _context.Turmas
             .AsNoTracking()
             .Where(t => _context.AlunoTurma
@@ -36,11 +33,9 @@ public class AlunoTurmaPersist : IAlunoTurmaPersist
     public async Task<Aluno?> GetExisteAlunoTurma(int turmaId, int alunoId)
     // Retorna um Aluno caso exista o AlunoTurma
     {
-        if (await _context.AlunoTurma.AnyAsync(at => at.TurmaId == turmaId && at.AlunoId == alunoId)){
-            return await _context.Alunos
-                .AsNoTracking().
-                FirstOrDefaultAsync(a => a.Id == alunoId);
-        }else{
+        if (await _context.AlunoTurma.AnyAsync(at => at.TurmaId == turmaId && at.AlunoId == alunoId))
+            return await _context.Alunos.AsNoTracking().FirstOrDefaultAsync(a => a.Id == alunoId);
+        else
             return null;
-    }}
+    }
 }

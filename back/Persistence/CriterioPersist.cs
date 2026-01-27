@@ -10,26 +10,13 @@ public class CriterioPersist : ICriterioPersist
 {
     private readonly APIContext _context;
 
-    public CriterioPersist(APIContext context)
-    {
+    public CriterioPersist(APIContext context) {
         _context = context;
     }
-    public async Task<Criterio[]> GetAllCriteriosAsync()
-    {
-        IQueryable<Criterio> query = _context.Criterios;
-
-        query = query.AsNoTracking()
-                        .OrderBy(a => a.Nome);
-
-        return await query.ToArrayAsync();
+    public async Task<Criterio[]> GetAllCriteriosAsync() {
+        return await _context.Criterios.AsNoTracking().OrderBy(a => a.Nome).ToArrayAsync();
     }
-    public async Task<Criterio> GetCriterioIdAsync(int criterioId)
-    {
-        IQueryable<Criterio> query = _context.Criterios;
-
-        query = query.AsNoTracking().OrderBy(a => a.Id)
-                        .Where(a => a.Id == criterioId);
-
-        return await query.FirstOrDefaultAsync();
+    public async Task<Criterio?> GetCriterioIdAsync(int criterioId){
+        return await _context.Criterios.AsNoTracking().OrderBy(a => a.Id).Where(a => a.Id == criterioId).FirstOrDefaultAsync();
     }
 }

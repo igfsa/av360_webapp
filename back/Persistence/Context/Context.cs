@@ -9,31 +9,34 @@ public class APIContext : DbContext
     public APIContext(DbContextOptions<APIContext> options) 
         : base(options) { }
     public DbSet<Aluno> Alunos { get; set; }
+    public DbSet<AlunoGrupo> AlunoGrupo { get; set; }
+    public DbSet<AlunoTurma> AlunoTurma { get; set; }
     public DbSet<Criterio> Criterios { get; set; }
+    public DbSet<CriterioTurma> CriterioTurma { get; set; }
+    public DbSet<Grupo> Grupos { get; set; }
     public DbSet<NotaFinal> NotasFinais { get; set; }
     public DbSet<NotaParcial> NotasParciais { get; set; }
+    public DbSet<Sessao> Sessoes { get; set; }
     public DbSet<Turma> Turmas { get; set; }
-    public DbSet<AlunoTurma> AlunoTurma { get; set; }
-    public DbSet<CriterioTurma> CriterioTurma { get; set; }
+    
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<AlunoGrupo>()
+                .HasKey(ag => new {ag.AlunoId, ag.GrupoId});
+                
             modelBuilder.Entity<AlunoTurma>()
-                .HasKey(AT => new {AT.AlunoId, AT.TurmaId});
+                .HasKey(at => new {at.AlunoId, at.TurmaId});
 
             modelBuilder.Entity<CriterioTurma>()
-                .HasKey(CT => new {CT.CriterioId, CT.TurmaId});
+                .HasKey(ct => new {ct.CriterioId, ct.TurmaId});
 
             modelBuilder.Entity<NotaFinal>()
-                .HasOne(nf => nf.Aluno)
-                .WithMany(a => a.NotasFinais)
-                .HasForeignKey(nt => nt.AlunoId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasIndex(a => new { a.SessaoId, a.AvaliadorId })
+                .IsUnique();
 
-            modelBuilder.Entity<NotaParcial>()
-                .HasOne(np => np.Aluno)
-                .WithMany(a => a.NotasParciais)
-                .HasForeignKey(np => np.AlunoId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<NotaFinal>()
+                .HasIndex(a => new { a.SessaoId, a.DeviceHash })
+                .IsUnique();
         }
 }

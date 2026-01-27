@@ -42,7 +42,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("{id:int}", Name = "ObterTurmaId")]
+        [HttpGet("{id:int}", Name = "GetTurmaId")]
         [ActionName("GetId")]
         public async Task<ActionResult<TurmaDTO>> Get(int id)
         {
@@ -64,7 +64,7 @@ namespace API.Controllers
 
         }
 
-        [HttpGet("{alunoId:int}", Name = "ObterTurmasAluno")]
+        [HttpGet("{alunoId:int}", Name = "GetTurmasAluno")]
         [ActionName("GetTurmasAluno")]
         public async Task<ActionResult<IEnumerable<TurmaDTO>>> GetTurmasAluno(int alunoId)
         {
@@ -86,7 +86,7 @@ namespace API.Controllers
 
         }
 
-        [HttpGet("{criterioId:int}", Name = "ObterTurmasCriterio")]
+        [HttpGet("{criterioId:int}", Name = "GetTurmasCriterio")]
         [ActionName("GetTurmasCriterio")]
         public async Task<ActionResult<IEnumerable<TurmaDTO>>> GetCriteriosTurma(int criterioId)
         {

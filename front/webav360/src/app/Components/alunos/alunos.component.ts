@@ -1,10 +1,14 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 import { AlunoService } from '../../Service/Aluno.service';
 import { Aluno } from '../../Models/Aluno';
+import { AvaliarModalComponent } from './modals/aluno_avaliar.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { CriterioService } from '../../Service/Criterio.service';
+import { Criterio } from '../../Models/Criterio';
 
 @Component({
   selector: 'app-alunos',
@@ -18,11 +22,13 @@ import { Aluno } from '../../Models/Aluno';
   styleUrls: ['./alunos.component.scss', '../../app.scss'],
 })
 export class AlunosComponent implements OnInit {
+	private modalService = inject(NgbModal);
   public loaded = false;
 
   public alunos: Aluno[]  = [];
   public alunosFiltrados : Aluno[] = [];
   private _filtroLista: string = '';
+  public criterios: Criterio[] = [];
 
   public get filtroLista() {
     return this._filtroLista
@@ -45,12 +51,16 @@ export class AlunosComponent implements OnInit {
 
   constructor(
     private alunoService: AlunoService,
+    private criterioService: CriterioService,
     private cdr: ChangeDetectorRef
   ){}
 
   ngOnInit() {
-    void this.getAlunos();
-    this.loaded = true;
+    this.getAlunos();
+      this.criterioService.getCriterios().subscribe((criterios) => {
+      this.criterios = criterios;
+      this.loaded = true;
+    })
   }
 
   public getAlunos (): void{
@@ -64,5 +74,14 @@ export class AlunosComponent implements OnInit {
       },
       error: (e) => console.log(e)
     })
+  }
+
+  public avaliar(){
+    const ref = this.modalService.open(AvaliarModalComponent, {
+      size: 'lg',
+      backdrop: 'static',
+      centered: true
+    });
+    ref.componentInstance.criterios = this.criterios;
   }
 }

@@ -3,15 +3,8 @@ namespace Domain.Entities;
 public class NotaParcial
 {
     public int Id { get; set; }
-    public int AlunoId { get; set; }
-    public required Aluno Aluno { get; set; }
-    public decimal Nota { get; set; }
-    public int TurmaId { get; set; }
-    public required Turma Turma { get; set; }
-    public int CriterioId { get; set; }
-    public required Criterio Criterio { get; set; }
-    public int AvaliadorId { get; set; }
-    public required Aluno Avaliador { get; set; }
     public int NotaFinalId { get; set; }
-    public required NotaFinal NotaFinal { get; set; }
+    public int AvaliadoId { get; set; }
+    public int CriterioId { get; set; }
+    public decimal Nota { get; set; }
 }

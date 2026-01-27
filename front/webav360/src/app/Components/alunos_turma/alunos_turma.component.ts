@@ -128,7 +128,8 @@ export class AlunoTurmaComponent implements OnInit {
   public editarTurma (): void{
     const ref = this.modalService.open(TurmaEditarModalComponent, {
       size: 'lg',
-      backdrop: 'static'
+      backdrop: 'static',
+      centered: true
     });
     ref.componentInstance.turma = this.turma;
 
@@ -158,7 +159,8 @@ export class AlunoTurmaComponent implements OnInit {
   public adicionarCriterioTurma (): void{
     const ref = this.modalService.open(TurmaCriterioModalComponent, {
       size: 'lg',
-      backdrop: 'static'
+      backdrop: 'static',
+      centered: true
     });
 
     ref.componentInstance.turma = this.turma;
@@ -193,7 +195,8 @@ export class AlunoTurmaComponent implements OnInit {
   public importAlunos(): void{
     const ref = this.modalService.open(TurmaImportModalComponent, {
       size: 'lg',
-      backdrop: 'static'
+      backdrop: 'static',
+      centered: true
     });
 
     ref.componentInstance.turma = this.turma;
