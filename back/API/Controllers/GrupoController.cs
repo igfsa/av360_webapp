@@ -92,7 +92,27 @@ public class GrupoController : ControllerBase
         }
 
     }
+    [HttpGet("{turmaId:int}", Name = "GetAlunoGruposCheckbox")]
+    [ActionName("GetAlunoGruposCheckbox")]
+    public async Task<ActionResult<IEnumerable<AlunoGrupoCheckboxDTO>>> GetAlunosGrupoCheckbox(int turmaId, int grupoId)
+    {
 
+        try
+        {
+            var alunosCheckbox = await _grupoService.GetAlunoGrupoTurma(turmaId, grupoId);
+            if (alunosCheckbox is null)
+            {
+                return NotFound();
+            }
+            return Ok(alunosCheckbox);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+            $"Erro ao tentar buscar Grupo. Erro: {ex.Message}");
+        }
+
+    }
     [HttpPost]
     [ActionName("Post")]
     public async Task<ActionResult<GrupoDTO>> Post(GrupoDTO model)
@@ -135,15 +155,31 @@ public class GrupoController : ControllerBase
                                             $"Erro ao tentar atualizar Grupos. Erro: {ex.Message}");
         }
     }
-    [HttpPut("", Name = "PutAlunoGrupo")]
-    [ActionName("PutAlunoGrupo")]
-    public async Task<ActionResult<GrupoDTO>> PutAlunoGrupo(AlunoGrupoDTO model)
+    // [HttpPut("", Name = "PutAlunoGrupo")]
+    // [ActionName("PutAlunoGrupo")]
+    // public async Task<ActionResult<GrupoDTO>> PutAlunoGrupo(AlunoGrupoDTO model)
+    // {
+    //     try
+    //     {
+    //         var turma = await _grupoService.AddAlunoGrupo(model);
+    //         await _turmaNotifier.TurmaAtualizadaAsync(model.grupoId);
+    //         return Ok(turma);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         return StatusCode(StatusCodes.Status500InternalServerError,
+    //             $"Erro ao tentar adicionar Grupo. Erro: {ex.Message}");
+    //     }
+    // }
+    [HttpPut("", Name = "PutAtualizarGrupo")]
+    [ActionName("PutAtualizarGrupo")]
+    public async Task<ActionResult<GrupoDTO>> PutAtualizarGrupo(AlunoGrupoDTO model)
     {
         try
         {
-            var turma = await _grupoService.AddAlunoGrupo(model);
+            await _grupoService.AtualizarGrupo(model.turmaId, model.grupoId, model.alunoIds);
             await _turmaNotifier.TurmaAtualizadaAsync(model.grupoId);
-            return Ok(turma);
+            return Ok();
         }
         catch (Exception ex)
         {

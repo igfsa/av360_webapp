@@ -23,6 +23,13 @@ public class AlunoGrupoPersist : IAlunoGrupoPersist
             .OrderBy(a => a.Nome)
             .ToArrayAsync();
     }
+    public async Task<AlunoGrupo[]> GetAlunosGrupoTurmaId(int turmaId)
+    {
+        return await _context.AlunoGrupo
+            .AsNoTracking()
+            .Where(ag => ag.TurmaId == turmaId)
+            .ToArrayAsync();
+    }    
     public async Task<Aluno?> GetExisteAlunoGrupo(int grupoId, int alunoId)
     // Retorna um Aluno caso exista o AlunoGrupo
     {
