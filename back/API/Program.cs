@@ -86,6 +86,7 @@ builder.Services.AddScoped<ICriterioNotifier, CriterioNotifier>();
 
 builder.Services.AddScoped<IGrupoService, GrupoService>();
 builder.Services.AddScoped<IGrupoPersist, GrupoPersist>();
+builder.Services.AddScoped<IGrupoNotifier, GrupoNotifier>();
 
 builder.Services.AddScoped<ISessaoService, SessaoService>();
 builder.Services.AddScoped<ISessaoPersist, SessaoPersist>();
@@ -125,6 +126,7 @@ app.MapControllers();
 
 app.MapHub<TurmaHub>("/hubs/turma");
 app.MapHub<CriterioHub>("/hubs/criterio");
+app.MapHub<GrupoHub>("/hubs/grupo");
 
 app.UseEndpoints(endpoints =>
 {

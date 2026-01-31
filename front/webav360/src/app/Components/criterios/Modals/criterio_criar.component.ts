@@ -37,7 +37,6 @@ export class CriterioCriarModalComponent implements OnInit {
   }
 
   salvar(): void {
-    console.log(this.novoCriterio)
     this.modal.close(this.novoCriterio);
   }
 }

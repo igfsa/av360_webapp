@@ -1,7 +1,6 @@
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 
 import { AlunoService } from '../../Service/Aluno.service';
 import { Aluno } from '../../Models/Aluno';
@@ -15,8 +14,7 @@ import { Criterio } from '../../Models/Criterio';
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
-    RouterLink
+    FormsModule
    ],
   templateUrl: './alunos.component.html',
   styleUrls: ['./alunos.component.scss', '../../app.scss'],

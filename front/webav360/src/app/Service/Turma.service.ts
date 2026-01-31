@@ -37,13 +37,12 @@ export class TurmaService {
   public putCriterioTurma (turmaCriterio: TurmaCriterio): Observable<Turma>{
     return this.http.put<Turma>(`${baseURL}api/Turma/PutCriterioTurma/`, turmaCriterio);
   }
+
   public postImportarAlunos (importAlunos: ImportAlunos): Observable<ImportAlunosResult>{
-    console.log(importAlunos);
     const formData = new FormData();
     formData.append('TurmaId', importAlunos.turmaId.toString());
     formData.append('ColunaNome', importAlunos.colunaNome);
     formData.append('Arquivo', importAlunos.file as File);
-    console.log(formData);
     return this.http.post<ImportAlunosResult>(`${baseURL}api/Turma/ImportAlunosTurma/${importAlunos.turmaId}`, formData);
   }
 }

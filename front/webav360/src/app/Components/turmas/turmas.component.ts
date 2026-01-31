@@ -84,13 +84,11 @@ export class TurmasComponent implements OnInit {
       backdrop: 'static',
       centered: true
     });
-    var turmaRes: Turma;
     ref.result.then(({Turma, ImportAlunos}) => {
       if (!Turma) return;
       this.turmaService.postTurma(Turma)
         .subscribe({
           next: turma => {
-            turmaRes = turma;
             Swal.fire({
               icon: 'success',
               title: 'Sucesso',

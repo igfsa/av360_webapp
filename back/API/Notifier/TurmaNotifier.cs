@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using API.Hubs;
 using Application.Contracts;
 using Microsoft.AspNetCore.SignalR;

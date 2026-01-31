@@ -16,7 +16,6 @@ import Swal from 'sweetalert2';
   imports: [
     CommonModule,
     FormsModule,
-    RouterLink
    ],
   templateUrl: './criterios.component.html',
   styleUrls: ['./criterios.component.scss', '../../app.scss'],

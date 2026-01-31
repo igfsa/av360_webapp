@@ -15,15 +15,18 @@ public class GrupoController : ControllerBase
     private readonly IGrupoService _grupoService;
     private readonly IAlunoService _alunoService;
     private ITurmaNotifier _turmaNotifier;
+    private IGrupoNotifier _grupoNotifier;
 
     public GrupoController(
         IGrupoService grupoService,
         IAlunoService alunoService,
-        ITurmaNotifier turmaNotifier)
+        ITurmaNotifier turmaNotifier,
+        IGrupoNotifier grupoNotifier)
     {
         _grupoService = grupoService;
         _alunoService = alunoService;
         _turmaNotifier = turmaNotifier;
+        _grupoNotifier = grupoNotifier;
     }
 
     [HttpGet]
@@ -101,6 +104,8 @@ public class GrupoController : ControllerBase
             {
                 return NoContent(); 
             }
+            await _grupoNotifier.GrupoAtualizadoAsync(grupo.Id);
+            await _turmaNotifier.TurmaAtualizadaAsync(grupo.TurmaId);
             return Ok(grupo);
         }
         catch (Exception ex)
@@ -120,6 +125,8 @@ public class GrupoController : ControllerBase
             {
                 return NoContent(); 
             }
+            await _grupoNotifier.GrupoAtualizadoAsync(grupo.Id);
+            await _turmaNotifier.TurmaAtualizadaAsync(grupo.TurmaId);
             return Ok(grupo);
         }
         catch (Exception ex)

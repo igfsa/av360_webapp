@@ -2,14 +2,25 @@ import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { forkJoin  } from 'rxjs';
+import { catchError, forkJoin, map, ObservableInput, of  } from 'rxjs';
+
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
+import {
+	NgbAccordionButton,
+	NgbAccordionDirective,
+	NgbAccordionItem,
+	NgbAccordionHeader,
+	NgbAccordionToggle,
+	NgbAccordionBody,
+	NgbAccordionCollapse,
+} from '@ng-bootstrap/ng-bootstrap/accordion';
+
 import Swal from 'sweetalert2';
 
 import { AlunoService } from '../../Service/Aluno.service';
 import { Aluno } from '../../Models/Aluno';
 import { TurmaService } from '../../Service/Turma.service';
-import { Turma } from '../../Models/Turma';
+import { createEmptyTurma, Turma } from '../../Models/Turma';
 import { CriterioService } from '../../Service/Criterio.service';
 import { Criterio } from '../../Models/Criterio';
 import { TurmaEditarModalComponent } from './Modals/turma_editar.component';
@@ -17,11 +28,22 @@ import { TurmaCriterioModalComponent } from './Modals/turma_criterio_add.compone
 import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
 import { TurmaImportModalComponent } from '../turmas/Modals/turma_import.component';
 import { ImportAlunos } from '../../Models/TurmaImport';
+import { TurmaGrupoModalComponent } from './Modals/grupo_add.component';
+import { GrupoService } from '../../Service/Grupo.service';
+import { Grupo } from '../../Models/Grupo';
+import { CriterioEditarModalComponent } from '../criterios/Modals/criterio_editar.component';
 
 @Component({
   selector: 'app-alunos-turma',
   standalone: true,
   imports: [
+		NgbAccordionButton,
+		NgbAccordionDirective,
+		NgbAccordionItem,
+		NgbAccordionHeader,
+		NgbAccordionToggle,
+		NgbAccordionBody,
+	  NgbAccordionCollapse,
     CommonModule,
     FormsModule,
    ],
@@ -36,12 +58,14 @@ export class AlunoTurmaComponent implements OnInit {
   public alunos: Aluno[]  = [];
   public alunosFiltrados : Aluno[] = [];
   public criterios: Criterio[]  = [];
-  public criteriosGlobais: Criterio[]  = [];
   public criteriosFiltrados : Criterio[] = [];
+  public grupos: Grupo[]  = [];
+  public gruposFiltrados: Grupo[]  = [];
   private _filtroAlunos: string = '';
   private _filtroCriterios: string = '';
-  public turma!: Turma;
+  private _filtroGrupos: string = '';
   public criterioIds: number[] = [];
+  public turma: Turma = createEmptyTurma();
 
   public get filtroAlunos() {
     return this._filtroAlunos
@@ -61,6 +85,15 @@ export class AlunoTurmaComponent implements OnInit {
     this.criteriosFiltrados = this.filtroCriterios ? this.filtrarCriterios(this.filtroCriterios) : this.criterios;
   }
 
+  public get filtroGrupos() {
+    return this._filtroGrupos
+  }
+
+  public set filtroGrupos(value : string) {
+    this._filtroGrupos = value;
+    this.gruposFiltrados = this.filtroGrupos ? this.filtrarGrupos(this.filtroGrupos) : this.grupos;
+  }
+
   public filtrarAlunos(filtrarPor: string): Aluno[] {
     filtrarPor = filtrarPor.toLocaleLowerCase();
     return this.alunos.filter(
@@ -75,6 +108,13 @@ export class AlunoTurmaComponent implements OnInit {
     )
   }
 
+  public filtrarGrupos(filtrarPor: string): Grupo[] {
+    filtrarPor = filtrarPor.toLocaleLowerCase();
+    return this.grupos.filter(
+      (grupo: { nome: string; }) => grupo.nome.toLocaleLowerCase().indexOf(filtrarPor) !== -1
+    )
+  }
+
   Id: string = '';
   Nome: string = '';
 
@@ -82,6 +122,7 @@ export class AlunoTurmaComponent implements OnInit {
     private alunoService: AlunoService,
     private turmaService: TurmaService,
     private criterioService: CriterioService,
+    private grupoService: GrupoService,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private turmaRealTime: TurmaRealTime,
@@ -108,9 +149,9 @@ export class AlunoTurmaComponent implements OnInit {
     forkJoin({
       alunos: this.alunoService.getAlunosTurma(turmaId),
       criterios: this.criterioService.getCriteriosTurma(turmaId),
+      grupos: this.grupoService.getGruposTurma(turmaId),
       turma: this.turmaService.getTurmaId(turmaId),
-      criteriosGlobais: this.criterioService.getCriterios()
-    }).subscribe(({ alunos, criterios, turma, criteriosGlobais }) => {
+    }).subscribe(({ alunos, criterios, grupos, turma }) => {
       this.turma = turma;
 
       this.alunos = alunos;
@@ -119,7 +160,8 @@ export class AlunoTurmaComponent implements OnInit {
       this.criterios = criterios;
       this.criteriosFiltrados = criterios;
 
-      this.criteriosGlobais = criteriosGlobais;
+      this.grupos = grupos;
+      this.gruposFiltrados = grupos;
 
       this.cdr.detectChanges();
     });
@@ -157,39 +199,120 @@ export class AlunoTurmaComponent implements OnInit {
   }
 
   public adicionarCriterioTurma (): void{
-    const ref = this.modalService.open(TurmaCriterioModalComponent, {
+    forkJoin({
+      criterios: this.criterioService.getCriterios(),
+    }).subscribe(res => {
+      const ref = this.modalService.open(TurmaCriterioModalComponent, {
+        size: 'lg',
+        backdrop: 'static',
+        centered: true
+      });
+
+      ref.componentInstance.turma = this.turma;
+      ref.componentInstance.criteriosTurma = this.criterios;
+      ref.componentInstance.criterios = res.criterios;
+
+      ref.result.then((cts: number[]) =>{
+        if (!cts) return;
+
+        this.turmaService.putCriterioTurma({
+          turmaId: this.turma.id,
+          criterioIds: cts
+        }).subscribe(({
+          next: () => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Sucesso',
+              text: `Critérios da turma ${this.turma.cod} alterados com sucesso!`
+            });
+          },
+          error: (err) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Erro',
+              text: err.error?.message ?? `Erro ao alterar critérios da turma ${this.turma.cod}`
+            });
+          }
+        }))
+      });
+    })
+  }
+  public alterarGruposTurma (): void{
+    const ref = this.modalService.open(TurmaGrupoModalComponent, {
       size: 'lg',
       backdrop: 'static',
       centered: true
     });
 
     ref.componentInstance.turma = this.turma;
-    ref.componentInstance.criteriosTurma = this.criterios;
-    ref.componentInstance.criterios = this.criteriosGlobais;
+    ref.componentInstance.gruposOrig = this.grupos;
 
-    ref.result.then((cts: number[]) =>{
-      if (!cts) return;
+    ref.result.then(({ add, edit }) => {
 
-      this.turmaService.putCriterioTurma({
-        turmaId: this.turma.id,
-        criterioIds: cts
-      }).subscribe(({
-        next: () => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Sucesso',
-            text: `Critérios da turma ${this.turma.cod} alterados com sucesso!`
-          });
-        },
-        error: (err) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: err.error?.message ?? `Erro ao alterar critérios da turma ${this.turma.cod}`
-          });
-        }
-      }))
-    });
+      const requests: ObservableInput<any>[] = [];
+
+      if (add?.length) {
+        add.forEach((g: Grupo) => {
+          g.turmaId = this.turma.id;
+
+          requests.push(
+            this.grupoService.postGrupo(g).pipe(
+              map(() => ({
+                type: 'add',
+                status: 'ok',
+                grupo: g.nome
+              })),
+              catchError(err =>
+                of({
+                  type: 'add',
+                  status: 'erro',
+                  grupo: g.nome,
+                  message: err?.error?.message || 'Erro desconhecido'
+              }))
+          ));
+        });
+      }
+
+      if (edit?.length) {
+        edit.forEach((g: Grupo) => {
+          requests.push(
+            this.grupoService.putGrupo(g).pipe(
+              map(() => ({
+                type: 'edit',
+                status: 'ok',
+                grupo: g.nome
+              })),
+              catchError(err =>
+                of({
+                  type: 'edit',
+                  status: 'erro',
+                  grupo: g.nome,
+                  message: err?.error?.message || 'Erro desconhecido'
+              }))
+          ));
+        });
+      }
+
+      if (!requests.length) return;
+
+      forkJoin(requests).subscribe(results => {
+
+        const addOk   = results.filter(r => r.type === 'add'  && r.status === 'ok').length;
+        const addErro = results.filter(r => r.type === 'add'  && r.status === 'erro').length;
+        const editOk  = results.filter(r => r.type === 'edit' && r.status === 'ok').length;
+        const editErro= results.filter(r => r.type === 'edit' && r.status === 'erro').length;
+
+        Swal.fire({
+          icon: 'info',
+          title: 'Info',
+          html: `
+            Equipes da turma ${this.turma.cod} processadas.<br><br>
+            <b>Adicionadas</b>: ${addOk} sucesso, ${addErro} erro.<br>
+            <b>Editadas</b>: ${editOk} sucesso, ${editErro} erro.
+          `
+        });
+      });
+    }).catch(() => {});
   }
 
   public importAlunos(): void{
@@ -210,8 +333,8 @@ export class AlunoTurmaComponent implements OnInit {
           Swal.fire({
             icon: 'info',
             title: 'Sucesso',
-            text: `${imported.total} alunos da turma ${this.turma.cod} processados!
-                  ${imported.sucesso} importados com sucesso.
+            html: `${imported.total} alunos da turma ${this.turma.cod} processados!<br>
+                  ${imported.sucesso} importados com sucesso.<br>
                   ${imported.falhas} com falha.`
           });
         },
@@ -225,4 +348,40 @@ export class AlunoTurmaComponent implements OnInit {
       });
     }).catch(() => {});
   }
+
+  public editarCriterio (criterio: Criterio): void{
+    const ref = this.modalService.open(CriterioEditarModalComponent, {
+      size: 'lg',
+      backdrop: 'static',
+      centered: true
+    });
+
+    ref.componentInstance.criterio = criterio;
+
+    ref.result.then((criterioEditado: Criterio) => {
+      if (!criterioEditado) return;
+
+      console.log(criterioEditado)
+
+      this.criterioService.putCriterio(criterioEditado).subscribe({
+        next: (c) => {
+          criterio = c;
+          Swal.fire({
+            icon: 'success',
+            title: 'Sucesso',
+            text: `Critério ${c.nome} editado com sucesso!`
+          });
+        },
+        error: (err) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: err.error?.message ?? `Erro ao editar critério ${criterioEditado.nome}`
+          });
+        }
+      });
+    }).catch(() => {});
+  }
+
 }
+

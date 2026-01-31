@@ -163,7 +163,6 @@ public class TurmaService : ITurmaService
             resultado.Total++;
             var nome = csv.GetField(dto.ColunaNome);
             try{
-                Console.WriteLine(nome);
                 if (string.IsNullOrWhiteSpace(nome) )
                     throw new Exception("Nome vazio");
                 var aluno = new Aluno{

@@ -159,6 +159,7 @@ namespace API.Controllers
             try
             { 
                 var result = await _turmaService.ImportarAlunosAsync(dto.TurmaId, dto);
+                await _turmaNotifier.TurmaAtualizadaAsync(dto.TurmaId);
                 return Ok(result);
             }
             catch (Exception ex)
