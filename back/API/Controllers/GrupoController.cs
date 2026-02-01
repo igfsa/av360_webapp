@@ -173,18 +173,16 @@ public class GrupoController : ControllerBase
     // }
     [HttpPut("", Name = "PutAtualizarGrupo")]
     [ActionName("PutAtualizarGrupo")]
-    public async Task<ActionResult<GrupoDTO>> PutAtualizarGrupo(AlunoGrupoDTO model)
-    {
-        try
-        {
+    public async Task<ActionResult<GrupoDTO>> PutAtualizarGrupo(AlunoGrupoDTO model) {
+        try {
             await _grupoService.AtualizarGrupo(model.turmaId, model.grupoId, model.alunoIds);
-            await _turmaNotifier.TurmaAtualizadaAsync(model.grupoId);
-            return Ok();
+            await _grupoNotifier.GrupoAtualizadoAsync(model.grupoId);
+            await _turmaNotifier.TurmaAtualizadaAsync(model.turmaId);
+            var grupo = await _grupoService.GetGrupoById(model.grupoId);
+            return Ok(grupo);
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             return StatusCode(StatusCodes.Status500InternalServerError,
                 $"Erro ao tentar adicionar Grupo. Erro: {ex.Message}");
-        }
-    }
+    }}
 }

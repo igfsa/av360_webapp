@@ -28,10 +28,12 @@ import { TurmaCriterioModalComponent } from './Modals/turma_criterio_add.compone
 import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
 import { TurmaImportModalComponent } from '../turmas/Modals/turma_import.component';
 import { ImportAlunos } from '../../Models/TurmaImport';
-import { TurmaGrupoModalComponent } from './Modals/grupo_add.component';
+import { TurmaGrupoModalComponent } from './Modals/grupo_att.component';
 import { GrupoService } from '../../Service/Grupo.service';
 import { Grupo } from '../../Models/Grupo';
 import { CriterioEditarModalComponent } from '../criterios/Modals/criterio_editar.component';
+import { AlunoGrupoModalComponent } from './Modals/aluno_grupo_att.component';
+import { AlunoGrupo } from '../../Models/AlunoGrupo';
 
 @Component({
   selector: 'app-alunos-turma',
@@ -198,7 +200,7 @@ export class AlunoTurmaComponent implements OnInit {
     }).catch(() => {});
   }
 
-  public adicionarCriterioTurma (): void{
+  public alterarCriterioTurma (): void{
     forkJoin({
       criterios: this.criterioService.getCriterios(),
     }).subscribe(res => {
@@ -314,6 +316,45 @@ export class AlunoTurmaComponent implements OnInit {
       });
     }).catch(() => {});
   }
+
+  public alterarAlunosGrupo (grupo: Grupo): void{
+    forkJoin({
+      alunoGrupoCheckbox: this.grupoService.GetAlunoGruposCheckbox(grupo.id, this.turma.id),
+    }).subscribe(res => {
+      const ref = this.modalService.open(AlunoGrupoModalComponent, {
+        size: 'lg',
+        backdrop: 'static',
+        centered: true
+      });
+      ref.componentInstance.turma = this.turma;
+      ref.componentInstance.grupo = grupo;
+      ref.componentInstance.alunosCheck = res.alunoGrupoCheckbox;
+      ref.componentInstance.grupoTurma = this.grupos;
+      ref.result.then((alunosGrupo: AlunoGrupo) => {
+        if (!alunosGrupo) return;
+        this.grupoService.putAtualizarGrupo({
+          grupoId: alunosGrupo.grupoId,
+          turmaId: alunosGrupo.turmaId,
+          alunoIds: alunosGrupo.alunoIds
+        }).subscribe(({
+          next: () => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Sucesso',
+              text: `Alunos do grupo ${grupo.nome} alterados com sucesso!`
+            });
+          },
+          error: (err) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Erro',
+              text: err.error?.message ?? `Erro ao alterar alunos do grupo ${grupo.nome}`
+            });
+          }
+        }))
+      });
+  })}
+
 
   public importAlunos(): void{
     const ref = this.modalService.open(TurmaImportModalComponent, {
