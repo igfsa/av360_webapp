@@ -38,5 +38,10 @@ public class APIContext : DbContext
             modelBuilder.Entity<NotaFinal>()
                 .HasIndex(a => new { a.SessaoId, a.DeviceHash })
                 .IsUnique();
+
+            modelBuilder.Entity<NotaParcial>()
+                .HasIndex(a => new { a.NotaFinalId, a.AvaliadoId, a.CriterioId })
+                .IsUnique();
+
         }
 }

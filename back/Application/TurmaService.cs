@@ -35,7 +35,8 @@ public class TurmaService : ITurmaService
     public async Task<IEnumerable<TurmaDTO>> GetTurmas(){
         try{
             var turmas= await _turmaPersist.GetAllTurmasAsync();
-            if (turmas== null) return null;
+            if (turmas== null) 
+                return null;
             var resultado = _mapper.Map<IEnumerable<TurmaDTO>>(turmas);
             return resultado;
         }
@@ -45,7 +46,8 @@ public class TurmaService : ITurmaService
     public async Task<TurmaDTO> GetTurmaById(int Id){
         try{
             var Turma = await _turmaPersist.GetTurmaIdAsync(Id);
-            if (Turma == null) return null;
+            if (Turma == null) 
+                return null;
             var resultado = _mapper.Map<TurmaDTO>(Turma);
             return resultado;
         }
@@ -66,7 +68,8 @@ public class TurmaService : ITurmaService
     public async Task<IEnumerable<TurmaDTO>> GetTurmasCriterio(int criterioId){
         try{
             var turmas = await _criterioTurmaPersist.GetTurmasCriterioIdAsync(criterioId);
-            if (turmas == null) return null;
+            if (turmas == null) 
+                return null;
             var resultado = _mapper.Map<IEnumerable<TurmaDTO>>(turmas);
             return resultado;
         }
@@ -189,7 +192,8 @@ public class TurmaService : ITurmaService
     public async Task<TurmaDTO> Update(int turmaId, TurmaDTO model){
         try{
             var turma = await _turmaPersist.GetTurmaIdAsync(turmaId);
-            if (turma == null) return null;
+            if (turma == null) 
+                return null;
             model.Id = turma.Id;
             _mapper.Map(model, turma);
             _geralPersist.Update(turma);

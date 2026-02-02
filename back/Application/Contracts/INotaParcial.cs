@@ -2,11 +2,10 @@ using Application.DTOs;
 
 namespace Application.Contracts;
 
-public interface INotaParcialParcial
+public interface INotaParcialService
 {
-    Task<IEnumerable<NotaParcialDTO>> GetTurmas();
-    Task<NotaParcialDTO> GetById(int? Id);
+    Task<NotaParcialDTO> GetById(int Id);
+    Task<IEnumerable<NotaParcialDTO>> GetNotaParcialNFinalId(int notaFinalId);
     Task<NotaParcialDTO> Add(NotaParcialDTO notaParcial);
-    Task<NotaParcialDTO> Update(NotaParcialDTO notaParcial);
-    
+    Task<NotaParcialDTO> Update(int NotaParcialId, NotaParcialDTO notaParcial);    
 }

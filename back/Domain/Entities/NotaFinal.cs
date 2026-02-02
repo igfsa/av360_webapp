@@ -8,4 +8,5 @@ public class NotaFinal
     public int GrupoId { get; set; }
     public string DeviceHash { get; set; } = "";
     public DateTime DataEnvio { get; set; }
+    public IEnumerable<NotaParcial>? NotasParciais { get; set; }
 }

@@ -71,6 +71,8 @@ var mapper_config = builder.Services.AddAutoMapper(cfg =>
     cfg.CreateMap<Aluno, AlunoDTO>().ReverseMap();
     cfg.CreateMap<Criterio, CriterioDTO>().ReverseMap();
     cfg.CreateMap<Grupo, GrupoDTO>().ReverseMap();
+    cfg.CreateMap<NotaFinal, NotaFinalDTO>().ReverseMap();
+    cfg.CreateMap<NotaParcial, NotaParcialDTO>().ReverseMap();
     cfg.CreateMap<Sessao, SessaoDTO>().ReverseMap();
     cfg.CreateMap<Turma, TurmaDTO>().ReverseMap();
 });
@@ -80,6 +82,8 @@ builder.Services.AddScoped<IGeralPersist, GeralPersist>();
 builder.Services.AddScoped<IAlunoService, AlunoService>();
 builder.Services.AddScoped<IAlunoPersist, AlunoPersist>();
 
+builder.Services.AddScoped<IAvaliacaoService, AvaliacaoService>();
+
 builder.Services.AddScoped<ICriterioService, CriterioService>();
 builder.Services.AddScoped<ICriterioPersist, CriterioPersist>();
 builder.Services.AddScoped<ICriterioNotifier, CriterioNotifier>();
@@ -87,6 +91,12 @@ builder.Services.AddScoped<ICriterioNotifier, CriterioNotifier>();
 builder.Services.AddScoped<IGrupoService, GrupoService>();
 builder.Services.AddScoped<IGrupoPersist, GrupoPersist>();
 builder.Services.AddScoped<IGrupoNotifier, GrupoNotifier>();
+
+builder.Services.AddScoped<INotaFinalService, NotaFinalService>();
+builder.Services.AddScoped<INotaFinalPersist, NotaFinalPersist>();
+
+builder.Services.AddScoped<INotaParcialService, NotaParcialService>();
+builder.Services.AddScoped<INotaParcialPersist, NotaParcialPersist>();
 
 builder.Services.AddScoped<ISessaoService, SessaoService>();
 builder.Services.AddScoped<ISessaoPersist, SessaoPersist>();
@@ -127,6 +137,7 @@ app.MapControllers();
 app.MapHub<TurmaHub>("/hubs/turma");
 app.MapHub<CriterioHub>("/hubs/criterio");
 app.MapHub<GrupoHub>("/hubs/grupo");
+app.MapHub<AvaliacaoHub>("/hubs/avaliacao");
 
 app.UseEndpoints(endpoints =>
 {
