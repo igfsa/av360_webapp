@@ -1,0 +1,86 @@
+<div class="container ">
+  <div class="m-2">
+    <span class="">Nota Máxima: {{turma.notaMax}}</span >
+    @if (sessaoAtiva) {
+      <button id="btn-buscar" class="btn btn-danger w-100" (click)="encerrarSessao();">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stop-circle-fill" viewBox="0 0 16 16">
+          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.5 5A1.5 1.5 0 0 0 5 6.5v3A1.5 1.5 0 0 0 6.5 11h3A1.5 1.5 0 0 0 11 9.5v-3A1.5 1.5 0 0 0 9.5 5z"/>
+        </svg>
+        Encerrar Avaliação
+      </button>
+    } @else {
+      <button id="btn-buscar" class="btn btn-success w-100" (click)="criaSessao();">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-circle-fill" viewBox="0 0 16 16">
+          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814z"/>
+        </svg>
+        Iniciar Avaliação
+      </button>
+    }
+  </div>
+  <div class="d-flex">
+    <div class="flex-fill p-2 w-50">
+      <table class="table table-striped text-center table-hover">
+        <thead class="table-dark">
+          <tr  style ='height: 2.4rem;'>
+            <th style = 'width: 10%; text-align: center;'>#</th>
+            <th>Nome</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (criterios && criterios.length){
+            @for (criterio of criterios; track criterio; let c = $index){
+              <tr  style ='height: 2.4rem;'>
+                <td style= 'text-align: center'>{{criterio.id}}</td>
+                <td>{{criterio.nome}}</td>
+              </tr>
+            }
+          }
+        </tbody>
+        <tfoot >
+          @if (!criterios.length){
+            <tr>
+              <td colspan="8" class="text-center">
+                <h4>Nenhum Criterio encontrado!</h4>
+              </td>
+            </tr>
+          }
+        </tfoot>
+      </table>
+    </div>
+    <div class="flex-fill p-2 w-50" style=" border-left: 0.2rem solid var(--secondary);">
+      <table class="table table-striped text-center table-hover">
+        <thead class="table-dark">
+          <tr  style ='height: 2.4rem;'>
+            <th style = 'width: 10%; text-align: center;'>#</th>
+            <th>Nome</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (grupos && grupos.length){
+            @for (grupo of grupos; track grupo; let c = $index){
+              <tr  style ='height: 2.4rem;'>
+                <td style= 'text-align: center'>{{grupo.id}}</td>
+                <td>{{grupo.nome}}</td>
+              </tr>
+            }
+          }
+        </tbody>
+        <tfoot >
+          @if (!grupos.length){
+            <tr>
+              <td colspan="8" class="text-center">
+                <h4>Nenhuma Equipe encontrada!</h4>
+              </td>
+            </tr>
+          }
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  @if (sessaoAtiva) {
+    <figure class="figure w-50 p-2">
+      <img [src]="qrCode" alt="QR Code da Avaliação" class="figure-img img-fluid rounded" >
+      <figcaption class="figure-caption">A caption for the above image.</figcaption>
+    </figure>
+  }
+</div>

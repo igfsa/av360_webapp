@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { createEmptyTurma, Turma } from '../../../Models/Turma';
+import { Turma } from '../../../Models/Turma';
 import { createEmptyImport, ImportAlunos } from '../../../Models/TurmaImport';
 
 
@@ -17,7 +17,7 @@ import { createEmptyImport, ImportAlunos } from '../../../Models/TurmaImport';
 
   <div class="modal-body">
     <div class="input-group m-3 row">
-      <span class="input-group-text col-2" id="basic-addon1" style = "font-size: 1.6rem;">Código: </span>
+      <span class="input-group-text col-2" id="basic-addon1" style = "font-size: 1.6rem;">Nome do Aluno: </span>
       <input type="text" class="form-control" [(ngModel)]="import.colunaNome" aria-label="Cod" aria-describedby="basic-addon1" style = "font-size: 1.6rem;">
     </div>
     <div class="input-group m-3 row">

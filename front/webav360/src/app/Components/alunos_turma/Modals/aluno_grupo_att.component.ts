@@ -14,18 +14,20 @@ import { AlunoGrupo } from '../../../Models/AlunoGrupo';
   imports: [CommonModule, FormsModule],
   template: `
     <div class="modal-header">
-      <h4 class="modal-title" style = "font-size: 2.4rem;">Turma {{ turma.cod }}</h4>
+      <h4 class="modal-title" style = "font-size: 2.4rem;">Grupo {{ grupo.nome }}</h4>
     </div>
     <div class="modal-body">
-      <table class="table table-hover">
-        <thead>
-          <td></td>
-          <td>
-            Aluno
-          </td>
-          <td>
-            Grupo Atual
-          </td>
+      <table id="main-table" class="table text-center table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th></th>
+            <th>
+              Aluno
+            </th>
+            <th>
+              Grupo Atual
+            </th>
+          </tr>
         </thead>
         <tbody>
           @for (aluno of alunosCheck; track aluno; let c = $index){
@@ -42,10 +44,10 @@ import { AlunoGrupo } from '../../../Models/AlunoGrupo';
                     data-bs-placement="top"
                     data-bs-title="Aluno adicionado em outro grupo"/>
               </td>
-              <td>
+              <td style = 'width: 50%;'>
                 {{ aluno.nome }}
               </td>
-              <td>
+              <td style = 'width: 40%;'>
                 @if(aluno.desabilitado && aluno.grupoAtualId){
                   {{ mostraGrupo(aluno.grupoAtualId) }}
                 }
@@ -65,7 +67,7 @@ export class AlunoGrupoModalComponent implements OnInit {
 
   @Input() turma!: Turma;
   @Input() grupo!: Grupo;
-  @Input() grupoTurma: Grupo[] = [];
+  @Input() gruposTurma: Grupo[] = [];
   @Input() alunosCheck: AlunoGrupoCheckbox[] = [];
 
   constructor(
@@ -90,7 +92,7 @@ export class AlunoGrupoModalComponent implements OnInit {
   }
 
   public mostraGrupo(id: number): string {
-    var res = this.grupoTurma.find(g => g.id = id)?.nome;
+    var res = this.gruposTurma.find(g => g.id == id)?.nome;
     if (!res){
       res = '';
     }

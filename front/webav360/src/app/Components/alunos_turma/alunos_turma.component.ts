@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { catchError, forkJoin, map, ObservableInput, of  } from 'rxjs';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
@@ -34,6 +34,8 @@ import { Grupo } from '../../Models/Grupo';
 import { CriterioEditarModalComponent } from '../criterios/Modals/criterio_editar.component';
 import { AlunoGrupoModalComponent } from './Modals/aluno_grupo_att.component';
 import { AlunoGrupo } from '../../Models/AlunoGrupo';
+import { Sessao } from '../../Models/Sessao';
+import { SessaoService } from '../../Service/Sessao.service';
 
 @Component({
   selector: 'app-alunos-turma',
@@ -48,6 +50,7 @@ import { AlunoGrupo } from '../../Models/AlunoGrupo';
 	  NgbAccordionCollapse,
     CommonModule,
     FormsModule,
+    RouterLink,
    ],
   templateUrl: './alunos_turma.component.html',
   styleUrls: ['./alunos_turma.component.scss', '../../app.scss'],
@@ -68,6 +71,7 @@ export class AlunoTurmaComponent implements OnInit {
   private _filtroGrupos: string = '';
   public criterioIds: number[] = [];
   public turma: Turma = createEmptyTurma();
+  public sessaoAtiva?: Sessao;
 
   public get filtroAlunos() {
     return this._filtroAlunos
@@ -125,6 +129,7 @@ export class AlunoTurmaComponent implements OnInit {
     private turmaService: TurmaService,
     private criterioService: CriterioService,
     private grupoService: GrupoService,
+    private sessaoService: SessaoService,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private turmaRealTime: TurmaRealTime,
@@ -153,7 +158,8 @@ export class AlunoTurmaComponent implements OnInit {
       criterios: this.criterioService.getCriteriosTurma(turmaId),
       grupos: this.grupoService.getGruposTurma(turmaId),
       turma: this.turmaService.getTurmaId(turmaId),
-    }).subscribe(({ alunos, criterios, grupos, turma }) => {
+      sessao: this.sessaoService.GetSessaoAtivaTurma(turmaId)
+    }).subscribe(({ alunos, criterios, grupos, turma, sessao }) => {
       this.turma = turma;
 
       this.alunos = alunos;
@@ -164,6 +170,8 @@ export class AlunoTurmaComponent implements OnInit {
 
       this.grupos = grupos;
       this.gruposFiltrados = grupos;
+
+      this.sessaoAtiva = sessao;
 
       this.cdr.detectChanges();
     });
@@ -239,6 +247,7 @@ export class AlunoTurmaComponent implements OnInit {
       });
     })
   }
+
   public alterarGruposTurma (): void{
     const ref = this.modalService.open(TurmaGrupoModalComponent, {
       size: 'lg',
@@ -329,7 +338,7 @@ export class AlunoTurmaComponent implements OnInit {
       ref.componentInstance.turma = this.turma;
       ref.componentInstance.grupo = grupo;
       ref.componentInstance.alunosCheck = res.alunoGrupoCheckbox;
-      ref.componentInstance.grupoTurma = this.grupos;
+      ref.componentInstance.gruposTurma = this.grupos;
       ref.result.then((alunosGrupo: AlunoGrupo) => {
         if (!alunosGrupo) return;
         this.grupoService.putAtualizarGrupo({

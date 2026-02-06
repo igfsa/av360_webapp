@@ -26,4 +26,7 @@ public class SessaoPersist : ISessaoPersist
             .OrderByDescending(s => s.DataInicio)
             .ToArrayAsync();
     }
+    public async Task<Sessao?> GetSessaoAtivaTurmaIdAsync(int TurmaId){
+        return await _context.Sessoes.AsNoTracking().FirstOrDefaultAsync(s => s.TurmaId == TurmaId && s.Ativo);
+    }
 }

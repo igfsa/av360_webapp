@@ -100,6 +100,7 @@ builder.Services.AddScoped<INotaParcialPersist, NotaParcialPersist>();
 
 builder.Services.AddScoped<ISessaoService, SessaoService>();
 builder.Services.AddScoped<ISessaoPersist, SessaoPersist>();
+builder.Services.AddScoped<ISessaoNotifier, SessaoNotifier>();
 
 builder.Services.AddScoped<ITurmaService, TurmaService>();
 builder.Services.AddScoped<ITurmaPersist, TurmaPersist>();
@@ -138,6 +139,7 @@ app.MapHub<TurmaHub>("/hubs/turma");
 app.MapHub<CriterioHub>("/hubs/criterio");
 app.MapHub<GrupoHub>("/hubs/grupo");
 app.MapHub<AvaliacaoHub>("/hubs/avaliacao");
+app.MapHub<AvaliacaoHub>("/hubs/sessao");
 
 app.UseEndpoints(endpoints =>
 {

@@ -81,7 +81,6 @@ export class TurmaGrupoModalComponent implements OnInit {
   }
 
   get podeSalvar(): boolean {
-    // caso normal
     if (this.form.valid) return true;
 
     const total = this.grupos.length;
@@ -90,13 +89,22 @@ export class TurmaGrupoModalComponent implements OnInit {
     const ultimo = this.grupos.at(total - 1) as FormGroup;
 
     const id = ultimo.get('id')?.value;
-    const nomeControl = ultimo.get('nome');
+    const nome = ultimo.get('nome')?.value;
 
-    const ehNovo = id === 0 || id === null || id === undefined;
-    const nomeVazio = nomeControl?.errors?.['required'];
+    const ehNovo = id == null || id === 0;
+    const nomeVazio = !nome || nome.trim() === '';
 
-    // último grupo novo e vazio → permitido
-    return ehNovo && nomeVazio;
+    if (ehNovo && nomeVazio) {
+      for (let i = 0; i < total - 1; i++) {
+        const grupo = this.grupos.at(i) as FormGroup;
+
+        if (grupo.invalid) {
+          return false;
+      }}
+      return true;
+    }
+
+    return false;
   }
 
   ngOnInit(): void {
