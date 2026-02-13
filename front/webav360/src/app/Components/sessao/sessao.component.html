@@ -28,7 +28,7 @@
         </thead>
         <tbody>
           @if (criterios && criterios.length){
-            @for (criterio of criterios; track criterio; let c = $index){
+            @for (criterio of criterios; track criterio.id){
               <tr  style ='height: 2.4rem;'>
                 <td style= 'text-align: center'>{{criterio.id}}</td>
                 <td>{{criterio.nome}}</td>
@@ -57,7 +57,7 @@
         </thead>
         <tbody>
           @if (grupos && grupos.length){
-            @for (grupo of grupos; track grupo; let c = $index){
+            @for (grupo of grupos; track grupo.id){
               <tr  style ='height: 2.4rem;'>
                 <td style= 'text-align: center'>{{grupo.id}}</td>
                 <td>{{grupo.nome}}</td>

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CriterioService } from '../../Service/Criterio.service';
 import { Criterio } from '../../Models/Criterio';
-import { RouterLink } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CriterioCriarModalComponent } from './Modals/criterio_criar.component';
 import { CriterioRealTime } from '../../Service/CriterioRealTime.service';
@@ -115,8 +114,6 @@ export class CriteriosComponent implements OnInit {
 
       ref.result.then((criterioEditado: Criterio) => {
         if (!criterioEditado) return;
-
-        console.log(criterioEditado)
 
         this.criterioService.putCriterio(criterioEditado).subscribe({
           next: (c) => {

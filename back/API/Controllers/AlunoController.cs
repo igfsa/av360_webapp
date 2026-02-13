@@ -60,6 +60,28 @@ namespace API.Controllers
 
         }
 
+        [HttpGet("{grupoId:int}", Name = "ObterAlunoNomeIdGrupo")]
+        [ActionName("ObterAlunoNomeIdGrupo")]
+        public async Task<ActionResult<AlunoDTO>> GetAlunoByNomeIdGrupo(int grupoId, string nome)
+        {
+
+            try
+            {
+                var alunos = await _alunoService.GetAlunoByNomeIdGrupo(nome, grupoId);
+                if (alunos is null)
+                {
+                    return NotFound();
+                }
+                return Ok(alunos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                $"Erro ao tentar buscar aluno. Erro: {ex.Message}");
+            }
+
+        }
+
         [HttpGet("{turmaId:int}", Name = "ObterAlunosTurma")]
         [ActionName("GetAlunosTurma")]
         public async Task<ActionResult<IEnumerable<AlunoDTO>>> GetAlunosTurma(int turmaId)
@@ -67,17 +89,61 @@ namespace API.Controllers
 
             try
             {
-                var turmas = await _alunoService.GetAlunosTurma(turmaId);
-                if (turmas is null)
+                var aluno = await _alunoService.GetAlunosTurma(turmaId);
+                if (aluno is null)
                 {
                     return NotFound();
                 }
-                return Ok(turmas);
+                return Ok(aluno);
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                 $"Erro ao tentar buscar aluno. Erro: {ex.Message}");
+            }
+
+        }
+        
+        [HttpGet("{turmaId:int}", Name = "GetAlunoGrupoNome")]
+        [ActionName("GetAlunoGrupoNome")]
+        public async Task<ActionResult<IEnumerable<AlunoGrupoNomeDTO>>> GetAlunoGrupoNome(int turmaId)
+        {
+
+            try
+            {
+                var alunos = await _alunoService.GetAlunoGrupoNome(turmaId);
+                if (alunos is null)
+                {
+                    return NotFound();
+                }
+                return Ok(alunos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                $"Erro ao tentar buscar alunos. Erro: {ex.Message}");
+            }
+
+        }
+        
+        [HttpGet("{grupoId:int}", Name = "GetAlunosGrupo")]
+        [ActionName("GetAlunosGrupo")]
+        public async Task<ActionResult<IEnumerable<AlunoDTO>>> GetAlunosGrupo(int grupoId)
+        {
+
+            try
+            {
+                var alunos = await _alunoService.GetAlunosGrupo(grupoId);
+                if (alunos is null)
+                {
+                    return NotFound();
+                }
+                return Ok(alunos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                $"Erro ao tentar buscar alunos. Erro: {ex.Message}");
             }
 
         }

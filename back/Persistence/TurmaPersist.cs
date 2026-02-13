@@ -17,6 +17,12 @@ public class TurmaPersist : ITurmaPersist
         return await  _context.Turmas.AsNoTracking().OrderBy(a => a.Cod).ToArrayAsync();;
     }
     public async Task<Turma?> GetTurmaIdAsync(int TurmaId){
-        return await _context.Turmas.AsNoTracking().OrderBy(a => a.Id).Where(a => a.Id == TurmaId).FirstOrDefaultAsync();;
+        return await _context.Turmas.AsNoTracking().Where(a => a.Id == TurmaId).FirstOrDefaultAsync();
+    }
+    public async Task<Turma?> GetTurmaGrupoIdAsync(int grupoId){
+        var grupo = await _context.Grupos.AsNoTracking().Where(g => g.Id == grupoId).FirstOrDefaultAsync();
+        if (grupo == null)
+            return null;
+        return await _context.Turmas.AsNoTracking().Where(t => t.Id == grupo.TurmaId).FirstOrDefaultAsync();
     }
 }

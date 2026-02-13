@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Application.Contracts;
 using Application.DTOs;
 using Persistence.Context;
+using Application.Services;
 
 namespace API.Controllers
 {
@@ -22,9 +23,41 @@ namespace API.Controllers
             _avaliacaoNotifier = avaliacaoNotifier;
         }
 
-        [HttpPut("")]
-        [ActionName("Put")]
-        public async Task<ActionResult> Put(AvaliacaoEnvioDTO model)
+        [HttpGet(Name = "GetValidaSessaoChavePub")]
+        [ActionName("GetValidaSessaoChavePub")]
+        public async Task<ActionResult<AvaliacaoPublicaDTO>> GetValidaSessaoChavePub(string token) {
+            try{
+                var avaliacao = await _avaliacaoService.GetValidaSessaoChavePub(token);
+                if (avaliacao == null)
+                    return NotFound("Sessão inválida ou encerrada");
+                return Ok(avaliacao);
+            }
+            catch (Exception ex) {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                $"Erro ao tentar buscar Sessão. Erro: {ex.Message}");
+        }}
+
+        [HttpGet(Name = "GeraNovaAvaliacaoEnvio")]
+        [ActionName("GeraNovaAvaliacaoEnvio")]
+        public async Task<ActionResult<AvaliacaoEnvioDTO>> GeraNovaAvaliacaoEnvio(int sessaoId, int grupoId, int avaliadorId) {
+            try{
+                var avaliacao = new AvaliacaoEnvioDTO
+                {
+                    SessaoId = sessaoId,
+                    GrupoId = grupoId,
+                    AvaliadorId = avaliadorId
+                }; 
+                var avaliacaoRes = await _avaliacaoService.GeraNovaAvaliacaoEnvio(avaliacao);
+                return Ok(avaliacaoRes);
+            }
+            catch (Exception ex) {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                $"Erro ao tentar buscar Sessão. Erro: {ex.Message}");
+        }}
+
+        [HttpPost("")]
+        [ActionName("Post")]
+        public async Task<ActionResult> Post(AvaliacaoEnvioDTO model)
         {
             try
             {

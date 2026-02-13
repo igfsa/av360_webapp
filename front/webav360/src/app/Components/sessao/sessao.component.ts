@@ -2,11 +2,13 @@ import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/co
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ActivatedRoute } from '@angular/router';
 import { forkJoin } from 'rxjs';
+import Swal from 'sweetalert2';
 
 import { createEmptyTurma, Turma } from '../../Models/Turma';
 import { Aluno } from '../../Models/Aluno';
 import { Criterio } from '../../Models/Criterio';
 import { Grupo } from '../../Models/Grupo';
+import { Sessao } from '../../Models/Sessao';
 
 import { AlunoService } from '../../Service/Aluno.service';
 import { TurmaService } from '../../Service/Turma.service';
@@ -14,9 +16,6 @@ import { CriterioService } from '../../Service/Criterio.service';
 import { GrupoService } from '../../Service/Grupo.service';
 import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
 import { SessaoService } from '../../Service/Sessao.service';
-import { Sessao } from '../../Models/Sessao';
-import { formatDate } from '@angular/common';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-sessao',

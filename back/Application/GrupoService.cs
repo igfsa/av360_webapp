@@ -36,7 +36,7 @@ public class GrupoService : IGrupoService
     }
 
     #region get
-    public async Task<IEnumerable<GrupoDTO>> GetGrupos() {
+    public async Task<IEnumerable<GrupoDTO>?> GetGrupos() {
         try {
             var grupos = await _grupoPersist.GetAllGruposAsync();
             if (grupos == null) 
@@ -48,7 +48,7 @@ public class GrupoService : IGrupoService
             throw new Exception(ex.Message);
     }}
 
-    public async Task<GrupoDTO> GetGrupoById(int Id) {
+    public async Task<GrupoDTO?> GetGrupoById(int Id) {
         try {
             var grupo = await _grupoPersist.GetGrupoIdAsync(Id);
             if (grupo == null) 
@@ -59,7 +59,7 @@ public class GrupoService : IGrupoService
         catch (Exception ex) {
             throw new Exception(ex.Message);
     }}
-    public async Task<IEnumerable<GrupoDTO>> GetGruposTurma(int turmaId) {
+    public async Task<IEnumerable<GrupoDTO>?> GetGruposTurma(int turmaId) {
         try {
             var grupos = await _grupoPersist.GetGruposTurmaIdAsync(turmaId);
             if (grupos == null) 
@@ -113,7 +113,7 @@ public class GrupoService : IGrupoService
     // }}
     #endregion
     #region add
-    public async Task<GrupoDTO> Add(GrupoDTO model) {
+    public async Task<GrupoDTO?> Add(GrupoDTO model) {
         try {
             var grupo = _mapper.Map<Grupo>(model);
             _geralPersist.Add(grupo);
@@ -128,7 +128,7 @@ public class GrupoService : IGrupoService
     }}
     #endregion
     #region update
-    public async Task<GrupoDTO> Update(int grupoId, GrupoDTO model) {
+    public async Task<GrupoDTO?> Update(int grupoId, GrupoDTO model) {
         try {
             var grupo = await _grupoPersist.GetGrupoIdAsync(grupoId);
             if (grupo == null) return null;

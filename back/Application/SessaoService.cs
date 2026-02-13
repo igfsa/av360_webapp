@@ -24,7 +24,7 @@ public class SessaoService : ISessaoService
     }
 
     #region get
-    public async Task<IEnumerable<SessaoDTO>> GetSessoes() {
+    public async Task<IEnumerable<SessaoDTO>?> GetSessoes() {
         try {
             var Sessoes = await _SessaoPersist.GetAllSessoesAsync();
             if (Sessoes == null) 
@@ -36,7 +36,7 @@ public class SessaoService : ISessaoService
             throw new Exception(ex.Message);
     }}
 
-    public async Task<SessaoDTO> GetSessaoById(int Id) {
+    public async Task<SessaoDTO?> GetSessaoById(int Id) {
         try {
             var Sessao = await _SessaoPersist.GetSessaoIdAsync(Id);
             if (Sessao == null) 
@@ -47,7 +47,7 @@ public class SessaoService : ISessaoService
         catch (Exception ex) {
             throw new Exception(ex.Message);
     }}
-    public async Task<IEnumerable<SessaoDTO>> GetSessoesTurma(int turmaId) {
+    public async Task<IEnumerable<SessaoDTO>?> GetSessoesTurma(int turmaId) {
         try {
             var Sessoes = await _SessaoPersist.GetSessoesTurmaIdAsync(turmaId);
             if (Sessoes == null) 
@@ -57,7 +57,7 @@ public class SessaoService : ISessaoService
         catch (Exception ex) {
             throw new Exception(ex.Message);
     }}
-    public async Task<SessaoDTO> GetSessaoAtivaTurmaIdAsync(int TurmaId){
+    public async Task<SessaoDTO?> GetSessaoAtivaTurmaIdAsync(int TurmaId){
         try {
             var sessao = await _SessaoPersist.GetSessaoAtivaTurmaIdAsync(TurmaId);
             if (sessao == null) 
@@ -67,21 +67,9 @@ public class SessaoService : ISessaoService
         catch (Exception ex) {
             throw new Exception(ex.Message);
     }}
-    public async Task<SessaoDTO> GetSessaoChavePub(string token){
-        try {
-            var sessoes = await _SessaoPersist.GetAllSessoesAsync();
-            var sessao = sessoes.FirstOrDefault(s =>
-                    s.TokenPublico == token &&
-                    s.Ativo &&
-                    s.DataFim == null);
-            return _mapper.Map<SessaoDTO>(sessao);
-        }
-        catch (Exception ex) {
-            throw new Exception(ex.Message);
-    }}
     #endregion
     #region add
-    public async Task<SessaoDTO> Add(SessaoDTO model) {
+    public async Task<SessaoDTO?> Add(SessaoDTO model) {
         try {
             var sessao = new Sessao
             {
@@ -102,7 +90,7 @@ public class SessaoService : ISessaoService
     }}
     #endregion
     #region update
-    public async Task<SessaoDTO> Update(int SessaoId, SessaoDTO model) {
+    public async Task<SessaoDTO?> Update(int SessaoId, SessaoDTO model) {
         try {
             var Sessao = await _SessaoPersist.GetSessaoIdAsync(SessaoId);
             if (Sessao == null) return null;
@@ -123,7 +111,7 @@ public class SessaoService : ISessaoService
         catch (Exception ex) {
             throw new Exception(ex.Message);
     }}
-    public async Task<SessaoDTO> EncerrarSessao(int SessaoId, SessaoDTO model) {
+    public async Task<SessaoDTO?> EncerrarSessao(int SessaoId, SessaoDTO model) {
         try {
             var Sessao = await _SessaoPersist.GetSessaoIdAsync(SessaoId);
             if (Sessao == null) return null;

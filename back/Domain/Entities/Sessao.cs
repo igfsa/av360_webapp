@@ -11,6 +11,6 @@ public class Sessao
     public int TurmaId { get; set; }
     public DateTime DataInicio { get; set; }
     public DateTime? DataFim { get; set; }
-    public string TokenPublico { get; set; }= "";
+    public string TokenPublico { get; set; } = "";
     public bool Ativo { get; set; }
 }

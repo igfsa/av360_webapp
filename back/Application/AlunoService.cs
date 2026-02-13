@@ -4,6 +4,7 @@ using Application.Contracts;
 using Application.DTOs;
 using Domain.Entities;
 using Persistence.Contracts;
+using Application.Helpers;
 
 namespace Application.Services;
 
@@ -13,23 +14,29 @@ public class AlunoService : IAlunoService
     private IAlunoPersist _alunoPersist;
     private IAlunoTurmaPersist _alunoTurmaPersist;
     private IAlunoGrupoPersist _alunoGrupoPersist;
+    private IGrupoPersist _grupoPersist;
+    private ITurmaPersist _turmaPersist;
     private readonly IMapper _mapper;
 
     public AlunoService(IGeralPersist geralPersist,
                         IAlunoPersist alunoPersist,
                         IAlunoTurmaPersist alunoTurmaPersist,
                         IAlunoGrupoPersist alunoGrupoPersist, 
+                        IGrupoPersist grupoPersist, 
+                        ITurmaPersist turmaPersist, 
                         IMapper mapper)
     {
         _geralPersist = geralPersist;
         _alunoPersist = alunoPersist;
         _alunoTurmaPersist = alunoTurmaPersist;
         _alunoGrupoPersist = alunoGrupoPersist;
+        _grupoPersist = grupoPersist;
+        _turmaPersist = turmaPersist;
         _mapper = mapper;
     }
 
     #region get
-    public async Task<IEnumerable<AlunoDTO>> GetAlunos(){
+    public async Task<IEnumerable<AlunoDTO>?> GetAlunos(){
         try{
             var alunos = await _alunoPersist.GetAllAlunosAsync();
             if (alunos == null) 
@@ -40,7 +47,7 @@ public class AlunoService : IAlunoService
             throw new Exception(ex.Message);
     }}
 
-    public async Task<AlunoDTO> GetAlunoById(int Id){
+    public async Task<AlunoDTO?> GetAlunoById(int Id){
         try {
             var aluno = await _alunoPersist.GetAlunoIdAsync(Id);
             if (aluno == null) 
@@ -51,7 +58,22 @@ public class AlunoService : IAlunoService
             throw new Exception(ex.Message);
     }}
 
-    public async Task<IEnumerable<AlunoDTO>> GetAlunosTurma(int turmaId){
+    public async Task<AlunoDTO?> GetAlunoByNomeIdGrupo(string nome, int grupoId){
+        try {
+            IEnumerable<AlunoDTO>? alunos = await GetAlunosGrupo(grupoId);
+            if (alunos == null)
+                throw new Exception("Alunos do Grupo não encontrados");
+            AlunoDTO? aluno = alunos.FirstOrDefault(a =>
+            Texto.Normalizar(a.Nome) == Texto.Normalizar(nome));
+            if (aluno == null) 
+                return null;
+            return _mapper.Map<AlunoDTO>(aluno);
+        }
+        catch (Exception ex) {
+            throw new Exception(ex.Message);
+    }}
+
+    public async Task<IEnumerable<AlunoDTO>?> GetAlunosTurma(int turmaId){
         try {
             var alunos = await _alunoTurmaPersist.GetAlunosTurmaIdAsync(turmaId);
             if (alunos == null) 
@@ -62,7 +84,7 @@ public class AlunoService : IAlunoService
         catch (Exception ex) {
             throw new Exception(ex.Message);
     }}
-    public async Task<IEnumerable<AlunoDTO>> GetAlunosGrupo(int grupoId){
+    public async Task<IEnumerable<AlunoDTO>?> GetAlunosGrupo(int grupoId){
         try {
             var alunos = await _alunoGrupoPersist.GetAlunosGrupoId(grupoId);
             if (alunos == null) 
@@ -73,9 +95,39 @@ public class AlunoService : IAlunoService
         catch (Exception ex) {
             throw new Exception(ex.Message);
     }}
+    public async Task<IEnumerable<AlunoGrupoNomeDTO>?> GetAlunoGrupoNome (int turmaId){
+        try {
+            var alunos = await _alunoTurmaPersist.GetAlunosTurmaIdAsync(turmaId);
+            var alunoGrupos = await _alunoGrupoPersist.GetAlunosGrupoTurmaId(turmaId);
+            var grupos = await _grupoPersist.GetGruposTurmaIdAsync(turmaId);
+            var turma = await _turmaPersist.GetTurmaIdAsync(turmaId);
+            if (turma == null)
+                throw new Exception("Turma não encontrada.");
+
+            var alunosGrupoNome = alunos.Select(aluno =>
+            {
+                var relacao = alunoGrupos.FirstOrDefault(ag => ag.AlunoId == aluno.Id);
+
+                var grupo = relacao != null ? grupos.FirstOrDefault(g => g.Id == relacao.GrupoId): null;
+                return new AlunoGrupoNomeDTO {
+                    AlunoId = aluno.Id,
+                    Nome = aluno.Nome,
+
+                    GrupoId = grupo?.Id,
+                    GrupoNome = grupo?.Nome,
+
+                    TurmaId = turma.Id,
+                    TurmaCod = turma.Cod
+                };
+            }).ToList();
+        return alunosGrupoNome;
+        }
+        catch (Exception ex) {
+            throw new Exception(ex.Message);
+    }}
     #endregion
     #region add
-    public async Task<AlunoDTO> Add(AlunoDTO model) {
+    public async Task<AlunoDTO?> Add(AlunoDTO model) {
         try {
             var aluno = _mapper.Map<Aluno>(model);
 
@@ -93,7 +145,7 @@ public class AlunoService : IAlunoService
     }}
     #endregion
     #region update
-    public async Task<AlunoDTO> Update(int alunoId, AlunoDTO model) {
+    public async Task<AlunoDTO?> Update(int alunoId, AlunoDTO model) {
         try {
             var aluno = await _alunoPersist.GetAlunoIdAsync(alunoId);
             if (aluno == null) 

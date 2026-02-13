@@ -24,7 +24,7 @@
     </thead>
     <tbody>
       @if (turmasFiltradas && turmasFiltradas.length){
-        @for (turma of turmasFiltradas; track turma; let t = $index){
+        @for (turma of turmasFiltradas; track turma.id){
           <tr>
             <td style= 'text-align: center'>{{turma.id}}</td>
             <td>{{turma.cod}}</td>

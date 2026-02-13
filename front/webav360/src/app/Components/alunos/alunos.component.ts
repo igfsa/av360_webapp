@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 
 import { AlunoService } from '../../Service/Aluno.service';
 import { Aluno } from '../../Models/Aluno';
-import { AvaliarModalComponent } from './modals/aluno_avaliar.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CriterioService } from '../../Service/Criterio.service';
 import { Criterio } from '../../Models/Criterio';
@@ -72,14 +71,5 @@ export class AlunosComponent implements OnInit {
       },
       error: (e) => console.log(e)
     })
-  }
-
-  public avaliar(){
-    const ref = this.modalService.open(AvaliarModalComponent, {
-      size: 'lg',
-      backdrop: 'static',
-      centered: true
-    });
-    ref.componentInstance.criterios = this.criterios;
   }
 }

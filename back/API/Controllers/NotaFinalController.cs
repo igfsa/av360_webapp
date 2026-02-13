@@ -40,15 +40,11 @@ namespace API.Controllers
 
         }
 
-        [HttpGet("{turmaId:int}", Name = "GetNotasFinaisAlunoSessao")]
+        [HttpGet("{sessaoId:int}", Name = "GetNotasFinaisAlunoSessao")]
         [ActionName("GetNotasFinaisAlunoSessao")]
         public async Task<ActionResult<IEnumerable<NotaFinalDTO>>> GetNotasFinaisAlunoSessao(int alunoId, int sessaoId) {
             try {
-                var NotasFinais = await _NotasFinaisService.GetNotasFinaisAlunoSessao(alunoId, sessaoId);
-                if (NotasFinais is null)
-                {
-                    return NotFound();
-                }
+                var NotasFinais = await _NotasFinaisService.GetNotasFinaisAlunoSessao(alunoId, sessaoId); 
                 return Ok(NotasFinais);
             }
             catch (Exception ex) {

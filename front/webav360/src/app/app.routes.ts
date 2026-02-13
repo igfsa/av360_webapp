@@ -7,6 +7,7 @@ import { CriteriosComponent } from './Components/criterios/criterios.component';
 import { AlunoTurmaComponent } from './Components/alunos_turma/alunos_turma.component';
 import { SessaoComponent } from './Components/sessao/sessao.component';
 import { AvaliacaoPublicaComponent } from './Components/avaliacao_publica/avaliacao_publica.component';
+import { AvaliacaoEncerradaComponent } from './Components/avaliacao_publica/Aux/avaliacao_encerrada.component';
 
 export const routes: Routes = [
   {path: '', component: TurmasComponent},
@@ -16,4 +17,5 @@ export const routes: Routes = [
   {path: 'Criterios', component: CriteriosComponent},
   {path: 'Sessao/:id', component: SessaoComponent},
   {path: 'avaliacao/publica/:token', component: AvaliacaoPublicaComponent},
+  {path: 'avaliacao/encerrada', component: AvaliacaoEncerradaComponent},
 ];

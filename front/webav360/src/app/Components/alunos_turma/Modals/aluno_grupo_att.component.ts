@@ -30,7 +30,7 @@ import { AlunoGrupo } from '../../../Models/AlunoGrupo';
           </tr>
         </thead>
         <tbody>
-          @for (aluno of alunosCheck; track aluno; let c = $index){
+          @for (aluno of alunosCheck; track aluno.alunoId){
             <tr (click)="!aluno.desabilitado && toggleAluno(aluno)"
                 [class.table-secondary]="aluno.desabilitado"
                 style="cursor: pointer"
@@ -58,7 +58,7 @@ import { AlunoGrupo } from '../../../Models/AlunoGrupo';
       </table>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-secondary btn-danger" (click)="modal.dismiss()">Cancelar</button>
+      <button class="btn btn-secondary btn-danger" (click)="modal.dismiss('cancel')">Cancelar</button>
       <button class="btn btn-secondary btn-success" (click)="salvar()">Salvar</button>
     </div>
   `

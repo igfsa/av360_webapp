@@ -25,7 +25,7 @@ public class NotaParcialService : INotaParcialService
 
     #region get
 
-    public async Task<NotaParcialDTO> GetById(int id) {
+    public async Task<NotaParcialDTO?> GetById(int id) {
         try {
             var NotaParcial = await _NotaParcialPersist.GetById(id);
             if (NotaParcial == null) 
@@ -36,7 +36,7 @@ public class NotaParcialService : INotaParcialService
         catch (Exception ex) {
             throw new Exception(ex.Message);
     }}
-    public async Task<IEnumerable<NotaParcialDTO>> GetNotaParcialNFinalId(int notaFinalId) {
+    public async Task<IEnumerable<NotaParcialDTO>?> GetNotaParcialNFinalId(int notaFinalId) {
         try {
             var NotasParciais = await _NotaParcialPersist.GetNotaParcialNFinalIdAsync(notaFinalId);
             if (NotasParciais == null) 
@@ -49,7 +49,7 @@ public class NotaParcialService : INotaParcialService
     }}
     #endregion
     #region add
-    public async Task<NotaParcialDTO> Add(NotaParcialDTO model) {
+    public async Task<NotaParcialDTO?> Add(NotaParcialDTO model) {
         try {
             var NotaParcial = _mapper.Map<NotaParcial>(model);
             _geralPersist.Add(NotaParcial);
@@ -64,7 +64,7 @@ public class NotaParcialService : INotaParcialService
     }}
     #endregion
     #region update
-    public async Task<NotaParcialDTO> Update(int NotaParcialId, NotaParcialDTO model) {
+    public async Task<NotaParcialDTO?> Update(int NotaParcialId, NotaParcialDTO model) {
         try {
             var NotaParcial = await _NotaParcialPersist.GetById(NotaParcialId);
             if (NotaParcial == null) return null;

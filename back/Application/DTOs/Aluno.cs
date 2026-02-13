@@ -9,7 +9,7 @@ public class AlunoDTO
     public int Id { get; set; }
     [Required]
     [StringLength (100)]
-    public string Nome { get; set; }
+    public string Nome { get; set; } = "";
     [JsonIgnore]
     public IEnumerable<TurmaDTO>? Turmas { get; set; }
     [JsonIgnore]

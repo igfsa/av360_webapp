@@ -36,6 +36,7 @@ import { AlunoGrupoModalComponent } from './Modals/aluno_grupo_att.component';
 import { AlunoGrupo } from '../../Models/AlunoGrupo';
 import { Sessao } from '../../Models/Sessao';
 import { SessaoService } from '../../Service/Sessao.service';
+import { AlunoGrupoNomes } from '../../Models/AlunoGrupoNomes';
 
 @Component({
   selector: 'app-alunos-turma',
@@ -72,6 +73,7 @@ export class AlunoTurmaComponent implements OnInit {
   public criterioIds: number[] = [];
   public turma: Turma = createEmptyTurma();
   public sessaoAtiva?: Sessao;
+  public alunoGrupo: AlunoGrupoNomes[] = [];
 
   public get filtroAlunos() {
     return this._filtroAlunos
@@ -158,8 +160,9 @@ export class AlunoTurmaComponent implements OnInit {
       criterios: this.criterioService.getCriteriosTurma(turmaId),
       grupos: this.grupoService.getGruposTurma(turmaId),
       turma: this.turmaService.getTurmaId(turmaId),
-      sessao: this.sessaoService.GetSessaoAtivaTurma(turmaId)
-    }).subscribe(({ alunos, criterios, grupos, turma, sessao }) => {
+      sessao: this.sessaoService.GetSessaoAtivaTurma(turmaId),
+      alunoGrupo: this.alunoService.getAlunoGrupoNome(turmaId)
+    }).subscribe(({ alunos, criterios, grupos, turma, sessao, alunoGrupo }) => {
       this.turma = turma;
 
       this.alunos = alunos;
@@ -170,6 +173,8 @@ export class AlunoTurmaComponent implements OnInit {
 
       this.grupos = grupos;
       this.gruposFiltrados = grupos;
+
+      this.alunoGrupo = alunoGrupo;
 
       this.sessaoAtiva = sessao;
 
@@ -244,7 +249,7 @@ export class AlunoTurmaComponent implements OnInit {
             });
           }
         }))
-      });
+      }).catch(() => {});
     })
   }
 
@@ -361,7 +366,7 @@ export class AlunoTurmaComponent implements OnInit {
             });
           }
         }))
-      });
+      }).catch(() => {});
   })}
 
 
@@ -431,6 +436,10 @@ export class AlunoTurmaComponent implements OnInit {
         }
       });
     }).catch(() => {});
+  }
+
+  public buscaAlunoGrupoId(id: number){
+    return this.alunoGrupo.find(ag => ag.alunoId == id)?.grupoNome;
   }
 
 }

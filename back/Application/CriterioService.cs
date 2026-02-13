@@ -31,12 +31,13 @@ public class CriterioService : ICriterioService
     }
 
     #region get
-    public async Task<IEnumerable<CriterioDTO>> GetCriterios()
+    public async Task<IEnumerable<CriterioDTO>?> GetCriterios()
     {
         try
         {
             var criterios = await _criterioPersist.GetAllCriteriosAsync();
-            if (criterios == null) return null;
+            if (criterios == null) 
+                return null;
 
             var resultado = _mapper.Map<IEnumerable<CriterioDTO>>(criterios);
 
@@ -48,7 +49,7 @@ public class CriterioService : ICriterioService
         }
     }
 
-    public async Task<CriterioDTO> GetCriterioById(int Id)
+    public async Task<CriterioDTO?> GetCriterioById(int Id)
     {
         try
         {
@@ -64,7 +65,7 @@ public class CriterioService : ICriterioService
             throw new Exception(ex.Message);
         }
     }
-    public async Task<IEnumerable<CriterioDTO>> GetCriteriosTurma(int turmaId)
+    public async Task<IEnumerable<CriterioDTO>?> GetCriteriosTurma(int turmaId)
     {
         try
         {
@@ -82,7 +83,7 @@ public class CriterioService : ICriterioService
     }
     #endregion
     #region add
-    public async Task<CriterioDTO> Add(CriterioDTO model)
+    public async Task<CriterioDTO?> Add(CriterioDTO model)
     {
         try
         {
@@ -105,7 +106,7 @@ public class CriterioService : ICriterioService
     }
     #endregion
     #region update
-    public async Task<CriterioDTO> Update(int criterioId, CriterioDTO model)
+    public async Task<CriterioDTO?> Update(int criterioId, CriterioDTO model)
     {
         try
         {

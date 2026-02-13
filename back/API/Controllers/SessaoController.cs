@@ -80,20 +80,6 @@ namespace API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError,
                 $"Erro ao tentar buscar Sessão. Erro: {ex.Message}");
         }}
-
-        [HttpGet(Name = "GetSessaoChavePub")]
-        [ActionName("GetSessaoChavePub")]
-        public async Task<ActionResult<SessaoDTO>> GetSessaoChavePub(string token) {
-            try{
-                var sessao = await _SessoesService.GetSessaoChavePub(token);
-                if (sessao == null)
-                    return NotFound("Sessão inválida ou encerrada");
-                return Ok(sessao);
-            }
-            catch (Exception ex) {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                $"Erro ao tentar buscar Sessão. Erro: {ex.Message}");
-        }}
         
         [HttpGet("{sessaoId}/qrcode")]
         public async Task<IActionResult> GetQrCode(int sessaoId)
@@ -102,7 +88,7 @@ namespace API.Controllers
             if (sessao == null) 
                 return NotFound();
 
-            var qrBytes = GeradorQrCode.GenerateQrCode($"https://seusite.com/avaliacao/publica/{sessao.TokenPublico}");
+            var qrBytes = GeradorQrCode.GenerateQrCode($"http://localhost:4200/avaliacao/publica/{sessao.TokenPublico}");
 
             return File(qrBytes, "image/png");
         }

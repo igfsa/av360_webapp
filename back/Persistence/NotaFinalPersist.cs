@@ -17,7 +17,7 @@ public class NotaFinalPersist : INotaFinalPersist
         return await _context.NotasFinais.AsNoTracking().FirstOrDefaultAsync(nf => nf.Id == notaFinalId);
     }
     public async Task<NotaFinal?> GetNotaFinalAlunoSessaoIdAsync(int alunoId, int sessaoId) {
-        return await _context.NotasFinais.AsNoTracking().FirstOrDefaultAsync(nf => nf.AvaliadorId == alunoId && nf.SessaoId == sessaoId);
+        return await _context.NotasFinais.AsNoTracking().FirstOrDefaultAsync(nf => nf.AvaliadorId == alunoId && nf.SessaoId == sessaoId) ?? null;
     }
     public async Task<NotaFinal[]> GetNotaFinalGrupoSessaoIdAsync(int grupoId, int sessaoId) {
         return await _context.NotasFinais

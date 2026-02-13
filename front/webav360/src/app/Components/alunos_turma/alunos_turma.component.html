@@ -1,7 +1,7 @@
 <div class="container">
   <div class="row m-2">
     <div class="col-6">
-      <h1 class = "">Turma {{turma?.cod}}</h1>
+      <h1 class = "">Turma {{turma.cod}}</h1>
     </div>
     <div class="col-3 p-2 header-button">
       <button id="btn-buscar" class="btn btn-primary w-100" (click)="editarTurma();" [disabled]="sessaoAtiva">
@@ -51,15 +51,17 @@
                 <tr>
                   <th style = 'width: 10%; text-align: center;'>#</th>
                   <th>Nome</th>
+                  <th style = 'width: 20%; text-align: center;'>Grupo Atual</th>
                   <th style = 'width: 20%; text-align: center;'>Ações</th>
                 </tr>
               </thead>
               <tbody>
                 @if (alunosFiltrados && alunosFiltrados.length){
-                  @for (aluno of alunosFiltrados; track aluno; let a = $index){
+                  @for (aluno of alunosFiltrados; track aluno.id){
                     <tr>
                       <td style= 'text-align: center'>{{aluno.id}}</td>
                       <td>{{aluno.nome}}</td>
+                      <td style= 'text-align: center'>{{buscaAlunoGrupoId(aluno.id)}}</td>
                       <td style= 'text-align: center'>
                         <button type="button" class="btn-editar btn btn-primary btn-sm mr-2 " [disabled]="sessaoAtiva">
                           <svg xmlns="http://www.w3.org/2000/svg" width="1.6rem" height="1.6rem" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
@@ -96,7 +98,7 @@
         <div ngbAccordionBody>
           <ng-template>
             <div class="m-2">
-              <span class="">Nota Máxima: {{turma?.notaMax}}</span >
+              <span class="">Nota Máxima: {{turma.notaMax}}</span >
               <div class="row">
                 <div class="col-9 p-2">
                   <input type="text" class="form-control " style = "font-size: 1.6rem;" placeholder="Buscar" [(ngModel)]="filtroCriterios">
@@ -121,7 +123,7 @@
               </thead>
               <tbody>
                 @if (criteriosFiltrados && criteriosFiltrados.length){
-                  @for (criterio of criteriosFiltrados; track criterio; let c = $index){
+                  @for (criterio of criteriosFiltrados; track criterio.id){
                     <tr>
                       <td style= 'text-align: center'>{{criterio.id}}</td>
                       <td>{{criterio.nome}}</td>
@@ -185,7 +187,7 @@
               </thead>
               <tbody>
                 @if (gruposFiltrados && gruposFiltrados.length){
-                  @for (grupo of gruposFiltrados; track grupo; let c = $index){
+                  @for (grupo of gruposFiltrados; track grupo.id){
                     <tr>
                       <td style= 'text-align: center'>{{grupo.id}}</td>
                       <td>{{grupo.nome}}</td>

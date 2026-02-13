@@ -7,5 +7,5 @@ public class CriterioDTO
 {
     public int Id { get; set; }
     [StringLength (100)]
-    public string Nome { get; set; }
+    public string Nome { get; set; } = "";
 }

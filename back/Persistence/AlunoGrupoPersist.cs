@@ -29,7 +29,7 @@ public class AlunoGrupoPersist : IAlunoGrupoPersist
             .AsNoTracking()
             .Where(ag => ag.TurmaId == turmaId)
             .ToArrayAsync();
-    }    
+    }
     public async Task<Aluno?> GetExisteAlunoGrupo(int grupoId, int alunoId)
     // Retorna um Aluno caso exista o AlunoGrupo
     {

@@ -8,6 +8,7 @@ using Application.DTOs;
 using Application.Helpers;
 using Domain.Entities;
 using Persistence.Contracts;
+using AutoMapper.Internal;
 
 namespace Application.Services;
 
@@ -32,7 +33,7 @@ public class TurmaService : ITurmaService
     }
 
     #region get
-    public async Task<IEnumerable<TurmaDTO>> GetTurmas(){
+    public async Task<IEnumerable<TurmaDTO>?> GetTurmas(){
         try{
             var turmas= await _turmaPersist.GetAllTurmasAsync();
             if (turmas== null) 
@@ -43,7 +44,7 @@ public class TurmaService : ITurmaService
         catch (Exception ex){
             throw new Exception(ex.Message);
     }}
-    public async Task<TurmaDTO> GetTurmaById(int Id){
+    public async Task<TurmaDTO?> GetTurmaById(int Id){
         try{
             var Turma = await _turmaPersist.GetTurmaIdAsync(Id);
             if (Turma == null) 
@@ -54,7 +55,7 @@ public class TurmaService : ITurmaService
         catch (Exception ex){
             throw new Exception(ex.Message);
     }}
-    public async Task<IEnumerable<TurmaDTO>> GetTurmasAluno(int alunoId){
+    public async Task<IEnumerable<TurmaDTO>?> GetTurmasAluno(int alunoId){
         try{
             var turmas = await _alunoTurmaPersist.GetTurmasAlunoIdAsync(alunoId);
             if (turmas == null) 
@@ -65,7 +66,7 @@ public class TurmaService : ITurmaService
         catch (Exception ex){
             throw new Exception(ex.Message);
     }}
-    public async Task<IEnumerable<TurmaDTO>> GetTurmasCriterio(int criterioId){
+    public async Task<IEnumerable<TurmaDTO>?> GetTurmasCriterio(int criterioId){
         try{
             var turmas = await _criterioTurmaPersist.GetTurmasCriterioIdAsync(criterioId);
             if (turmas == null) 
@@ -78,7 +79,7 @@ public class TurmaService : ITurmaService
     }}
     #endregion
     #region add
-    public async Task<TurmaDTO> Add(TurmaDTO model){
+    public async Task<TurmaDTO?> Add(TurmaDTO model){
         try{
             var Turma = _mapper.Map<Turma>(model);
             _geralPersist.Add(Turma);
@@ -91,10 +92,10 @@ public class TurmaService : ITurmaService
         catch (Exception ex){
             throw new Exception(ex.Message);
     }}
-    public async Task<AlunoDTO> AddTurmaAluno(int alunoId, int turmaId){
+    public async Task<AlunoDTO?> AddTurmaAluno(int alunoId, int turmaId){
         try{
-            Aluno aluno = await _alunoTurmaPersist.GetExisteAlunoTurma(turmaId, alunoId);
-            Turma turma = await _turmaPersist.GetTurmaIdAsync(turmaId);
+            Aluno? aluno = await _alunoTurmaPersist.GetExisteAlunoTurma(turmaId, alunoId);
+            Turma? turma = await _turmaPersist.GetTurmaIdAsync(turmaId);
             if( aluno == null && turma != null){
                 AlunoTurma at = new(){
                     TurmaId = turmaId,
@@ -112,7 +113,7 @@ public class TurmaService : ITurmaService
         catch (Exception ex){
             throw new Exception(ex.Message);
      }}    
-    public async Task<TurmaDTO> AddTurmaCriterio(TurmaCriterioDTO model){
+    public async Task<TurmaDTO?> AddTurmaCriterio(TurmaCriterioDTO model){
         try{
             var criteriosAtuais = await _criterioTurmaPersist.
                 GetCriteriosByIdTurmaIdAsync(model.turmaId);
@@ -148,16 +149,18 @@ public class TurmaService : ITurmaService
             HeaderValidated = null
         };
         using var stream = dto.Arquivo.OpenReadStream();
-        var encoding = CSV.EncodingDetector(stream);
+        var encoding = Texto.EncodingDetector(stream);
         using var reader = new StreamReader(stream, encoding, detectEncodingFromByteOrderMarks: true);
         using var csv = new CsvReader(reader, config);
         await csv.ReadAsync();
         csv.ReadHeader();
         var headers = csv.HeaderRecord;
+        if (headers == null)
+            throw new Exception($"Colunas da tabela não encontradas.");
         foreach (var h in headers){
             Console.WriteLine($"HEADER: '{h}'");
         }
-        if (!headers.Any(h =>CSV.Normalizar(h) == CSV.Normalizar(dto.ColunaNome))){
+        if (!headers.Any(h =>Texto.Normalizar(h) == Texto.Normalizar(dto.ColunaNome))){
             throw new Exception($"Coluna '{dto.ColunaNome}' não encontrada.");
         };
         int linha = 1;
@@ -178,7 +181,7 @@ public class TurmaService : ITurmaService
             }
             catch (Exception ex){
                 resultado.Falhas++;
-                resultado.Erros.Add(new CsvImportErrorDTO{
+                resultado.Erros.Append(new CsvImportErrorDTO{
                     Linha = linha,
                     Nome = nome,
                     Erro = ex.Message
@@ -189,7 +192,7 @@ public class TurmaService : ITurmaService
     }
     #endregion
     #region update
-    public async Task<TurmaDTO> Update(int turmaId, TurmaDTO model){
+    public async Task<TurmaDTO?> Update(int turmaId, TurmaDTO model){
         try{
             var turma = await _turmaPersist.GetTurmaIdAsync(turmaId);
             if (turma == null) 

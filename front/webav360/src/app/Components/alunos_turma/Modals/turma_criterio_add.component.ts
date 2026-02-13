@@ -34,7 +34,7 @@ import { CriterioCheckbox } from '../../../Models/CriterioCheckbox';
           </tr>
         </thead>
         <tbody>
-          @for (criterio of criteriosCheck; track criterio; let c = $index){
+          @for (criterio of criteriosCheck; track criterio.id){
             <tr (click)="toggleCriterio(criterio)"
                  style="cursor: pointer">
               <td width="4rem">

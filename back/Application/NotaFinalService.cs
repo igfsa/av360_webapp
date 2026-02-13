@@ -24,7 +24,7 @@ public class NotaFinalService : INotaFinalService
 
     #region get
 
-    public async Task<NotaFinalDTO> GetById(int id) {
+    public async Task<NotaFinalDTO?> GetById(int id) {
         try {
             var NotaFinal = await _NotaFinalPersist.GetNotaFinalIdAsync(id);
             if (NotaFinal == null) 
@@ -35,7 +35,7 @@ public class NotaFinalService : INotaFinalService
         catch (Exception ex) {
             throw new Exception(ex.Message);
     }}
-    public async Task<IEnumerable<NotaFinalDTO>> GetNotasFinaisAlunoSessao(int alunoId, int sessaoId) {
+    public async Task<IEnumerable<NotaFinalDTO>?> GetNotasFinaisAlunoSessao(int alunoId, int sessaoId) {
         try {
             var NotasFinais = await _NotaFinalPersist.GetNotaFinalAlunoSessaoIdAsync(alunoId, sessaoId);
             if (NotasFinais == null) 
@@ -46,7 +46,7 @@ public class NotaFinalService : INotaFinalService
         catch (Exception ex) {
             throw new Exception(ex.Message);
     }}
-    public async Task<IEnumerable<NotaFinalDTO>> GetNotasFinaisGrupoSessao(int grupoId, int sessaoId) {
+    public async Task<IEnumerable<NotaFinalDTO>?> GetNotasFinaisGrupoSessao(int grupoId, int sessaoId) {
         try {
             var NotasFinais = await _NotaFinalPersist.GetNotaFinalGrupoSessaoIdAsync(grupoId, sessaoId);
             if (NotasFinais == null) 
@@ -59,7 +59,7 @@ public class NotaFinalService : INotaFinalService
     }}
     #endregion
     #region add
-    public async Task<NotaFinalDTO> Add(NotaFinalDTO model) {
+    public async Task<NotaFinalDTO?> Add(NotaFinalDTO model) {
         try {
             var NotaFinal = _mapper.Map<NotaFinal>(model);
             _geralPersist.Add(NotaFinal);
@@ -74,7 +74,7 @@ public class NotaFinalService : INotaFinalService
     }}
     #endregion
     #region update
-    public async Task<NotaFinalDTO> Update(int NotaFinalId, NotaFinalDTO model) {
+    public async Task<NotaFinalDTO?> Update(int NotaFinalId, NotaFinalDTO model) {
         try {
             var NotaFinal = await _NotaFinalPersist.GetNotaFinalIdAsync(NotaFinalId);
             if (NotaFinal == null) return null;

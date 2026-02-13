@@ -83,6 +83,7 @@ builder.Services.AddScoped<IAlunoService, AlunoService>();
 builder.Services.AddScoped<IAlunoPersist, AlunoPersist>();
 
 builder.Services.AddScoped<IAvaliacaoService, AvaliacaoService>();
+builder.Services.AddScoped<IAvaliacaoNotifier, AvaliacaoNotifier>();
 
 builder.Services.AddScoped<ICriterioService, CriterioService>();
 builder.Services.AddScoped<ICriterioPersist, CriterioPersist>();
@@ -139,7 +140,7 @@ app.MapHub<TurmaHub>("/hubs/turma");
 app.MapHub<CriterioHub>("/hubs/criterio");
 app.MapHub<GrupoHub>("/hubs/grupo");
 app.MapHub<AvaliacaoHub>("/hubs/avaliacao");
-app.MapHub<AvaliacaoHub>("/hubs/sessao");
+app.MapHub<SessaoHub>("/hubs/sessao");
 
 app.UseEndpoints(endpoints =>
 {
