@@ -11,6 +11,11 @@ import { AvaliacaoItem } from '../../Models/AvaliacaoItem';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AvaliacaoAgrupada } from '../../Models/AvaliacaoAgrupada';
+import { forkJoin } from 'rxjs';
+import { Turma } from '../../Models/Turma';
+import { TurmaService } from '../../Service/Turma.service';
+import { AvaliacaoEnvio } from '../../Models/AvaliacaoEnvio';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-avaliacao_publica',
@@ -27,6 +32,7 @@ export class AvaliacaoPublicaComponent implements OnInit {
   step = 1;
   token!: string;
   dados!: AvaliacaoPublica;
+  turma!: Turma;
   grupos: Grupo[] = [];
   alunosGrupo: Aluno[] = [];
   criterios: Criterio[] = [];
@@ -34,15 +40,20 @@ export class AvaliacaoPublicaComponent implements OnInit {
   nomeAluno = '';
   alunoLogado!: Aluno;
   avaliacoes: AvaliacaoAgrupada[] = [];
+  avaliacaoEnvio!: AvaliacaoEnvio;
   indiceAtual = 0;
+  carregandoDados: boolean = true;
+  carregandoAvaliacao: boolean = true;
+  editarNotas: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
     private avaliacaoService: AvaliacaoService,
     private alunoService: AlunoService,
+    private turmaService: TurmaService,
     private deviceService: DeviceService,
     private router: Router,
-    private cdr: ChangeDetectorRef,
+    public cdr: ChangeDetectorRef
   ) {}
 
   get atual() {
@@ -56,21 +67,20 @@ export class AvaliacaoPublicaComponent implements OnInit {
 
   public carregarSessao() {
     this.avaliacaoService.GetValidaSessaoChavePub(this.token).subscribe({
-      next: (dto) => {this.dados = dto, this.grupos = dto.grupos, this.criterios = dto.criterios,
-        console.log(this.grupos);
-        console.log(this.criterios);
-        console.log(this.dados);},
+      next: (dto) => {
+        this.dados = dto,
+        this.grupos = [...dto.grupos].sort((a, b) => a.id - b.id);
+        this.criterios = [...dto.criterios].sort((a, b) => a.id - b.id);
+        this.carregandoDados = false;
+
+        this.cdr.detectChanges();
+      },
       error: (erro) => {console.log(erro); this.router.navigate(['/avaliacao/encerrada'])}
     });
-    this.criterios.sort((a, b) => a.id - b.id);
-    this.grupos.sort((a, b) => a.id - b.id);
-
-    this.cdr.detectChanges();
   }
 
   public selecionarGrupo(grupo: any) {
     this.grupoSelecionado = grupo;
-    this.alunoService.getAlunosGrupo(this.grupoSelecionado.id).subscribe(res => this.alunosGrupo = res );
     this.step = 2;
   }
 
@@ -78,44 +88,89 @@ export class AvaliacaoPublicaComponent implements OnInit {
     if (!this.grupoSelecionado)
       return;
     this.alunoService.getAlunoNomeIdGrupo(this.grupoSelecionado.id, this.nomeAluno).subscribe(
-      aluno => {this.alunoLogado = aluno;
-      this.carregarAvaliacao();
-      console.log(this.avaliacoes);
+      aluno => {
+        this.alunoLogado = aluno;
+        this.carregarAvaliacao();
     });
   }
 
-  public carregarAvaliacao() {
-    this.avaliacaoService.GeraNovaAvaliacaoEnvio(
-      this.dados.sessaoId,
-      this.grupoSelecionado.id,
-      this.alunoLogado.id
-    ).subscribe(data => {
-      this.avaliacoes =  this.agruparAvaliacao(data.itens);
-      this.indiceAtual = 0;
-      this.step = 3;
-    });
+  public async carregarAvaliacao() {
+    const hash = await this.deviceService.getDeviceHash();
+  //   forkJoin({
+  //     avaliacao: this.avaliacaoService.GeraNovaAvaliacaoEnvio(
+  //       this.dados.sessaoId,
+  //       this.grupoSelecionado.id,
+  //       this.alunoLogado.id,
+  //       hash
+  //     ),
+  //     alunos: this.alunoService.getAlunosGrupo(this.grupoSelecionado.id),
+  //     turma: this.turmaService.getTurmaId(this.dados.turmaId)
+  //   }).subscribe({
+  //     next: ({avaliacao, alunos, turma}) => {
+  //       this.alunosGrupo = alunos;
+  //       this.avaliacaoEnvio = avaliacao;
+  //       console.log(this.avaliacaoEnvio)
+  //       this.avaliacoes =  this.agruparAvaliacao(avaliacao.itens);
+  //       this.turma = turma
+  //       this.indiceAtual = 0;
+  //       this.step = 3;
+  //       this.carregandoAvaliacao = false;
+
+  //       this.cdr.detectChanges();
+  //     },
+  //     error: (err) => {
+  // console.log("ERROR EXECUTADO", err);
+  //       Swal.fire({
+  //         icon: 'error',
+  //         title: 'Erro',
+  //         text: err.error?.message ?? `${err}`
+  //       });
+  //     }
+  //   });
+  forkJoin({
+  avaliacao: this.avaliacaoService.GeraNovaAvaliacaoEnvio(
+    this.dados.sessaoId,
+    this.grupoSelecionado.id,
+    this.alunoLogado.id,
+    hash
+  ),
+  alunos: this.alunoService.getAlunosGrupo(this.grupoSelecionado.id),
+  turma: this.turmaService.getTurmaId(this.dados.turmaId)
+})
+.subscribe({
+  next: (res) => {
+    console.log("NEXT EXECUTADO", res);
+  },
+  error: (err) => {
+    console.log("ERROR DO SUBSCRIBE EXECUTADO", err);
+    alert("Erro caiu aqui");
   }
+});}
+
 
   public proximo() {
     if (!this.avaliacaoValida(this.atual)) return;
 
+    if(this.editarNotas) {
+      this.step = 4;
+      return
+    }
+
     this.indiceAtual++;
     if (this.indiceAtual === this.avaliacoes.length) {
+      this.editarNotas = true;
       this.step = 4;
     }
   }
 
-  public async enviar() {
-    const hash = await this.deviceService.getDeviceHash();
+  public enviar() {
     const itens = this.desagruparAvaliacao(this.avaliacoes);
 
-    this.avaliacaoService.PostAvaliacao({
-      avaliadorId: this.alunoLogado.id,
-      deviceHash: hash,
-      grupoId: this.grupoSelecionado.id,
-      itens: itens,
-      sessaoId: this.dados.sessaoId
-    }).subscribe(() => {
+    this.avaliacaoEnvio.itens = itens;
+
+    console.log(itens);
+
+    this.avaliacaoService.PostAvaliacao(this.avaliacaoEnvio).subscribe(() => {
       this.step = 5;
     });
   }
@@ -126,7 +181,7 @@ export class AvaliacaoPublicaComponent implements OnInit {
   }
 
   public avaliacaoValida(item: any): boolean {
-    return item.criterios.every((c: any) => c.nota !== null);
+    return item.criterios.every((c: any) => (c.nota >= 1 && c.nota <= this.turma.notaMax) || c.nota !== null);
   }
 
   private agruparAvaliacao(itens: AvaliacaoItem[]): AvaliacaoAgrupada[] {

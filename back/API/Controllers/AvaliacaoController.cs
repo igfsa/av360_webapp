@@ -39,13 +39,14 @@ namespace API.Controllers
 
         [HttpGet(Name = "GeraNovaAvaliacaoEnvio")]
         [ActionName("GeraNovaAvaliacaoEnvio")]
-        public async Task<ActionResult<AvaliacaoEnvioDTO>> GeraNovaAvaliacaoEnvio(int sessaoId, int grupoId, int avaliadorId) {
+        public async Task<ActionResult<AvaliacaoEnvioDTO>> GeraNovaAvaliacaoEnvio(int sessaoId, int grupoId, int avaliadorId, string deviceHash) {
             try{
                 var avaliacao = new AvaliacaoEnvioDTO
                 {
                     SessaoId = sessaoId,
                     GrupoId = grupoId,
-                    AvaliadorId = avaliadorId
+                    AvaliadorId = avaliadorId,
+                    DeviceHash = deviceHash
                 }; 
                 var avaliacaoRes = await _avaliacaoService.GeraNovaAvaliacaoEnvio(avaliacao);
                 return Ok(avaliacaoRes);

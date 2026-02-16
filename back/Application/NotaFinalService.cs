@@ -35,12 +35,12 @@ public class NotaFinalService : INotaFinalService
         catch (Exception ex) {
             throw new Exception(ex.Message);
     }}
-    public async Task<IEnumerable<NotaFinalDTO>?> GetNotasFinaisAlunoSessao(int alunoId, int sessaoId) {
+    public async Task<NotaFinalDTO?> GetNotasFinaisAlunoSessao(int alunoId, int sessaoId) {
         try {
             var NotasFinais = await _NotaFinalPersist.GetNotaFinalAlunoSessaoIdAsync(alunoId, sessaoId);
             if (NotasFinais == null) 
                 return null;
-            var resultado = _mapper.Map<IEnumerable<NotaFinalDTO>>(NotasFinais);
+            var resultado = _mapper.Map<NotaFinalDTO>(NotasFinais);
             return resultado;
         }
         catch (Exception ex) {

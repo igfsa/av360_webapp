@@ -66,8 +66,17 @@ public class AvaliacaoService : IAvaliacaoService
 
     public async Task<AvaliacaoEnvioDTO> GeraNovaAvaliacaoEnvio(AvaliacaoEnvioDTO avaliacao) {
         try{
+            if (await _alunoGrupoService.GetExisteAlunoGrupo(avaliacao.GrupoId, avaliacao.AvaliadorId) == null)
+                throw new Exception("Aluno não inserido no grupo");
+            if (await _notaFinalPersist.GetNotaFinalAlunoSessaoIdAsync(avaliacao.AvaliadorId, avaliacao.SessaoId) != null)
+                throw new Exception("Aluno já avaliou nesta sessão");
+            if (await _notaFinalPersist.GetNotaFinalHashAsync(avaliacao.DeviceHash, avaliacao.SessaoId) != null)
+                throw new Exception("Dispositivo já avaliou nesta sessão");
+
+            var sessao = await _sessaoService.GetSessaoById(avaliacao.SessaoId) ?? throw new Exception("Sessão inválida");
             var grupo = await _grupoService.GetGrupoById(avaliacao.GrupoId) ?? throw new Exception("Grupo inválido");
             var turma = await _turmaService.GetTurmaById(grupo.TurmaId) ?? throw new Exception("Turma inválida");
+            
             var criterios = await _criterioService.GetCriteriosTurma(turma.Id) ?? [];
             var alunos = await _alunoService.GetAlunosGrupo(avaliacao.GrupoId) ?? [];
             var itensAdd = alunos.SelectMany(a => 
@@ -111,7 +120,6 @@ public class AvaliacaoService : IAvaliacaoService
             };
             _geralPersist.Add(final);
             await _geralPersist.SaveChangesAsync();
-            Console.WriteLine($"-------------------------------------------------{final.Id}-------------------------------------------------");
             var paraAdicionar = model.Itens
                 .Select(np => 
                     new NotaParcial{

@@ -1,0 +1,110 @@
+.avaliacao-container {
+  position: relative;
+  width: 100%;
+  padding: 8px;
+}
+
+/* Scroll container */
+.tabela-wrapper {
+  position: relative;
+  overflow: auto;
+  max-height: 70vh; // ativa scroll vertical
+  -webkit-overflow-scrolling: touch;
+  border-radius: 12px;
+}
+
+/* Gradiente lateral direito */
+.tabela-wrapper::after {
+  content: "";
+  position: sticky;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 30px;
+  pointer-events: none;
+  background: linear-gradient(to left, rgba(0,0,0,0.08), transparent);
+  float: right;
+}
+
+/* Tabela */
+.tabela-avaliacao {
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 800px;
+  width: max-content;
+  font-size: 14px;
+}
+
+/* Células */
+.tabela-avaliacao th,
+.tabela-avaliacao td {
+  padding: 12px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* =========================
+   HEADER FIXO
+========================= */
+.tabela-avaliacao thead th {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  font-weight: 600;
+}
+
+/* =========================
+   PRIMEIRA COLUNA FIXA
+========================= */
+.sticky-col {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  text-align: left;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.05);
+}
+
+/* Header + coluna fixa precisa ficar acima */
+thead .sticky-col {
+  z-index: 5;
+}
+
+/* =========================
+   PRIMEIRA LINHA FIXA
+========================= */
+
+/* Ajuste especial para célula que é coluna fixa + primeira linha */
+tr.first-row th.sticky-col {
+  z-index: 6;
+}
+
+/* Nome do aluno */
+.nome-col {
+  min-width: 160px;
+  font-weight: 600;
+}
+
+/* Colunas critério */
+.criterio-col {
+  min-width: 100px;
+}
+
+/* Nota estilo badge */
+.nota-badge {
+  display: inline-block;
+  min-width: 36px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  background: #e9ecef;
+  font-weight: 600;
+}
+
+/* Botão */
+.btn-editar {
+  border: none;
+  background: #0d6efd;
+  color: white;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 14px;
+}

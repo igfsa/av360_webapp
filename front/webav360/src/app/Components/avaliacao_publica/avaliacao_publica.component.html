@@ -1,78 +1,112 @@
 <div class="container">
   <h1>Etapa {{step}}/5</h1>
-  @if(step === 1){
-    <div>
-      <h2>Escolha seu grupo</h2>
-      @for (grupo of grupos; track grupo.id) {
-        <button class="btn btn-outline-primary w-100 m-2" (click)="selecionarGrupo(grupo)">
-          {{ grupo.nome }}
-        </button>
-      }
-    </div>
-  }
-  @else if(step === 2){
-    <div class="input-group mb-3 row">
-      <label class="input-group-text w-25" style="font-size: 1.6rem;">Nome:</label>
-      <input
-        type="text"
-        class="form-control"
-        style="font-size: 1.6rem;"
-        [(ngModel)]="nomeAluno"
-      />
-    </div>
-    <button class="btn btn-primary" (click)="validarAluno()">Continuar</button>
-  }
-  @else if(step === 3){
-    <div>
-      <h3>Avaliando {{ atual.avaliadoNome }}</h3>
-      <table>
-        @for (criterio of atual.criterios; track criterio.criterioId) {
-          <tr>
-            <label class="input-group-text" style="font-size: 1.6rem;">{{ criterio.criterioNome }}</label>
-            <input type="number"
-              class="form-control"
-              style="font-size: 1.6rem;"
-              [(ngModel)]="criterio.nota"
-              placeholder="Nota" />
-          </tr>
-        }
-      </table>
-
-      <button class="btn btn-primary" (click)="proximo()">Próximo</button>
-    </div>
-  }
-  @else if(step === 4){
-    <div>
-      <h2>Resumo</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Aluno </th>
-            @for (criterio of criterios; track criterio.id) {
-              <th>{{criterio.nome}}</th>
-            }
-            <th>Alterar</th>
-          </tr>
-        </thead>
-        @for (avaliacao of avaliacoes; track avaliacao.avaliadoId; let a = $index) {
-        <tr>
-          <td>{{ avaliacao.avaliadoNome }}</td>
-          @for (criterio of avaliacao.criterios; track criterio.criterioId) {
-            <td>{{criterio.nota}}</td>
+  @if(!carregandoDados){
+    @if(step === 1){
+      <div>
+        <h2>Escolha seu grupo</h2>
+          @for (grupo of grupos; track grupo.id) {
+            <button class="btn btn-outline-primary w-100 m-2" (click)="selecionarGrupo(grupo)">
+              {{ grupo.nome }}
+            </button>
           }
-          <td><button class="btn btn-primary" (click)="editar(a)">Editar</button></td>
-        </tr>
-      }
-      </table>
+      </div>
+    }
+    @else if(step === 2){
+      <div class="input-group mb-3 row">
+        <label class="input-group-text w-25" style="font-size: 1.6rem;">Nome:</label>
+        <input
+          type="text"
+          class="form-control"
+          style="font-size: 1.6rem;"
+          [(ngModel)]="nomeAluno"
+        />
+      </div>
+      <button class="btn btn-primary" (click)="validarAluno()">Continuar</button>
+    }
+    @else if(step === 3){
+      <div>
+      @if (!carregandoAvaliacao) {
+        <h3>Avaliando {{ atual.avaliadoNome }}</h3>
+          <table>
+            @for (criterio of atual.criterios; track criterio.criterioId) {
+              <tr>
+                <label class="input-group-text" style="font-size: 1.6rem;">{{ criterio.criterioNome }}</label>
+                <input type="number"
+                  class="form-control"
+                  style="font-size: 1.6rem;"
+                  [(ngModel)]="criterio.nota"
+                  placeholder="Nota" />
+              </tr>
+            }
+          </table>
 
-      <button class="btn btn-primary" (click)="enviar()">Enviar avaliação</button>
-    </div>
-  }  @else if(step == 5){
-    <div>
-      <h2>Avaliação enviada com sucesso!</h2>
-      <p>Obrigado por participar.</p>
-    </div>
-  } @else {
-    <p>Ocorreu um erro</p>
-  }
+          <button class="btn btn-primary" (click)="proximo()">Próximo</button>
+      }@else {
+        <span>Buscando Dados de Avaliação...</span>
+      }
+     </div>
+    }
+    @else if(step === 4){
+      <div>
+        <h2>Resumo</h2>
+        <div class="avaliacao-container">
+
+          <div class="tabela-wrapper">
+            <table class="tabela-avaliacao table text-center table-hover">
+
+              <thead class="table-dark">
+                <tr class="first-row">
+                  <th class="sticky-col nome-col">Aluno</th>
+
+                  @for (criterio of criterios; track criterio.id) {
+                    <th class="criterio-col">
+                      {{ criterio.nome }}
+                    </th>
+                  }
+
+                  <th class="acao-col">Ação</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                @for (avaliacao of avaliacoes; track avaliacao.avaliadoId; let a = $index) {
+                  <tr>
+
+                    <td class="sticky-col nome-col">
+                      {{ avaliacao.avaliadoNome }}
+                    </td>
+
+                    @for (criterio of avaliacao.criterios; track criterio.criterioId) {
+                      <td class="nota-col">
+                        <span class="nota-badge">
+                          {{ criterio.nota }}
+                        </span>
+                      </td>
+                    }
+
+                    <td class="acao-col">
+                      <button class="btn-editar" (click)="editar(a)">Editar</button>
+                    </td>
+
+                  </tr>
+                }
+              </tbody>
+
+            </table>
+          </div>
+
+        </div>
+
+        <button class="btn btn-primary" (click)="enviar()">Enviar avaliação</button>
+      </div>
+    }  @else if(step == 5){
+      <div>
+        <h2>Avaliação enviada com sucesso!</h2>
+        <p>Obrigado por participar.</p>
+      </div>
+    } @else {
+      <p>Ocorreu um erro</p>
+    }} @else {
+      <span>Buscando Dados de Sessão...</span>
+    }
 </div>
