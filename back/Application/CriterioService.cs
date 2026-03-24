@@ -4,6 +4,7 @@ using Application.Contracts;
 using Application.DTOs;
 using Domain.Entities;
 using Persistence.Contracts;
+using Domain.Exceptions;
 
 namespace Application.Services;
 
@@ -12,124 +13,92 @@ public class CriterioService : ICriterioService
     private readonly IGeralPersist _geralPersist;
     private ICriterioPersist _criterioPersist;
     private ICriterioTurmaPersist _criterioTurmaPersist;
-    private readonly ITurmaService _turmaService;
 
     private readonly IMapper _mapper;
 
     public CriterioService(IGeralPersist geralPersist,
                         ICriterioPersist criterioPersist, 
-                        ITurmaService turmaService,
                         IMapper mapper,
                         ICriterioTurmaPersist criterioTurmaPersist)
     {
         _geralPersist = geralPersist;
         _criterioPersist = criterioPersist;
-        _turmaService = turmaService;
         _mapper = mapper;
         _criterioTurmaPersist = criterioTurmaPersist;
         
     }
 
     #region get
-    public async Task<IEnumerable<CriterioDTO>?> GetCriterios()
+    public async Task<IEnumerable<CriterioDTO>> GetCriterios()
     {
         try
         {
-            var criterios = await _criterioPersist.GetAllCriteriosAsync();
-            if (criterios == null) 
-                return null;
+            var criterios = await _criterioPersist.GetAllCriteriosAsync()
+                ?? throw new NotFoundException("Nenhum critério encontrado");
 
-            var resultado = _mapper.Map<IEnumerable<CriterioDTO>>(criterios);
-
-            return resultado;
+            return _mapper.Map<IEnumerable<CriterioDTO>>(criterios);
         }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
+        catch {
+            throw;
         }
     }
 
-    public async Task<CriterioDTO?> GetCriterioById(int Id)
+    public async Task<CriterioDTO> GetCriterioById(int Id)
     {
         try
         {
-            var criterio = await _criterioPersist.GetCriterioIdAsync(Id);
-            if (criterio == null) return null;
+            var criterio = await _criterioPersist.GetCriterioIdAsync(Id)
+                ?? throw new NotFoundException("Critério não encontrado");
 
-            var resultado = _mapper.Map<CriterioDTO>(criterio);
-
-            return resultado;
+            return _mapper.Map<CriterioDTO>(criterio);
         }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
+        catch {
+            throw;
         }
     }
-    public async Task<IEnumerable<CriterioDTO>?> GetCriteriosTurma(int turmaId)
+    public async Task<IEnumerable<CriterioDTO>> GetCriteriosTurma(int turmaId)
     {
         try
         {
-            var criterios = await _criterioTurmaPersist.GetCriteriosTurmaIdAsync(turmaId);
-            if (criterios == null) return null;
+            var criterios = await _criterioTurmaPersist.GetCriteriosTurmaIdAsync(turmaId)
+                ?? throw new NotFoundException("Nenhum critério encontrado");
 
-            var resultado = _mapper.Map<IEnumerable<CriterioDTO>>(criterios);
-
-            return resultado;
+            return _mapper.Map<IEnumerable<CriterioDTO>>(criterios);
         }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
+        catch {
+            throw;
         }
     }
     #endregion
     #region add
-    public async Task<CriterioDTO?> Add(CriterioDTO model)
-    {
-        try
-        {
-            var criterio = _mapper.Map<Criterio>(model);
-
+    public async Task<CriterioDTO> Add(CriterioDTO model){
+        try{
+            var criterio = new Criterio(
+                nome: model.Nome
+            );
             _geralPersist.Add(criterio);
-
-            if (await _geralPersist.SaveChangesAsync())
-            {
-                var CriterioRetorno = await _criterioPersist.GetCriterioIdAsync(criterio.Id);
-
-                return _mapper.Map<CriterioDTO>(CriterioRetorno);
-            }
-            return null;
+            var CriterioRetorno = await _criterioPersist.GetCriterioIdAsync(criterio.Id);
+            return _mapper.Map<CriterioDTO>(CriterioRetorno);
         }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
+        catch {
+            throw;
         }
     }
     #endregion
     #region update
-    public async Task<CriterioDTO?> Update(int criterioId, CriterioDTO model)
+    public async Task<CriterioDTO> Update(int criterioId, CriterioDTO model)
     {
         try
         {
-            var criterio = await _criterioPersist.GetCriterioIdAsync(criterioId);
-            if (criterio == null) return null;
+            var criterio = await _criterioPersist.GetCriterioIdAsync(criterioId)
+                ?? throw new NotFoundException("Critério não encontrado");
+            criterio.AtualizarCriterio(model.Nome);
 
-            model.Id = criterio.Id;
-
-            _mapper.Map(model, criterio);
-
-            _geralPersist.Update(criterio);
-
-            if (await _geralPersist.SaveChangesAsync())
-            {
-                var criterioRetorno = await _criterioPersist.GetCriterioIdAsync(criterioId);
-
-                return _mapper.Map<CriterioDTO>(criterioRetorno);
-            }
-            return null;
+            var criterioRetorno = await _criterioPersist.GetCriterioIdAsync(criterioId);
+            return _mapper.Map<CriterioDTO>(criterioRetorno);
         }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
+        catch {
+            throw;
         }
     }
     #endregion 

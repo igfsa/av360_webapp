@@ -5,6 +5,7 @@ using Application.DTOs;
 using Domain.Entities;
 using Persistence.Contracts;
 using Application.Helpers;
+using Domain.Exceptions;
 
 namespace Application.Services;
 
@@ -36,73 +37,66 @@ public class AlunoService : IAlunoService
     }
 
     #region get
-    public async Task<IEnumerable<AlunoDTO>?> GetAlunos(){
+    public async Task<IEnumerable<AlunoDTO>> GetAlunos(){
         try{
-            var alunos = await _alunoPersist.GetAllAlunosAsync();
-            if (alunos == null) 
-                return null;
+            var alunos = await _alunoPersist.GetAllAlunosAsync()
+                ?? throw new NotFoundException("Nenhum aluno encontrado");
             return _mapper.Map<IEnumerable<AlunoDTO>>(alunos);
         }
         catch (Exception ex){
             throw new Exception(ex.Message);
     }}
 
-    public async Task<AlunoDTO?> GetAlunoById(int Id){
+    public async Task<AlunoDTO> GetAlunoById(int Id){
         try {
-            var aluno = await _alunoPersist.GetAlunoIdAsync(Id);
-            if (aluno == null) 
-                return null;
+            var aluno = await _alunoPersist.GetAlunoIdAsync(Id)
+                ?? throw new NotFoundException("Aluno não encontrado");
             return _mapper.Map<AlunoDTO>(aluno);
         }
-        catch (Exception ex) {
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
 
-    public async Task<AlunoDTO?> GetAlunoByNomeIdGrupo(string nome, int grupoId){
+    public async Task<AlunoDTO> GetAlunoByNomeIdGrupo(string nome, int grupoId){
         try {
-            IEnumerable<AlunoDTO>? alunos = await GetAlunosGrupo(grupoId);
-            if (alunos == null)
-                throw new Exception("Alunos do Grupo não encontrados");
+            IEnumerable<AlunoDTO>? alunos = await GetAlunosGrupo(grupoId)
+                ?? throw new NotFoundException("Nenhum aluno encontrado");
             AlunoDTO? aluno = alunos.FirstOrDefault(a =>
-            Texto.Normalizar(a.Nome) == Texto.Normalizar(nome));
-            if (aluno == null) 
-                return null;
+            Texto.Normalizar(a.Nome) == Texto.Normalizar(nome))
+                ?? throw new NotFoundException("Aluno não encontrado");
             return _mapper.Map<AlunoDTO>(aluno);
         }
-        catch (Exception ex) {
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
 
-    public async Task<IEnumerable<AlunoDTO>?> GetAlunosTurma(int turmaId){
+    public async Task<IEnumerable<AlunoDTO>> GetAlunosTurma(int turmaId){
         try {
-            var alunos = await _alunoTurmaPersist.GetAlunosTurmaIdAsync(turmaId);
-            if (alunos == null) 
-                return null;
+            var alunos = await _alunoTurmaPersist.GetAlunosTurmaIdAsync(turmaId)
+                ?? throw new NotFoundException("Nenhum aluno encontrado");
                 
             return _mapper.Map<IEnumerable<AlunoDTO>>(alunos);
         }
-        catch (Exception ex) {
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
-    public async Task<IEnumerable<AlunoDTO>?> GetAlunosGrupo(int grupoId){
+    public async Task<IEnumerable<AlunoDTO>> GetAlunosGrupo(int grupoId){
         try {
-            var alunos = await _alunoGrupoPersist.GetAlunosGrupoId(grupoId);
-            if (alunos == null) 
-                return null;
+            var alunos = await _alunoGrupoPersist.GetAlunosGrupoId(grupoId)
+                ?? throw new NotFoundException("Nenhum aluno encontrado");
 
             return _mapper.Map<IEnumerable<AlunoDTO>>(alunos);
         }
-        catch (Exception ex) {
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
-    public async Task<IEnumerable<AlunoGrupoNomeDTO>?> GetAlunoGrupoNome (int turmaId){
+    public async Task<IEnumerable<AlunoGrupoNomeDTO>> GetAlunoGrupoNome (int turmaId){
         try {
             var alunos = await _alunoTurmaPersist.GetAlunosTurmaIdAsync(turmaId);
             var alunoGrupos = await _alunoGrupoPersist.GetAlunosGrupoTurmaId(turmaId);
             var grupos = await _grupoPersist.GetGruposTurmaIdAsync(turmaId);
-            var turma = await _turmaPersist.GetTurmaIdAsync(turmaId);
-            if (turma == null)
-                throw new Exception("Turma não encontrada.");
+            var turma = await _turmaPersist.GetTurmaIdAsync(turmaId)
+                ?? throw new NotFoundException("Turma não encontrada");
 
             var alunosGrupoNome = alunos.Select(aluno =>
             {
@@ -122,47 +116,39 @@ public class AlunoService : IAlunoService
             }).ToList();
         return alunosGrupoNome;
         }
-        catch (Exception ex) {
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
     #endregion
     #region add
-    public async Task<AlunoDTO?> Add(AlunoDTO model) {
+    public async Task<AlunoDTO> Add(AlunoDTO model) {
         try {
-            var aluno = _mapper.Map<Aluno>(model);
+            var aluno = new Aluno(model.Nome);
 
             _geralPersist.Add(aluno);
 
-            if (await _geralPersist.SaveChangesAsync()) {
-                var alunoRetorno = await _alunoPersist.GetAlunoIdAsync(aluno.Id);
-
-                return _mapper.Map<AlunoDTO>(alunoRetorno);
-            }
-            return null;
+            await _geralPersist.SaveChangesAsync();
+            return _mapper.Map<AlunoDTO>(aluno);
         }
-        catch (Exception ex) {
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
     #endregion
     #region update
-    public async Task<AlunoDTO?> Update(int alunoId, AlunoDTO model) {
+    public async Task<AlunoDTO> Update(int alunoId, AlunoDTO model) {
         try {
-            var aluno = await _alunoPersist.GetAlunoIdAsync(alunoId);
-            if (aluno == null) 
-                return null;
+            var aluno = await _alunoPersist.GetAlunoIdAsync(alunoId)
+                ?? throw new NotFoundException("Aluno não encontrado");
 
             model.Id = aluno.Id;
             _mapper.Map(model, aluno);
-            _geralPersist.Update(aluno);
-            if (await _geralPersist.SaveChangesAsync()) {
-                var alunoRetorno = await _alunoPersist.GetAlunoIdAsync(alunoId);
-
-                return _mapper.Map<AlunoDTO>(alunoRetorno);
-            }
-            return null;
+            aluno.AtualizarAluno(aluno.Nome);
+            await _geralPersist.SaveChangesAsync();
+            var alunoRetorno = await _alunoPersist.GetAlunoIdAsync(alunoId);
+            return _mapper.Map<AlunoDTO>(alunoRetorno);
         }
-        catch (Exception ex) {
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
     #endregion
 }

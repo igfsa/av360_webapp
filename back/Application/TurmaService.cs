@@ -8,7 +8,7 @@ using Application.DTOs;
 using Application.Helpers;
 using Domain.Entities;
 using Persistence.Contracts;
-using AutoMapper.Internal;
+using Domain.Exceptions;
 
 namespace Application.Services;
 
@@ -16,123 +16,104 @@ public class TurmaService : ITurmaService
 {
     private readonly IGeralPersist _geralPersist;
     private ITurmaPersist _turmaPersist;
+    private ICriterioPersist _criterioPersist;
+    private IAlunoPersist _alunoPersist;
     private IAlunoTurmaPersist _alunoTurmaPersist;
     private ICriterioTurmaPersist _criterioTurmaPersist;
     private readonly IMapper _mapper;
 
     public TurmaService(IGeralPersist geralPersist,
-                        ITurmaPersist TurmaPersist,
+                        ITurmaPersist turmaPersist,
+                        ICriterioPersist criterioPersist,
+                        IAlunoPersist alunoPersist,
                         IAlunoTurmaPersist alunoTurmaPersist,
                         ICriterioTurmaPersist criterioTurmaPersist,
                         IMapper mapper) {
         _geralPersist = geralPersist;
-        _turmaPersist = TurmaPersist;
+        _turmaPersist = turmaPersist;
+        _criterioPersist = criterioPersist;
+        _alunoPersist = alunoPersist;
         _alunoTurmaPersist = alunoTurmaPersist;
         _criterioTurmaPersist = criterioTurmaPersist;
         _mapper = mapper;
     }
 
     #region get
-    public async Task<IEnumerable<TurmaDTO>?> GetTurmas(){
+    public async Task<IEnumerable<TurmaDTO>> GetTurmas(){
         try{
-            var turmas= await _turmaPersist.GetAllTurmasAsync();
-            if (turmas== null) 
-                return null;
-            var resultado = _mapper.Map<IEnumerable<TurmaDTO>>(turmas);
-            return resultado;
+            var turmas = await _turmaPersist.GetAllTurmasAsync()
+                ?? throw new NotFoundException("Nenhuma turma encontrada");
+            return _mapper.Map<IEnumerable<TurmaDTO>>(turmas);
         }
-        catch (Exception ex){
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
-    public async Task<TurmaDTO?> GetTurmaById(int Id){
+    public async Task<TurmaDTO> GetTurmaById(int Id){
         try{
-            var Turma = await _turmaPersist.GetTurmaIdAsync(Id);
-            if (Turma == null) 
-                return null;
-            var resultado = _mapper.Map<TurmaDTO>(Turma);
-            return resultado;
+            var turma = await _turmaPersist.GetTurmaIdAsync(Id)
+                ?? throw new NotFoundException("Turma não encontrada");
+            return _mapper.Map<TurmaDTO>(turma);;
         }
-        catch (Exception ex){
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
-    public async Task<IEnumerable<TurmaDTO>?> GetTurmasAluno(int alunoId){
+    public async Task<IEnumerable<TurmaDTO>> GetTurmasAluno(int alunoId){
         try{
-            var turmas = await _alunoTurmaPersist.GetTurmasAlunoIdAsync(alunoId);
-            if (turmas == null) 
-                return null;
-            var resultado = _mapper.Map<IEnumerable<TurmaDTO>>(turmas);
-            return resultado;
+            var turmas = await _alunoTurmaPersist.GetTurmasAlunoIdAsync(alunoId)
+                ?? throw new NotFoundException("Turmas não encontradas");
+            return _mapper.Map<IEnumerable<TurmaDTO>>(turmas);
         }
-        catch (Exception ex){
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
-    public async Task<IEnumerable<TurmaDTO>?> GetTurmasCriterio(int criterioId){
+    public async Task<IEnumerable<TurmaDTO>> GetTurmasCriterio(int criterioId){
         try{
-            var turmas = await _criterioTurmaPersist.GetTurmasCriterioIdAsync(criterioId);
-            if (turmas == null) 
-                return null;
-            var resultado = _mapper.Map<IEnumerable<TurmaDTO>>(turmas);
-            return resultado;
+            var turmas = await _criterioTurmaPersist.GetTurmasCriterioIdAsync(criterioId)
+                ?? throw new NotFoundException("Turmas não encontradas");
+            return _mapper.Map<IEnumerable<TurmaDTO>>(turmas);
         }
-        catch (Exception ex){
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
     #endregion
     #region add
-    public async Task<TurmaDTO?> Add(TurmaDTO model){
+    public async Task<TurmaDTO> Add(TurmaDTO model){
         try{
-            var Turma = _mapper.Map<Turma>(model);
-            _geralPersist.Add(Turma);
-            if (await _geralPersist.SaveChangesAsync()){
-                var TurmaRetorno = await _turmaPersist.GetTurmaIdAsync(Turma.Id);
-                return _mapper.Map<TurmaDTO>(TurmaRetorno);
-            }
-            return null;
+            var turma = new Turma(cod: model.Cod, notaMax: model.NotaMax);
+            _geralPersist.Add(turma);
+            if (await _geralPersist.SaveChangesAsync())
+                return _mapper.Map<TurmaDTO>(turma);
+            throw new Exception("Ocorreu um erro inesperado");
         }
-        catch (Exception ex){
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
-    public async Task<AlunoDTO?> AddTurmaAluno(int alunoId, int turmaId){
+    public async Task<AlunoDTO> AddTurmaAluno(int turmaId, int alunoId){
         try{
-            Aluno? aluno = await _alunoTurmaPersist.GetExisteAlunoTurma(turmaId, alunoId);
-            Turma? turma = await _turmaPersist.GetTurmaIdAsync(turmaId);
-            if( aluno == null && turma != null){
-                AlunoTurma at = new(){
-                    TurmaId = turmaId,
-                    AlunoId = alunoId,
-                };
-                _geralPersist.Add(at);
-                if (await _geralPersist.SaveChangesAsync()){
-                    return _mapper.Map<AlunoDTO>(aluno);
-                }
-                throw new Exception("Erro");
-            }
-            else{
-                return null;
-        }}
-        catch (Exception ex){
-            throw new Exception(ex.Message);
-     }}    
-    public async Task<TurmaDTO?> AddTurmaCriterio(TurmaCriterioDTO model){
-        try{
-            var criteriosAtuais = await _criterioTurmaPersist.
-                GetCriteriosByIdTurmaIdAsync(model.turmaId);
-            var paraRemover = criteriosAtuais
-                .Where(tc => !model.criterioIds.Contains(tc.CriterioId));
-            _geralPersist.DeleteRange(paraRemover);
-            var idsAtuais = criteriosAtuais.Select(tc => tc.CriterioId).ToHashSet();
-            var paraAdicionar = model.criterioIds
-                .Where(id => !idsAtuais.Contains(id))
-                .Select(id => new CriterioTurma{
-                    TurmaId = model.turmaId,
-                    CriterioId = id
-                });
-            _geralPersist.AddRangeAsync(paraAdicionar);
+            var aluno = await _alunoPersist.GetAlunoIdAsync(alunoId) 
+                ?? throw new NotFoundException("Aluno não encontrado");
+            var turma = await _turmaPersist.GetTurmaIdAsync(turmaId) 
+                ?? throw new NotFoundException("Turma não encontrada");
+            turma.AdicionarAluno(aluno);
             await _geralPersist.SaveChangesAsync();
-            return await GetTurmaById(model.turmaId);
+            var alunoRetorno = await _alunoTurmaPersist.GetExisteAlunoTurma(turma.Id, aluno.Id);
+            return _mapper.Map<AlunoDTO>(alunoRetorno);
         }
-        catch (Exception ex){
-            throw new Exception(ex.Message);
+        catch {
+            throw;
+     }}
+    public async Task<TurmaDTO> AddTurmaCriterio(TurmaCriterioDTO model){
+        try{
+            var turma = await _turmaPersist.GetTurmaIdAsync(model.turmaId)
+                ?? throw new NotFoundException("Turma não encontrada");            
+            var criterios = await _criterioPersist.GetAllCriteriosAsync();
+            var criteriosTurma = criterios.Where(c => model.criterioIds.Contains(c.Id));
+            turma.AtualizarCriterios(criteriosTurma);
+            await _geralPersist.SaveChangesAsync();
+            return _mapper.Map<TurmaDTO>(turma);
+        }
+        catch {
+            throw;
     }}
     public async Task<CsvImportResultDTO> ImportarAlunosAsync( int turmaId, CsvImportRequestDTO dto)
     {
@@ -154,15 +135,15 @@ public class TurmaService : ITurmaService
         using var csv = new CsvReader(reader, config);
         await csv.ReadAsync();
         csv.ReadHeader();
-        var headers = csv.HeaderRecord;
-        if (headers == null)
-            throw new Exception($"Colunas da tabela não encontradas.");
+        var headers = csv.HeaderRecord
+            ?? throw new Exception($"Colunas da tabela não encontradas.");
         foreach (var h in headers){
             Console.WriteLine($"HEADER: '{h}'");
         }
-        if (!headers.Any(h =>Texto.Normalizar(h) == Texto.Normalizar(dto.ColunaNome))){
-            throw new Exception($"Coluna '{dto.ColunaNome}' não encontrada.");
-        };
+        if (!headers.Any(h =>Texto.Normalizar(h) == Texto.Normalizar(dto.ColunaNome)))
+            throw new BusinessException($"Coluna '{dto.ColunaNome}' não encontrada.");
+        Turma turma = await _turmaPersist.GetTurmaIdAsync(turmaId)
+            ?? throw new NotFoundException("Turma não encontrada");
         int linha = 1;
         while (await csv.ReadAsync()){
             linha++;
@@ -170,13 +151,12 @@ public class TurmaService : ITurmaService
             var nome = csv.GetField(dto.ColunaNome);
             try{
                 if (string.IsNullOrWhiteSpace(nome) )
-                    throw new Exception("Nome vazio");
-                var aluno = new Aluno{
-                    Nome = nome
-                };
+                    throw new Domain.Exceptions.ValidationException("Nome vazio");
+                var aluno = new Aluno(nome);
                 _geralPersist.Add(aluno);
                 await _geralPersist.SaveChangesAsync();
-                await AddTurmaAluno(aluno.Id, turmaId);
+                turma.AdicionarAluno(aluno);
+                await _geralPersist.SaveChangesAsync();
                 resultado.Sucesso++;
             }
             catch (Exception ex){
@@ -192,22 +172,17 @@ public class TurmaService : ITurmaService
     }
     #endregion
     #region update
-    public async Task<TurmaDTO?> Update(int turmaId, TurmaDTO model){
+    public async Task<TurmaDTO> Update(int turmaId, TurmaDTO model){
         try{
-            var turma = await _turmaPersist.GetTurmaIdAsync(turmaId);
-            if (turma == null) 
-                return null;
-            model.Id = turma.Id;
-            _mapper.Map(model, turma);
-            _geralPersist.Update(turma);
-            if (await _geralPersist.SaveChangesAsync()){
-                var TurmaRetorno = await _turmaPersist.GetTurmaIdAsync(turmaId);
-                return _mapper.Map<TurmaDTO>(TurmaRetorno);
-            }
-            return null;
+            var turma = await _turmaPersist.GetTurmaIdAsync(turmaId)
+                ?? throw new NotFoundException("Turma não encontrada");
+            turma.AtualizarTurma(model.Cod, model.NotaMax);
+            await _geralPersist.SaveChangesAsync();
+            var TurmaRetorno = await _turmaPersist.GetTurmaIdAsync(turmaId);
+            return _mapper.Map<TurmaDTO>(TurmaRetorno);
         }
-        catch (Exception ex){
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
     #endregion
 }

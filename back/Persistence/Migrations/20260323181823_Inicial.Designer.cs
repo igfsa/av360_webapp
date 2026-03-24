@@ -12,7 +12,7 @@ using Persistence.Context;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(APIContext))]
-    [Migration("20260213081154_Inicial")]
+    [Migration("20260323181823_Inicial")]
     partial class Inicial
     {
         /// <inheritdoc />
@@ -24,6 +24,36 @@ namespace Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+
+            modelBuilder.Entity("AlunoTurma", b =>
+                {
+                    b.Property<int>("AlunosId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TurmasId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AlunosId", "TurmasId");
+
+                    b.HasIndex("TurmasId");
+
+                    b.ToTable("AlunoTurma", (string)null);
+                });
+
+            modelBuilder.Entity("CriterioTurma", b =>
+                {
+                    b.Property<int>("CriteriosId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TurmasId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CriteriosId", "TurmasId");
+
+                    b.HasIndex("TurmasId");
+
+                    b.ToTable("CriterioTurma", (string)null);
+                });
 
             modelBuilder.Entity("Domain.Entities.Aluno", b =>
                 {
@@ -57,21 +87,6 @@ namespace Persistence.Migrations
                     b.HasKey("AlunoId", "GrupoId");
 
                     b.ToTable("AlunoGrupo");
-                });
-
-            modelBuilder.Entity("Domain.Entities.AlunoTurma", b =>
-                {
-                    b.Property<int>("AlunoId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TurmaId")
-                        .HasColumnType("int");
-
-                    b.HasKey("AlunoId", "TurmaId");
-
-                    b.HasIndex("TurmaId");
-
-                    b.ToTable("AlunoTurma");
                 });
 
             modelBuilder.Entity("Domain.Entities.Criterio", b =>
@@ -139,21 +154,6 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.CriterioTurma", b =>
-                {
-                    b.Property<int>("CriterioId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TurmaId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CriterioId", "TurmaId");
-
-                    b.HasIndex("TurmaId");
-
-                    b.ToTable("CriterioTurma");
-                });
-
             modelBuilder.Entity("Domain.Entities.Grupo", b =>
                 {
                     b.Property<int>("Id")
@@ -204,7 +204,14 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AvaliadorId");
+
+                    b.HasIndex("GrupoId");
+
                     b.HasIndex("SessaoId", "AvaliadorId")
+                        .IsUnique();
+
+                    b.HasIndex("SessaoId", "DeviceHash")
                         .IsUnique();
 
                     b.ToTable("NotasFinais");
@@ -282,7 +289,7 @@ namespace Persistence.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("varchar(30)");
 
-                    b.Property<decimal?>("NotaMax")
+                    b.Property<decimal>("NotaMax")
                         .HasPrecision(5, 2)
                         .HasColumnType("decimal(5,2)");
 
@@ -291,37 +298,78 @@ namespace Persistence.Migrations
                     b.ToTable("Turmas");
                 });
 
-            modelBuilder.Entity("Domain.Entities.AlunoTurma", b =>
+            modelBuilder.Entity("AlunoTurma", b =>
                 {
+                    b.HasOne("Domain.Entities.Aluno", null)
+                        .WithMany()
+                        .HasForeignKey("AlunosId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.Turma", null)
-                        .WithMany("AlunoTurma")
-                        .HasForeignKey("TurmaId")
+                        .WithMany()
+                        .HasForeignKey("TurmasId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Domain.Entities.CriterioTurma", b =>
+            modelBuilder.Entity("CriterioTurma", b =>
                 {
+                    b.HasOne("Domain.Entities.Criterio", null)
+                        .WithMany()
+                        .HasForeignKey("CriteriosId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.Turma", null)
-                        .WithMany("CriterioTurma")
-                        .HasForeignKey("TurmaId")
+                        .WithMany()
+                        .HasForeignKey("TurmasId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Entities.Grupo", b =>
                 {
-                    b.HasOne("Domain.Entities.Turma", null)
+                    b.HasOne("Domain.Entities.Turma", "Turma")
                         .WithMany("Grupos")
                         .HasForeignKey("TurmaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Turma");
+                });
+
+            modelBuilder.Entity("Domain.Entities.NotaFinal", b =>
+                {
+                    b.HasOne("Domain.Entities.Aluno", "Avaliador")
+                        .WithMany()
+                        .HasForeignKey("AvaliadorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Domain.Entities.Grupo", "Grupo")
+                        .WithMany()
+                        .HasForeignKey("GrupoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Sessao", "Sessao")
+                        .WithMany("Notasfinais")
+                        .HasForeignKey("SessaoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Avaliador");
+
+                    b.Navigation("Grupo");
+
+                    b.Navigation("Sessao");
                 });
 
             modelBuilder.Entity("Domain.Entities.NotaParcial", b =>
                 {
                     b.HasOne("Domain.Entities.NotaFinal", null)
-                        .WithMany("NotasParciais")
+                        .WithMany("NotasParcial")
                         .HasForeignKey("NotaFinalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -329,15 +377,16 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.NotaFinal", b =>
                 {
-                    b.Navigation("NotasParciais");
+                    b.Navigation("NotasParcial");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Sessao", b =>
+                {
+                    b.Navigation("Notasfinais");
                 });
 
             modelBuilder.Entity("Domain.Entities.Turma", b =>
                 {
-                    b.Navigation("AlunoTurma");
-
-                    b.Navigation("CriterioTurma");
-
                     b.Navigation("Grupos");
                 });
 #pragma warning restore 612, 618

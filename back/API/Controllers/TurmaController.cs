@@ -49,12 +49,8 @@ namespace API.Controllers
 
             try
             {
-                var turmas = await _turmaService.GetTurmaById(id);
-                if (turmas is null)
-                {
-                    return NotFound();
-                }
-                return Ok(turmas);
+                var turma = await _turmaService.GetTurmaById(id);
+                return Ok(turma);
             }
             catch (Exception ex)
             {
@@ -71,17 +67,13 @@ namespace API.Controllers
 
             try
             {
-                var alunos = await _turmaService.GetTurmasAluno(alunoId);
-                if (alunos is null)
-                {
-                    return NotFound();
-                }
-                return Ok(alunos);
+                var turmas = await _turmaService.GetTurmasAluno(alunoId);
+                return Ok(turmas);
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                $"Erro ao tentar buscar aluno. Erro: {ex.Message}");
+                $"Erro ao tentar buscar Turmas. Erro: {ex.Message}");
             }
 
         }
@@ -103,7 +95,7 @@ namespace API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                $"Erro ao tentar buscar criterio. Erro: {ex.Message}");
+                $"Erro ao tentar buscar critérios. Erro: {ex.Message}");
             }
 
         }
@@ -129,27 +121,22 @@ namespace API.Controllers
             }
         }
 
-        [HttpPost("{alunoId:int}", Name = "AddAlunoTurma")]
+        [HttpPost("{turmaId:int}", Name = "AddAlunoTurma")]
         [ActionName("PostAlunoTurma")]
-        public async Task<ActionResult<AlunoDTO>> PostAlunoTurma(int alunoId, int turmaId)
+        public async Task<ActionResult<AlunoDTO>> PostAlunoTurma(int turmaId, int alunoId)
         {
             try
             {
-                var aluno = await _alunoService.GetAlunoById(alunoId);
                 var turma = await _turmaService.GetTurmaById(turmaId);
-                var addTurma = await _turmaService.AddTurmaAluno(alunoId, turmaId);
-                
-                if (addTurma == null) 
-                {
-                    return BadRequest($"Aluno {aluno.Nome} já existe na turma {turma.Cod}.");
-                }
+                var aluno = await _turmaService.AddTurmaAluno(turmaId, alunoId);
+
                 await _turmaNotifier.TurmaAtualizadaAsync(turmaId);
-                return Ok(turma);
+                return Ok(aluno);
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    $"Erro ao tentar adicionar Turma. Erro: {ex.Message}");
+                    $"Erro ao tentar adicionar Aluno na Turma. Erro: {ex.Message}");
             }
         }
         [HttpPost("{turmaId:int}", Name = "ImportAlunosTurma")]
@@ -165,7 +152,7 @@ namespace API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    $"Erro ao tentar adicionar Turma. Erro: {ex.Message}");
+                    $"Erro ao tentar importar Alunos na Turma. Erro: {ex.Message}");
             }
         }
 
@@ -182,7 +169,7 @@ namespace API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    $"Erro ao tentar adicionar Turma. Erro: {ex.Message}");
+                    $"Erro ao tentar adicionar Critérios na Turma. Erro: {ex.Message}");
             }
         }
 

@@ -5,6 +5,7 @@ using Application.DTOs;
 using Domain.Entities;
 using Persistence.Contracts;
 using Google.Protobuf.WellKnownTypes;
+using Domain.Exceptions;
 
 namespace Application.Services;
 
@@ -12,45 +13,50 @@ public class AvaliacaoService : IAvaliacaoService
 {
     private readonly IGeralPersist _geralPersist;
     private readonly ISessaoService _sessaoService;
-    private readonly IAlunoGrupoPersist _alunoGrupoService;
+    private readonly ISessaoPersist _sessaoPersist;
     private readonly IAlunoService _alunoService;
+    private readonly IAlunoPersist _alunoPersist;
     private readonly ICriterioService _criterioService;
-    private readonly INotaFinalPersist _notaFinalPersist;    
+    private readonly ICriterioPersist _criterioPersist;
     private readonly IGrupoService _grupoService;
+    private readonly IGrupoPersist _grupoPersist;
     private readonly ITurmaService _turmaService;
     private readonly IMapper _mapper;
 
     public AvaliacaoService(IGeralPersist geralPersist,
                         ISessaoService sessaoService,
-                        IAlunoGrupoPersist alunoGrupoService,
+                        ISessaoPersist sessaoPersist,
                         IAlunoService alunoService,
+                        IAlunoPersist alunoPersist,
                         ICriterioService criterioService,
-                        INotaFinalPersist notaFinalPersist,
+                        ICriterioPersist criterioPersist,
                         IGrupoService grupoService,
+                        IGrupoPersist grupoPersist,
                         ITurmaService turmaService,
                         IMapper mapper)
     {
         _geralPersist = geralPersist;
         _sessaoService = sessaoService;
-        _alunoGrupoService = alunoGrupoService;
+        _sessaoPersist = sessaoPersist;
         _alunoService = alunoService;
+        _alunoPersist = alunoPersist;
         _criterioService = criterioService;
-        _notaFinalPersist = notaFinalPersist;
+        _criterioPersist = criterioPersist;
         _grupoService = grupoService;
+        _grupoPersist = grupoPersist;
         _turmaService = turmaService;
         _mapper = mapper;
     }
 
     #region get
-    public async Task<AvaliacaoPublicaDTO?> GetValidaSessaoChavePub(string token){
+    public async Task<AvaliacaoPublicaDTO> GetValidaSessaoChavePub(string token){
         try {
             var sessoes = await _sessaoService.GetSessoes() ?? [];
             var sessao = sessoes.FirstOrDefault(s =>
                     s.TokenPublico == token &&
                     s.Ativo &&
-                    s.DataFim == null);
-            if (sessao == null)
-                return null;
+                    s.DataFim == null)
+                ?? throw new NotFoundException("Sessão não encontrada");
             var criterios = await _criterioService.GetCriteriosTurma(sessao.TurmaId);
             var grupos = await _grupoService.GetGruposTurma(sessao.TurmaId);
             return new AvaliacaoPublicaDTO{
@@ -60,22 +66,18 @@ public class AvaliacaoService : IAvaliacaoService
                 Criterios = criterios ?? []
             };
         }
-        catch (Exception ex) {
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
 
     public async Task<AvaliacaoEnvioDTO> GeraNovaAvaliacaoEnvio(AvaliacaoEnvioDTO avaliacao) {
         try{
-            if (await _alunoGrupoService.GetExisteAlunoGrupo(avaliacao.GrupoId, avaliacao.AvaliadorId) == null)
-                throw new Exception("Aluno não inserido no grupo");
-            if (await _notaFinalPersist.GetNotaFinalAlunoSessaoIdAsync(avaliacao.AvaliadorId, avaliacao.SessaoId) != null)
-                throw new Exception("Aluno já avaliou nesta sessão");
-            if (await _notaFinalPersist.GetNotaFinalHashAsync(avaliacao.DeviceHash, avaliacao.SessaoId) != null)
-                throw new Exception("Dispositivo já avaliou nesta sessão");
-
-            var sessao = await _sessaoService.GetSessaoById(avaliacao.SessaoId) ?? throw new Exception("Sessão inválida");
-            var grupo = await _grupoService.GetGrupoById(avaliacao.GrupoId) ?? throw new Exception("Grupo inválido");
-            var turma = await _turmaService.GetTurmaById(grupo.TurmaId) ?? throw new Exception("Turma inválida");
+            var sessao = await _sessaoService.GetSessaoById(avaliacao.SessaoId) 
+                ?? throw new Exception("Sessão inválida");
+            var grupo = await _grupoService.GetGrupoById(avaliacao.GrupoId) 
+                ?? throw new Exception("Grupo inválido");
+            var turma = await _turmaService.GetTurmaById(grupo.TurmaId) 
+                ?? throw new Exception("Turma inválida");
             
             var criterios = await _criterioService.GetCriteriosTurma(turma.Id) ?? [];
             var alunos = await _alunoService.GetAlunosGrupo(avaliacao.GrupoId) ?? [];
@@ -90,50 +92,43 @@ public class AvaliacaoService : IAvaliacaoService
             avaliacao.Itens = itensAdd;
             return avaliacao;
         }
-        catch (Exception ex) {
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
 
     #endregion
     #region add
     public async Task<NotaFinalDTO> AddAvaliacao(AvaliacaoEnvioDTO model){
         try{
-            if (await _alunoGrupoService.GetExisteAlunoGrupo(model.GrupoId, model.AvaliadorId) == null)
-                throw new Exception("Aluno não inserido no grupo");
-            if (await _notaFinalPersist.GetNotaFinalAlunoSessaoIdAsync(model.AvaliadorId, model.SessaoId) != null)
-                throw new Exception("Aluno já avaliou nesta sessão");
-            if(await _notaFinalPersist.GetNotaFinalHashAsync(model.DeviceHash, model.SessaoId) != null)
-                throw new Exception("Dispositivo já avaliou nesta sessão");
-
-            var sessao = await _sessaoService.GetSessaoById(model.SessaoId) ?? throw new Exception("Sessão inválida");
-            if (sessao.DataFim != null)
-                throw new Exception("Prazo encerrado");
             if (model.Itens == null)
-                throw new Exception("Sem avaliações");
+                throw new BusinessException("Sem avaliações");
 
-            var final = new NotaFinal{
-                SessaoId = model.SessaoId,
-                AvaliadorId = model.AvaliadorId,
-                GrupoId = model.GrupoId,
-                DeviceHash = model.DeviceHash,
-                DataEnvio = DateTime.Now
-            };
+            var final = new NotaFinal(
+                sessao: await _sessaoPersist.GetSessaoIdAsync(model.SessaoId) 
+                    ?? throw new BusinessException("Sessão inválida"),
+                avaliador: await _alunoPersist.GetAlunoIdAsync(model.AvaliadorId) 
+                    ?? throw new BusinessException("Avaliador não encontrado"),
+                grupo: await _grupoPersist.GetGrupoIdAsync(model.GrupoId) 
+                    ?? throw new BusinessException("Grupo não encontrado"),
+                deviceHash: model.DeviceHash
+            );
             _geralPersist.Add(final);
             await _geralPersist.SaveChangesAsync();
             var paraAdicionar = model.Itens
-                .Select(np => 
-                    new NotaParcial{
-                        NotaFinalId = final.Id,
-                        AvaliadoId = np.AvaliadoId,
-                        CriterioId = np.CriterioId,
-                        Nota = np.Nota })
+                .Select(async np => 
+                    final.AdicionarNotaParcial(
+                        avaliado: await _alunoPersist.GetAlunoIdAsync(np.AvaliadoId)
+                            ?? throw new BusinessException("Avaliado não encontrado"),
+                        criterio: await _criterioPersist.GetCriterioIdAsync(np.CriterioId)
+                            ?? throw new BusinessException("Critério não encontrado"),
+                        nota: np.Nota ))
                 .ToList();
             _geralPersist.AddRangeAsync(paraAdicionar);
             await _geralPersist.SaveChangesAsync();
             return _mapper.Map<NotaFinalDTO>(final);
         }
-        catch (Exception ex){
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
     #endregion
     #region update

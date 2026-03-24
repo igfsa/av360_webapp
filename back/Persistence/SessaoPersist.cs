@@ -14,19 +14,25 @@ public class SessaoPersist : ISessaoPersist
         _context = context;
     }
     public async Task<Sessao[]> GetAllSessoesAsync(){
-        return await _context.Sessoes.AsNoTracking().OrderByDescending(a => a.DataInicio).ToArrayAsync();
+        return await _context.Sessoes
+            .AsNoTracking()
+            .OrderByDescending(a => a.DataInicio)
+            .ToArrayAsync();
     }
     public async Task<Sessao?> GetSessaoIdAsync(int SessaoId){
-        return await _context.Sessoes.AsNoTracking().FirstOrDefaultAsync(s => s.Id == SessaoId);
+        return await _context.Sessoes
+            .Include(s => s.Notasfinais)
+            .FirstOrDefaultAsync(s => s.Id == SessaoId);
     }
     public async Task<Sessao[]> GetSessoesTurmaIdAsync(int turmaId) {
         return await _context.Sessoes
-            .AsNoTracking()
             .Where(s => s.TurmaId == turmaId)
             .OrderByDescending(s => s.DataInicio)
             .ToArrayAsync();
     }
     public async Task<Sessao?> GetSessaoAtivaTurmaIdAsync(int TurmaId){
-        return await _context.Sessoes.AsNoTracking().FirstOrDefaultAsync(s => s.TurmaId == TurmaId && s.Ativo);
+        return await _context.Sessoes
+            .Include(s => s.Notasfinais)
+            .FirstOrDefaultAsync(s => s.TurmaId == TurmaId && s.Ativo);
     }
 }

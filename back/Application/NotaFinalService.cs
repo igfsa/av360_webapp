@@ -4,6 +4,7 @@ using Application.Contracts;
 using Application.DTOs;
 using Domain.Entities;
 using Persistence.Contracts;
+using Domain.Exceptions;
 
 namespace Application.Services;
 
@@ -24,76 +25,62 @@ public class NotaFinalService : INotaFinalService
 
     #region get
 
-    public async Task<NotaFinalDTO?> GetById(int id) {
+    public async Task<NotaFinalDTO> GetById(int id) {
         try {
-            var NotaFinal = await _NotaFinalPersist.GetNotaFinalIdAsync(id);
-            if (NotaFinal == null) 
-                return null;
-            var resultado = _mapper.Map<NotaFinalDTO>(NotaFinal);
-            return resultado;
+            var NotaFinal = await _NotaFinalPersist.GetNotaFinalIdAsync(id)
+                ?? throw new NotFoundException("Nota Final não encontrada");
+            return _mapper.Map<NotaFinalDTO>(NotaFinal);
         }
-        catch (Exception ex) {
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
-    public async Task<NotaFinalDTO?> GetNotasFinaisAlunoSessao(int alunoId, int sessaoId) {
+    public async Task<NotaFinalDTO> GetNotasFinaisAlunoSessao(int alunoId, int sessaoId) {
         try {
-            var NotasFinais = await _NotaFinalPersist.GetNotaFinalAlunoSessaoIdAsync(alunoId, sessaoId);
-            if (NotasFinais == null) 
-                return null;
-            var resultado = _mapper.Map<NotaFinalDTO>(NotasFinais);
-            return resultado;
+            var NotasFinais = await _NotaFinalPersist.GetNotaFinalAlunoSessaoIdAsync(alunoId, sessaoId)
+                ?? throw new NotFoundException("Notas Finais não encontradas");
+            return _mapper.Map<NotaFinalDTO>(NotasFinais);
         }
-        catch (Exception ex) {
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
-    public async Task<IEnumerable<NotaFinalDTO>?> GetNotasFinaisGrupoSessao(int grupoId, int sessaoId) {
+    public async Task<IEnumerable<NotaFinalDTO>> GetNotasFinaisGrupoSessao(int grupoId, int sessaoId) {
         try {
-            var NotasFinais = await _NotaFinalPersist.GetNotaFinalGrupoSessaoIdAsync(grupoId, sessaoId);
-            if (NotasFinais == null) 
-                return null;
-            var resultado = _mapper.Map<IEnumerable<NotaFinalDTO>>(NotasFinais);
-            return resultado;
+            var NotasFinais = await _NotaFinalPersist.GetNotaFinalGrupoSessaoIdAsync(grupoId, sessaoId)
+                ?? throw new NotFoundException("Notas Finais não encontradas");
+            return _mapper.Map<IEnumerable<NotaFinalDTO>>(NotasFinais);
         }
-        catch (Exception ex) {
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
     #endregion
     #region add
-    public async Task<NotaFinalDTO?> Add(NotaFinalDTO model) {
+    public async Task<NotaFinalDTO> Add(NotaFinalDTO model) {
         try {
             var NotaFinal = _mapper.Map<NotaFinal>(model);
             _geralPersist.Add(NotaFinal);
-            if (await _geralPersist.SaveChangesAsync()) {
-                var NotaFinalRetorno = await _NotaFinalPersist.GetNotaFinalIdAsync(NotaFinal.Id);
-                return _mapper.Map<NotaFinalDTO>(NotaFinalRetorno);
-            }
-            return null;
+            await _geralPersist.SaveChangesAsync();
+            var NotaFinalRetorno = await _NotaFinalPersist.GetNotaFinalIdAsync(NotaFinal.Id);
+            return _mapper.Map<NotaFinalDTO>(NotaFinalRetorno);
         }
-        catch (Exception ex) {
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
     #endregion
     #region update
-    public async Task<NotaFinalDTO?> Update(int NotaFinalId, NotaFinalDTO model) {
+    public async Task<NotaFinalDTO> Update(int NotaFinalId, NotaFinalDTO model) {
         try {
-            var NotaFinal = await _NotaFinalPersist.GetNotaFinalIdAsync(NotaFinalId);
-            if (NotaFinal == null) return null;
+            var NotaFinal = await _NotaFinalPersist.GetNotaFinalIdAsync(NotaFinalId)
+                ?? throw new NotFoundException("Nota Final não encontrada");
 
             model.Id = NotaFinal.Id;
-
             _mapper.Map(model, NotaFinal);
-
             _geralPersist.Update(NotaFinal);
 
-            if (await _geralPersist.SaveChangesAsync()) {
-                var NotaFinalRetorno = await _NotaFinalPersist.GetNotaFinalIdAsync(NotaFinalId);
-
-                return _mapper.Map<NotaFinalDTO>(NotaFinalRetorno);
-            }
-            return null;
+            var NotaFinalRetorno = await _NotaFinalPersist.GetNotaFinalIdAsync(NotaFinalId);
+            return _mapper.Map<NotaFinalDTO>(NotaFinalRetorno);
         }
-        catch (Exception ex) {
-            throw new Exception(ex.Message);
+        catch {
+            throw;
     }}
     #endregion
 }

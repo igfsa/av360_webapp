@@ -14,11 +14,14 @@ public class NotaParcialPersist : INotaParcialPersist
         _context = context;
     }
     public async Task<NotaParcial?> GetById(int notaParcialId){
-        return await _context.NotasParciais.AsNoTracking().FirstOrDefaultAsync(np => np.Id == notaParcialId);
+        return await _context.NotasParciais
+            .Include(np => np.Avaliado)
+            .Include(np => np.Avaliado)
+            .Include(np => np.Avaliado)
+            .FirstOrDefaultAsync(np => np.Id == notaParcialId);
     }
     public async Task<NotaParcial[]> GetNotaParcialNFinalIdAsync(int notaFinalId) {
         return await _context.NotasParciais
-            .AsNoTracking()
             .Where(np => np.NotaFinalId == notaFinalId)
             .OrderByDescending(np => np.Id)
             .ToArrayAsync();

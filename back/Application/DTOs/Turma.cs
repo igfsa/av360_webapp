@@ -13,8 +13,7 @@ public class TurmaDTO
     public required string Cod { get; set; }
     [Column(TypeName = "decimal(5,2)")]
     public decimal NotaMax { get; set; } = 0;
-    [JsonIgnore]
-    public IEnumerable<AlunoDTO>? Alunos { get; set; }
-    [JsonIgnore]
-    public IEnumerable<CriterioDTO>? Criterio { get; set; }
+    public IEnumerable<AlunoDTO> Alunos { get; set; } = [];
+    public IEnumerable<CriterioDTO> Criterios { get; set; } = [];
+    public IReadOnlyCollection<GrupoDTO> Grupos { get; set; } = [];
 }

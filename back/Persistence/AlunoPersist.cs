@@ -14,9 +14,14 @@ public class AlunoPersist : IAlunoPersist
         _context = context;
     }
     public async Task<Aluno[]> GetAllAlunosAsync(){
-        return await _context.Alunos.AsNoTracking().OrderBy(a => a.Nome).ToArrayAsync();
+        return await _context.Alunos
+            .Include(a => a.Turmas)
+            .OrderBy(a => a.Nome)
+            .ToArrayAsync();
     }
     public async Task<Aluno?> GetAlunoIdAsync(int alunoId){
-        return await _context.Alunos.AsNoTracking().OrderBy(a => a.Id).Where(a => a.Id == alunoId).FirstOrDefaultAsync();
+        return await _context.Alunos
+            .Include(a => a.Turmas)
+            .FirstOrDefaultAsync(a => a.Id == alunoId);
     }
 }

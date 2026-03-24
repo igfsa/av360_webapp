@@ -14,9 +14,12 @@ public class CriterioPersist : ICriterioPersist
         _context = context;
     }
     public async Task<Criterio[]> GetAllCriteriosAsync() {
-        return await _context.Criterios.AsNoTracking().OrderBy(a => a.Nome).ToArrayAsync();
+        return await _context.Criterios
+            .OrderBy(a => a.Nome)
+            .ToArrayAsync();
     }
     public async Task<Criterio?> GetCriterioIdAsync(int criterioId){
-        return await _context.Criterios.AsNoTracking().OrderBy(a => a.Id).Where(a => a.Id == criterioId).FirstOrDefaultAsync();
+        return await _context.Criterios
+            .FirstOrDefaultAsync(c => c.Id == criterioId);
     }
 }

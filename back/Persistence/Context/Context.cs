@@ -10,9 +10,7 @@ public class APIContext : DbContext
         : base(options) { }
     public DbSet<Aluno> Alunos { get; set; }
     public DbSet<AlunoGrupo> AlunoGrupo { get; set; }
-    public DbSet<AlunoTurma> AlunoTurma { get; set; }
     public DbSet<Criterio> Criterios { get; set; }
-    public DbSet<CriterioTurma> CriterioTurma { get; set; }
     public DbSet<Grupo> Grupos { get; set; }
     public DbSet<NotaFinal> NotasFinais { get; set; }
     public DbSet<NotaParcial> NotasParciais { get; set; }
@@ -24,12 +22,6 @@ public class APIContext : DbContext
         {
             modelBuilder.Entity<AlunoGrupo>()
                 .HasKey(ag => new {ag.AlunoId, ag.GrupoId});
-                
-            modelBuilder.Entity<AlunoTurma>()
-                .HasKey(at => new {at.AlunoId, at.TurmaId});
-
-            modelBuilder.Entity<CriterioTurma>()
-                .HasKey(ct => new {ct.CriterioId, ct.TurmaId});
 
             modelBuilder.Entity<Aluno>()
                 .Property(a => a.Nome)
@@ -41,20 +33,26 @@ public class APIContext : DbContext
 
             modelBuilder.Entity<Criterio>()
                 .HasData(
-                    new Criterio { Id = 1, Nome = "Nível de Participação" },
-                    new Criterio { Id = 2, Nome = "Pontualidade na Entrega de Tarefas" },
-                    new Criterio { Id = 3, Nome = "Capacidade de Trabalhar em Equipe" },
-                    new Criterio { Id = 4, Nome = "Controle Emocional" },
-                    new Criterio { Id = 5, Nome = "Disposição para Compartilhar Tarefas" },
-                    new Criterio { Id = 6, Nome = "Respeito às Individualidades" },
-                    new Criterio { Id = 7, Nome = "Responsabilidade" },
-                    new Criterio { Id = 8, Nome = "Criatividade" },
-                    new Criterio { Id = 9, Nome = "Conhecimento Teórico" }
+                    new Criterio (nome: "Nível de Participação" ) { Id = 1 },
+                    new Criterio (nome: "Pontualidade na Entrega de Tarefas"){ Id = 2 },
+                    new Criterio (nome: "Capacidade de Trabalhar em Equipe"){ Id = 3 },
+                    new Criterio (nome: "Controle Emocional"){ Id = 4 },
+                    new Criterio (nome: "Disposição para Compartilhar Tarefas"){ Id = 5 },
+                    new Criterio (nome: "Respeito às Individualidades"){ Id = 6 },
+                    new Criterio (nome: "Responsabilidade"){ Id = 7 },
+                    new Criterio (nome: "Criatividade"){ Id = 8 },
+                    new Criterio (nome: "Conhecimento Teórico"){ Id = 9 }
                 );
 
             modelBuilder.Entity<Grupo>()
                 .Property(g => g.Nome)
                 .HasMaxLength(100);
+
+            modelBuilder.Entity<Grupo>()
+                .HasOne(g => g.Turma)
+                .WithMany(t => t.Grupos)
+                .HasForeignKey(g => g.TurmaId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Turma>()
                 .Property(t => t.Cod)
@@ -64,12 +62,26 @@ public class APIContext : DbContext
                 .Property(t => t.NotaMax)
                 .HasPrecision(5, 2);
 
+            modelBuilder.Entity<Turma>()
+                .HasMany(t => t.Alunos)
+                .WithMany(a => a.Turmas)
+                .UsingEntity(j => j.ToTable("AlunoTurma"));
+
+            modelBuilder.Entity<Turma>()
+                .HasMany(t => t.Criterios)
+                .WithMany(c => c.Turmas)
+                .UsingEntity(j => j.ToTable("CriterioTurma"));
+                
             modelBuilder.Entity<Sessao>()
                 .Property(s => s.TokenPublico)
                 .HasMaxLength(33);
 
             modelBuilder.Entity<NotaFinal>()
                 .HasIndex(a => new { a.SessaoId, a.AvaliadorId })
+                .IsUnique();
+
+            modelBuilder.Entity<NotaFinal>()
+                .HasIndex(a => new { a.SessaoId, a.DeviceHash })
                 .IsUnique();
 
             modelBuilder.Entity<NotaFinal>()

@@ -15,32 +15,32 @@ public class CriterioTurmaPersist : ICriterioTurmaPersist
     }
 
     public async Task<Criterio[]> GetCriteriosTurmaIdAsync(int turmaId) {
-    return await _context.Criterios
-            .AsNoTracking()
-            .Where(c => _context.CriterioTurma
-                .Any(ct => ct.TurmaId == turmaId && ct.CriterioId == c.Id))
-            .OrderBy(c => c.Nome)
-            .ToArrayAsync();
+        return await _context.Criterios
+                .AsNoTracking()
+                .Where(c => c.Turmas
+                    .Any(t => t.Id == turmaId))
+                .OrderBy(c => c.Nome)
+                .ToArrayAsync();
     }
-    public async Task<CriterioTurma[]> GetCriteriosByIdTurmaIdAsync(int turmaId){
-        return await _context.CriterioTurma
-            .AsNoTracking()
-            .Where(ct => _context.Criterios
-                .Any(c => ct.TurmaId == turmaId && ct.CriterioId == c.Id))
-            .ToArrayAsync();
-    }
+    // public async Task<CriterioTurma[]> GetCriteriosByIdTurmaIdAsync(int turmaId){
+    //     return await _context.CriterioTurma
+    //         .AsNoTracking()
+    //         .Where(ct => _context.Criterios
+    //             .Any(c => ct.TurmaId == turmaId && ct.CriterioId == c.Id))
+    //         .ToArrayAsync();
+    // }
     public async Task<Turma[]> GetTurmasCriterioIdAsync(int criterioId){
         return await _context.Turmas
             .AsNoTracking()
-            .Where(t => _context.CriterioTurma
-                .Any(ct => ct.CriterioId == criterioId && ct.TurmaId == t.Id))
+            .Where(t => t.Criterios
+                .Any(c => c.Id == criterioId))
             .OrderBy(t => t.Cod)
             .ToArrayAsync();
     }
-    public async Task<Criterio?> GetValidaCriterioTurma(int turmaId, int criterioId){
-        if (await _context.CriterioTurma.AnyAsync(ct => ct.TurmaId == turmaId && ct.CriterioId == criterioId))
-            return null;
-        else 
-            return await _context.Criterios.AsNoTracking().OrderBy(c => c.Id).Where(c => c.Id == criterioId).FirstOrDefaultAsync();
+    public async Task<Criterio?> GetExisteCriterioTurma(int turmaId, int criterioId){
+        var turma = await _context.Turmas
+            .FirstOrDefaultAsync(t => t.Id == turmaId);
+        return turma!.Criterios
+            .FirstOrDefault(c => c.Id == criterioId);
     }
 }

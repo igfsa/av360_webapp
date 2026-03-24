@@ -14,10 +14,15 @@ public class GrupoPersist : IGrupoPersist
         _context = context;
     }
     public async Task<Grupo[]> GetAllGruposAsync(){
-        return await _context.Grupos.AsNoTracking().OrderBy(g => g.Nome).ToArrayAsync();
+        return await _context.Grupos
+            .AsNoTracking()
+            .OrderBy(g => g.Nome)
+            .ToArrayAsync();
     }
     public async Task<Grupo?> GetGrupoIdAsync(int grupoId){
-        return await _context.Grupos.AsNoTracking().FirstOrDefaultAsync(g => g.Id == grupoId);
+        return await _context.Grupos
+            .Include(g => g.Turma)
+            .FirstOrDefaultAsync(g => g.Id == grupoId);
     }
     public async Task<Grupo[]> GetGruposTurmaIdAsync(int turmaId) {
         return await _context.Grupos

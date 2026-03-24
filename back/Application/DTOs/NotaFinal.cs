@@ -14,6 +14,5 @@ public class NotaFinalDTO
     public int GrupoId { get; set; }
     public string DeviceHash { get; set; } = "";
     public DateTime DataEnvio { get; set; }
-    [JsonIgnore]
     public IEnumerable<NotaParcial>? NotasParciais { get; set; }
 }

@@ -14,10 +14,12 @@ public class NotaFinalPersist : INotaFinalPersist
         _context = context;
     }
     public async Task<NotaFinal?> GetNotaFinalIdAsync(int notaFinalId){
-        return await _context.NotasFinais.AsNoTracking().FirstOrDefaultAsync(nf => nf.Id == notaFinalId);
+        return await _context.NotasFinais
+            .FirstOrDefaultAsync(nf => nf.Id == notaFinalId);
     }
     public async Task<NotaFinal?> GetNotaFinalAlunoSessaoIdAsync(int alunoId, int sessaoId) {
-        return await _context.NotasFinais.AsNoTracking().FirstOrDefaultAsync(nf => nf.AvaliadorId == alunoId && nf.SessaoId == sessaoId);
+        return await _context.NotasFinais
+            .FirstOrDefaultAsync(nf => nf.AvaliadorId == alunoId && nf.SessaoId == sessaoId);
     }
     public async Task<NotaFinal[]> GetNotaFinalGrupoSessaoIdAsync(int grupoId, int sessaoId) {
         return await _context.NotasFinais
@@ -27,6 +29,8 @@ public class NotaFinalPersist : INotaFinalPersist
             .ToArrayAsync();
     }
     public async Task<NotaFinal?> GetNotaFinalHashAsync(string deviceHash, int sessaoId) {
-        return await _context.NotasFinais.AsNoTracking().FirstOrDefaultAsync(nf => nf.DeviceHash == deviceHash && nf.SessaoId == sessaoId);
+        return await _context.NotasFinais
+            .AsNoTracking()
+            .FirstOrDefaultAsync(nf => nf.DeviceHash == deviceHash && nf.SessaoId == sessaoId);
     }
 }
