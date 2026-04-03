@@ -1,4 +1,5 @@
 namespace Persistence.Contracts;
+
 public interface IGeralPersist
 {
     //GERAL

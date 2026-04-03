@@ -1,10 +1,7 @@
-using System.Text.Json.Serialization;
 using Application.Contracts;
 using Application.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
-using Microsoft.Extensions.DependencyInjection;
-using AutoMapper;
 
 using Persistence;
 using Persistence.Context;
@@ -32,24 +29,9 @@ builder.Services.AddOpenApi();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 builder.Services.AddControllers()
-        .AddJsonOptions(options =>
-            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())
-        )
         .AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling =
             Newtonsoft.Json.ReferenceLoopHandling.Ignore
         );
-
-// builder.Services.AddControllers().AddNewtonsoftJson(options =>
-// {
-//     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-// });
-
-// builder.Services.AddControllers().AddJsonOptions(options =>
-// {
-//     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
-// });
-
-// Configurando string de conexão. Usadas variáveis de ambiente locais.
 
 builder.Services.AddSignalR();
 
@@ -65,16 +47,16 @@ builder.Services.AddDbContext<APIContext>(options =>
     ServerVersion.AutoDetect(mySqlConnection)
 ));
 
-var mapper_config = builder.Services.AddAutoMapper(cfg => 
+var mapper_config = builder.Services.AddAutoMapper(cfg =>
 {
     cfg.LicenseKey = Environment.GetEnvironmentVariable("AUTOMAPPER_KEY");
-    cfg.CreateMap<Aluno, AlunoDTO>().ReverseMap();
-    cfg.CreateMap<Criterio, CriterioDTO>().ReverseMap();
-    cfg.CreateMap<Grupo, GrupoDTO>().ReverseMap();
-    cfg.CreateMap<NotaFinal, NotaFinalDTO>().ReverseMap();
-    cfg.CreateMap<NotaParcial, NotaParcialDTO>().ReverseMap();
-    cfg.CreateMap<Sessao, SessaoDTO>().ReverseMap();
-    cfg.CreateMap<Turma, TurmaDTO>().ReverseMap();
+    _ = cfg.CreateMap<Aluno, AlunoDTO>().ReverseMap();
+    _ = cfg.CreateMap<Criterio, CriterioDTO>().ReverseMap();
+    _ = cfg.CreateMap<Grupo, GrupoDTO>().ReverseMap();
+    _ = cfg.CreateMap<NotaFinal, NotaFinalDTO>().ReverseMap();
+    _ = cfg.CreateMap<NotaParcial, NotaParcialDTO>().ReverseMap();
+    _ = cfg.CreateMap<Sessao, SessaoDTO>().ReverseMap();
+    _ = cfg.CreateMap<Turma, TurmaDTO>().ReverseMap();
 });
 
 builder.Services.AddScoped<IGeralPersist, GeralPersist>();
@@ -120,9 +102,9 @@ app.UseCors("Allowlocalhost");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    _ = app.MapOpenApi();
 
-    app.UseSwaggerUI(options =>
+    _ = app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/openapi/v1.json", "v1");
     });

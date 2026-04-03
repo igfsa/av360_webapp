@@ -6,13 +6,9 @@ using Persistence.Context;
 
 namespace Persistence;
 
-public class AlunoGrupoPersist : IAlunoGrupoPersist
+public class AlunoGrupoPersist(APIContext context) : IAlunoGrupoPersist
 {
-    private readonly APIContext _context;
-
-    public AlunoGrupoPersist(APIContext context) {
-        _context = context;
-    }
+    private readonly APIContext _context = context;
 
     public async Task<Aluno[]> GetAlunosGrupoId(int grupoId)
     {

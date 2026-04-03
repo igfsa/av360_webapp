@@ -10,6 +10,5 @@ public interface IGrupoService
     Task<IEnumerable<AlunoGrupoCheckboxDTO>> GetAlunoGrupoTurma(int turmaId, int grupoId);
     Task<GrupoDTO> Add(GrupoDTO model);
     Task<GrupoDTO> Update(int grupoId, GrupoDTO model);
-    // Task<GrupoDTO> AddAlunoGrupo(AlunoGrupoDTO model);
-    Task AtualizarGrupo( int turmaId, int grupoId, List<int> alunosSelecionados);
+    Task AtualizarGrupo(int turmaId, int grupoId, List<int> alunosSelecionados);
 }

@@ -6,22 +6,20 @@ using Persistence.Context;
 
 namespace Persistence;
 
-public class AlunoTurmaPersist : IAlunoTurmaPersist
+public class AlunoTurmaPersist(APIContext context) : IAlunoTurmaPersist
 {
-    private readonly APIContext _context;
+    private readonly APIContext _context = context;
 
-    public AlunoTurmaPersist(APIContext context) {
-        _context = context;
-    }
-
-    public async Task<Aluno[]> GetAlunosTurmaIdAsync(int turmaId) {
+    public async Task<Aluno[]> GetAlunosTurmaIdAsync(int turmaId)
+    {
         var turma = await _context.Turmas
             .Include(t => t.Alunos)
             .FirstOrDefaultAsync(t => t.Id == turmaId)
                 ?? null!;
         return turma.Alunos.ToArray();
     }
-    public async Task<Turma[]> GetTurmasAlunoIdAsync(int alunoId) {
+    public async Task<Turma[]> GetTurmasAlunoIdAsync(int alunoId)
+    {
         var aluno = await _context.Alunos
             .Include(a => a.Turmas)
             .FirstOrDefaultAsync(a => a.Id == alunoId)

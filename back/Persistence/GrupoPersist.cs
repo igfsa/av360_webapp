@@ -6,25 +6,25 @@ using Persistence.Context;
 
 namespace Persistence;
 
-public class GrupoPersist : IGrupoPersist
+public class GrupoPersist(APIContext context) : IGrupoPersist
 {
-    private readonly APIContext _context;
+    private readonly APIContext _context = context;
 
-    public GrupoPersist(APIContext context){
-        _context = context;
-    }
-    public async Task<Grupo[]> GetAllGruposAsync(){
+    public async Task<Grupo[]> GetAllGruposAsync()
+    {
         return await _context.Grupos
             .AsNoTracking()
             .OrderBy(g => g.Nome)
             .ToArrayAsync();
     }
-    public async Task<Grupo?> GetGrupoIdAsync(int grupoId){
+    public async Task<Grupo?> GetGrupoIdAsync(int grupoId)
+    {
         return await _context.Grupos
             .Include(g => g.Turma)
             .FirstOrDefaultAsync(g => g.Id == grupoId);
     }
-    public async Task<Grupo[]> GetGruposTurmaIdAsync(int turmaId) {
+    public async Task<Grupo[]> GetGruposTurmaIdAsync(int turmaId)
+    {
         return await _context.Grupos
             .AsNoTracking()
             .Where(g => g.TurmaId == turmaId)

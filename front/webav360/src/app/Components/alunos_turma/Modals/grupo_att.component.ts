@@ -35,7 +35,7 @@ import { Grupo } from '../../../Models/Grupo';
                     placeholder="Nome da equipe"
                   />
                   @if (grupo.get('nome')?.touched && grupo.get('nome')?.invalid) {
-                    <div class="error">
+                    <div class="alert alert-danger">
                       <span class="text-danger fw-bold" >Nome inválido...</span>
                     </div>
                   }
@@ -149,7 +149,6 @@ export class TurmaGrupoModalComponent implements OnInit {
 
     const differences = this.getDiff(this.gruposOrig, this.grupos.value as Grupo[]);
 
-    // console.log(differences.edit, differences.add);
     this.modal.close({edit: differences.edit, add: differences.add});
   }
 

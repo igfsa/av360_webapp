@@ -1,131 +1,68 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 using Application.Contracts;
 using Application.DTOs;
-using Persistence.Context;
-using Domain.Entities;
 
-namespace API.Controllers
+namespace API.Controllers;
+
+[ApiController]
+[Route("api/[controller]/[action]")]
+public class CriterioController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]/[action]")]
-    public class CriterioController : ControllerBase
+    private readonly ICriterioService _criterioService;
+    private readonly ICriterioNotifier _criterioNotifier;
+
+    public CriterioController(
+                        ICriterioService criterioService,
+                        ICriterioNotifier criterioNotifier)
     {
-        private readonly ICriterioService _criterioService;
-        private readonly ICriterioNotifier _criterioNotifier;
+        _criterioService = criterioService;
+        _criterioNotifier = criterioNotifier;
+    }
 
-        public CriterioController(
-                            ICriterioService criterioService,
-                            ICriterioNotifier criterioNotifier)
-        {
-            _criterioService = criterioService;
-            _criterioNotifier = criterioNotifier;
-        }
+    [HttpGet]
+    [ActionName("GetAllCriterios")]
+    public async Task<ActionResult<IEnumerable<CriterioDTO>>> Get()
+    {
+        var criterios = await _criterioService.GetCriterios();
+        return Ok(criterios);
+    }
 
-        [HttpGet]
-        [ActionName("GetAllCriterios")]
-        public async Task<ActionResult<IEnumerable<CriterioDTO>>> Get()
-        {
-            try
-            {
-                var criterios = await _criterioService.GetCriterios();
-                if (criterios is null)
-                {
-                    return NotFound();
-                }
-                return Ok(criterios);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                $"Erro ao tentar buscar critérios. Erro: {ex.Message}");
-            }
-        }
+    [HttpGet("{id:int}", Name = "GetCriterioId")]
+    [ActionName("GetId")]
+    public async Task<ActionResult<CriterioDTO>> Get(int id)
+    {
+        var criterios = await _criterioService.GetCriterioById(id);
+        return Ok(criterios);
+    }
 
-        [HttpGet("{id:int}", Name = "GetCriterioId")]
-        [ActionName("GetId")]
-        public async Task<ActionResult<CriterioDTO>> Get(int id)
-        {
+    [HttpGet("{turmaId:int}", Name = "GetCriteriosTurma")]
+    [ActionName("GetCriteriosTurma")]
+    public async Task<ActionResult<CriterioDTO>> GetCriterioTurma(int turmaId)
+    {
+        var criterios = await _criterioService.GetCriteriosTurma(turmaId);
 
-            try
-            {
-                var criterios = await _criterioService.GetCriterioById(id);
-                if (criterios is null)
-                {
-                    return NotFound();
-                }
-                return Ok(criterios);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                $"Erro ao tentar buscar critério. Erro: {ex.Message}");
-            }
+        return Ok(criterios);
+    }
 
-        }
+    [HttpPost]
+    [ActionName("Post")]
+    public async Task<ActionResult<CriterioDTO>> Post(CriterioDTO model)
+    {
+        var criterio = await _criterioService.Add(model);
 
-        [HttpGet("{turmaId:int}", Name = "GetCriteriosTurma")]
-        [ActionName("GetCriteriosTurma")]
-        public async Task<ActionResult<CriterioDTO>> GetCriterioTurma(int turmaId)
-        {
+        await _criterioNotifier.CriterioAtualizadoAsync(criterio.Id);
+        return Ok(criterio);
+    }
 
-            try
-            {
-                var criterios = await _criterioService.GetCriteriosTurma(turmaId);
+    [HttpPut("{id:int}")]
+    [ActionName("Put")]
+    public async Task<ActionResult> Put(int id, CriterioDTO model)
+    {
+        var criterio = await _criterioService.Update(id, model);
 
-                return Ok(criterios);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                $"Erro ao tentar buscar critério. Erro: {ex.Message}");
-            }
-
-        }
-
-        [HttpPost]
-        [ActionName("Post")]
-        public async Task<ActionResult<CriterioDTO>> Post(CriterioDTO model)
-        {
-            try
-            {
-                var criterio = await _criterioService.Add(model);
-                if (model == null) 
-                {
-                   return NoContent(); 
-                }
-                await _criterioNotifier.CriterioAtualizadoAsync(criterio.Id);
-                return Ok(criterio);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    $"Erro ao tentar adicionar critério. Erro: {ex.Message}");
-            }
-        }
-
-        [HttpPut("{id:int}")]
-        [ActionName("Put")]
-        public async Task<ActionResult> Put(int id, CriterioDTO model)
-        {
-            try
-            {
-                var criterio = await _criterioService.Update(id, model);
-                if (criterio == null)
-                {
-                   return NoContent(); 
-                }
-                await _criterioNotifier.CriterioAtualizadoAsync(model.Id);
-                return Ok(criterio);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                                                $"Erro ao tentar atualizar critério. Erro: {ex.Message}");
-            }
-        }
-
+        await _criterioNotifier.CriterioAtualizadoAsync(model.Id);
+        return Ok(criterio);
     }
 
 }

@@ -1,6 +1,8 @@
+import { Aluno } from "./Aluno";
+
 export interface AvaliacaoAgrupada {
   avaliadoId: number;
-  avaliadoNome: string;
+  avaliado: Aluno;
   criterios: {
     criterioId: number;
     criterioNome: string;

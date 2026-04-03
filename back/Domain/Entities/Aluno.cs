@@ -1,11 +1,10 @@
-using System.Text.Json.Serialization;
 using Domain.Exceptions;
 
 namespace Domain.Entities;
 
 public class Aluno
 {
-    private Aluno(){}
+    private Aluno() { }
     public Aluno(string nome)
     {
         if (string.IsNullOrWhiteSpace(nome))
@@ -14,10 +13,11 @@ public class Aluno
         Nome = nome;
     }
 
-    public int Id { get; set; }
+    public int Id { get; private set; }
     public string Nome { get; private set; } = null!;
-    private readonly List<Turma> _turmas = new();
+    private readonly List<Turma> _turmas = [];
     public IReadOnlyCollection<Turma> Turmas => _turmas;
+
     public void AtualizarAluno(string nome)
     {
         if (string.IsNullOrWhiteSpace(nome))

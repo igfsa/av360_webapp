@@ -6,31 +6,33 @@ using Persistence.Contracts;
 
 namespace Persistence;
 
-public class SessaoPersist : ISessaoPersist
+public class SessaoPersist(APIContext context) : ISessaoPersist
 {
-    private readonly APIContext _context;
+    private readonly APIContext _context = context;
 
-    public SessaoPersist(APIContext context){
-        _context = context;
-    }
-    public async Task<Sessao[]> GetAllSessoesAsync(){
+    public async Task<Sessao[]> GetAllSessoesAsync()
+    {
         return await _context.Sessoes
             .AsNoTracking()
             .OrderByDescending(a => a.DataInicio)
             .ToArrayAsync();
     }
-    public async Task<Sessao?> GetSessaoIdAsync(int SessaoId){
+    public async Task<Sessao?> GetSessaoIdAsync(int SessaoId)
+    {
         return await _context.Sessoes
             .Include(s => s.Notasfinais)
+            .Include(s => s.Turma)
             .FirstOrDefaultAsync(s => s.Id == SessaoId);
     }
-    public async Task<Sessao[]> GetSessoesTurmaIdAsync(int turmaId) {
+    public async Task<Sessao[]> GetSessoesTurmaIdAsync(int turmaId)
+    {
         return await _context.Sessoes
             .Where(s => s.TurmaId == turmaId)
             .OrderByDescending(s => s.DataInicio)
             .ToArrayAsync();
     }
-    public async Task<Sessao?> GetSessaoAtivaTurmaIdAsync(int TurmaId){
+    public async Task<Sessao?> GetSessaoAtivaTurmaIdAsync(int TurmaId)
+    {
         return await _context.Sessoes
             .Include(s => s.Notasfinais)
             .FirstOrDefaultAsync(s => s.TurmaId == TurmaId && s.Ativo);

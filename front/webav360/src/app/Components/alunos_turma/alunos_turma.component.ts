@@ -416,12 +416,20 @@ export class AlunoTurmaComponent implements OnInit {
     ref.result.then((criterioEditado: Criterio) => {
       if (!criterioEditado) return;
 
-      console.log(criterioEditado)
-
       this.criterioService.putCriterio(criterioEditado).subscribe({
         next: (c) => {
           criterio = c;
-          Swal.fire({
+          Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            }
+          }).fire({
             icon: 'success',
             title: 'Sucesso',
             text: `Critério ${c.nome} editado com sucesso!`

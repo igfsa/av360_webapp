@@ -1,15 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using Domain.Exceptions;
 
 namespace Domain.Entities;
 
 public class Sessao
 {
-    private Sessao(){}
+    private Sessao() { }
     public Sessao(Turma turma, DateTime dataInicio, string tokenPublico)
     {
         if (string.IsNullOrWhiteSpace(tokenPublico))
@@ -20,15 +15,16 @@ public class Sessao
         Turma = turma;
         DataInicio = dataInicio;
         TokenPublico = tokenPublico;
+        Ativo = true;
     }
-    public int Id { get; set; }
+    public int Id { get; private set; }
     public int TurmaId { get; private set; }
-    public readonly Turma Turma = null!;
+    public Turma Turma { get; private set; } = null!;
     public DateTime DataInicio { get; private set; }
     public DateTime? DataFim { get; private set; }
     public string TokenPublico { get; private set; } = null!;
     public bool Ativo { get; private set; }
-    private readonly List<NotaFinal> _notasFinais = new();
+    private readonly List<NotaFinal> _notasFinais = [];
     public IReadOnlyCollection<NotaFinal> Notasfinais => _notasFinais;
 
     public bool ValidaAvaliacao(Aluno avaliador, string deviceHash)

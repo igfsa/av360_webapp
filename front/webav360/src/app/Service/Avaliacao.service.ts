@@ -5,6 +5,7 @@ import { baseURL } from '../../main.server';
 import { AvaliacaoPublica } from '../Models/AvaliacaoPublica';
 import { AvaliacaoEnvio } from '../Models/AvaliacaoEnvio';
 import { NotaFinal } from '../Models/NotaFinal';
+import { AvaliacaoPostResult } from '../Models/AvaliacaoPostResult';
 
 @Injectable({
   providedIn: 'root'
@@ -26,8 +27,8 @@ export class AvaliacaoService {
     return this.http.get<AvaliacaoEnvio>(`${baseURL}api/Avaliacao/GeraNovaAvaliacaoEnvio`, {params});
   }
 
-  public PostAvaliacao(avaliacao: AvaliacaoEnvio){
-    return this.http.post(`${baseURL}api/Avaliacao/Post`,  avaliacao);
+  public PostAvaliacao(avaliacao: AvaliacaoEnvio): Observable<AvaliacaoPostResult>{
+    return this.http.post<AvaliacaoPostResult>(`${baseURL}api/Avaliacao/Post`,  avaliacao);
   }
 
   public GetNotasFinaisAlunoSessao(sessaoId: number, alunoId: number): Observable<NotaFinal> {

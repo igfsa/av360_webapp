@@ -8,25 +8,16 @@ using Domain.Exceptions;
 
 namespace Application.Services;
 
-public class CriterioService : ICriterioService
+public class CriterioService(IGeralPersist geralPersist,
+                    ICriterioPersist criterioPersist,
+                    IMapper mapper,
+                    ICriterioTurmaPersist criterioTurmaPersist) : ICriterioService
 {
-    private readonly IGeralPersist _geralPersist;
-    private ICriterioPersist _criterioPersist;
-    private ICriterioTurmaPersist _criterioTurmaPersist;
+    private readonly IGeralPersist _geralPersist = geralPersist;
+    private readonly ICriterioPersist _criterioPersist = criterioPersist;
+    private readonly ICriterioTurmaPersist _criterioTurmaPersist = criterioTurmaPersist;
 
-    private readonly IMapper _mapper;
-
-    public CriterioService(IGeralPersist geralPersist,
-                        ICriterioPersist criterioPersist, 
-                        IMapper mapper,
-                        ICriterioTurmaPersist criterioTurmaPersist)
-    {
-        _geralPersist = geralPersist;
-        _criterioPersist = criterioPersist;
-        _mapper = mapper;
-        _criterioTurmaPersist = criterioTurmaPersist;
-        
-    }
+    private readonly IMapper _mapper = mapper;
 
     #region get
     public async Task<IEnumerable<CriterioDTO>> GetCriterios()
@@ -38,7 +29,8 @@ public class CriterioService : ICriterioService
 
             return _mapper.Map<IEnumerable<CriterioDTO>>(criterios);
         }
-        catch {
+        catch
+        {
             throw;
         }
     }
@@ -52,7 +44,8 @@ public class CriterioService : ICriterioService
 
             return _mapper.Map<CriterioDTO>(criterio);
         }
-        catch {
+        catch
+        {
             throw;
         }
     }
@@ -65,22 +58,28 @@ public class CriterioService : ICriterioService
 
             return _mapper.Map<IEnumerable<CriterioDTO>>(criterios);
         }
-        catch {
+        catch
+        {
             throw;
         }
     }
     #endregion
     #region add
-    public async Task<CriterioDTO> Add(CriterioDTO model){
-        try{
+    public async Task<CriterioDTO> Add(CriterioDTO model)
+    {
+        try
+        {
             var criterio = new Criterio(
                 nome: model.Nome
             );
             _geralPersist.Add(criterio);
+
+            _ = await _geralPersist.SaveChangesAsync();
             var CriterioRetorno = await _criterioPersist.GetCriterioIdAsync(criterio.Id);
             return _mapper.Map<CriterioDTO>(CriterioRetorno);
         }
-        catch {
+        catch
+        {
             throw;
         }
     }
@@ -94,10 +93,12 @@ public class CriterioService : ICriterioService
                 ?? throw new NotFoundException("Critério não encontrado");
             criterio.AtualizarCriterio(model.Nome);
 
+            _ = await _geralPersist.SaveChangesAsync();
             var criterioRetorno = await _criterioPersist.GetCriterioIdAsync(criterioId);
             return _mapper.Map<CriterioDTO>(criterioRetorno);
         }
-        catch {
+        catch
+        {
             throw;
         }
     }

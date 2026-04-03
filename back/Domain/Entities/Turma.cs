@@ -4,7 +4,7 @@ namespace Domain.Entities;
 
 public class Turma
 {
-    private Turma (){}
+    private Turma() { }
     public Turma(string cod, decimal notaMax)
     {
         if (string.IsNullOrWhiteSpace(cod))
@@ -13,16 +13,16 @@ public class Turma
         Cod = cod;
         NotaMax = notaMax;
     }
-    public int Id { get; set; }
+    public int Id { get; private set; }
     public string Cod { get; private set; } = null!;
     public decimal NotaMax { get; private set; }
-    private readonly List<Aluno> _alunos = new();
+    private readonly List<Aluno> _alunos = [];
     public IReadOnlyCollection<Aluno> Alunos => _alunos;
-    private readonly List<Criterio> _criterios = new();
+    private readonly List<Criterio> _criterios = [];
     public IReadOnlyCollection<Criterio> Criterios => _criterios;
-    private readonly List<Grupo> _grupos = new();
+    private readonly List<Grupo> _grupos = [];
     public IReadOnlyCollection<Grupo> Grupos => _grupos;
-    
+
     public void AtualizarTurma(string cod, decimal notaMax)
     {
         if (string.IsNullOrWhiteSpace(cod))
@@ -36,17 +36,14 @@ public class Turma
     {
         if (_alunos.Any(a => a.Id == aluno.Id))
             throw new BusinessException("Aluno já matriculado.");
-        Console.WriteLine(aluno.Nome);
         _alunos.Add(aluno);
     }
 
     public void RemoverAluno(int alunoId)
     {
-        var aluno = _alunos.FirstOrDefault(a => a.Id == alunoId);
-        if (aluno == null)
-            throw new BusinessException("Aluno não encontrado.");
-
-        _alunos.Remove(aluno);
+        var aluno = _alunos.FirstOrDefault(a => a.Id == alunoId) 
+            ?? throw new BusinessException("Aluno não encontrado.");
+        _ = _alunos.Remove(aluno);
     }
 
     public void AtualizarCriterios(IEnumerable<Criterio> novosCriterios)
@@ -54,7 +51,7 @@ public class Turma
         var novosIds = novosCriterios.Select(c => c.Id).ToHashSet();
 
         // remover
-        _criterios.RemoveAll(c => !novosIds.Contains(c.Id));
+        _ = _criterios.RemoveAll(c => !novosIds.Contains(c.Id));
 
         // adicionar
         foreach (var criterio in novosCriterios)
@@ -74,10 +71,8 @@ public class Turma
 
     public void RemoverGrupo(int grupoId)
     {
-        var grupo = _grupos.FirstOrDefault(a => a.Id == grupoId);
-        if (grupo == null)
-            throw new BusinessException("Equipe não vinculada.");
-
-        _grupos.Remove(grupo);
+        var grupo = _grupos.FirstOrDefault(a => a.Id == grupoId) 
+            ?? throw new BusinessException("Equipe não vinculada.");
+        _ = _grupos.Remove(grupo);
     }
 }

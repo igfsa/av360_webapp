@@ -87,6 +87,7 @@ export class SessaoComponent implements OnInit {
     this.sessaoService.postSessao({
       id: 0,
       turmaId: this.turma.id,
+      turma: this.turma,
       dataInicio: new Date(),
       dataFim: new Date(),
       tokenPublico: '',

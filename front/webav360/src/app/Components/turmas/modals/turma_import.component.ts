@@ -11,11 +11,11 @@ import { createEmptyImport, ImportAlunos } from '../../../Models/TurmaImport';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-  <div class="modal-header">
+  <div class="modal-header mx-5 mt-5">
     <h4 class="modal-title" style = "font-size: 2.4rem;">Importar Alunos</h4>
   </div>
 
-  <div class="modal-body">
+  <div class="modal-body vh-100 mx-5">
     <div class="input-group m-3 row">
       <span class="input-group-text col-2" id="basic-addon1" style = "font-size: 1.6rem;">Nome do Aluno: </span>
       <input type="text" class="form-control" [(ngModel)]="import.colunaNome" aria-label="Cod" aria-describedby="basic-addon1" style = "font-size: 1.6rem;">
@@ -26,7 +26,7 @@ import { createEmptyImport, ImportAlunos } from '../../../Models/TurmaImport';
     </div>
   </div>
 
-  <div class="modal-footer">
+  <div class="modal-footer mx-5 m-b">
     <button class="btn btn-secondary btn-danger" (click)="modal.dismiss()">Cancelar</button>
     <button class="btn btn-secondary btn-success" (click)="salvar()">Salvar</button>
   </div>

@@ -1,153 +1,87 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 using Application.Contracts;
 using Application.DTOs;
-using Persistence.Context;
-using Domain.Entities;
 
 namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]")]
-public class GrupoController : ControllerBase
+public class GrupoController(
+    IGrupoService grupoService,
+    IAlunoService alunoService,
+    ITurmaNotifier turmaNotifier,
+    IGrupoNotifier grupoNotifier) : ControllerBase
 {
-    private readonly IGrupoService _grupoService;
-    private readonly IAlunoService _alunoService;
-    private ITurmaNotifier _turmaNotifier;
-    private IGrupoNotifier _grupoNotifier;
-
-    public GrupoController(
-        IGrupoService grupoService,
-        IAlunoService alunoService,
-        ITurmaNotifier turmaNotifier,
-        IGrupoNotifier grupoNotifier)
-{
-        _grupoService = grupoService;
-        _alunoService = alunoService;
-        _turmaNotifier = turmaNotifier;
-        _grupoNotifier = grupoNotifier;
-    }
+    private readonly IGrupoService _grupoService = grupoService;
+    private readonly IAlunoService _alunoService = alunoService;
+    private readonly ITurmaNotifier _turmaNotifier = turmaNotifier;
+    private readonly IGrupoNotifier _grupoNotifier = grupoNotifier;
 
     [HttpGet]
     [ActionName("GetAllGrupos")]
-    public async Task<ActionResult<IEnumerable<GrupoDTO>>> Get() {
-        try {
-            var grupos = await _grupoService.GetGrupos();
-            if (grupos is null) {
-                return NotFound();
-            }
-            return Ok(grupos);
-        }
-        catch (Exception ex) {
-            return StatusCode(StatusCodes.Status500InternalServerError,
-            $"Erro ao tentar buscar Grupo. Erro: {ex.Message}");
-    }}
+    public async Task<ActionResult<IEnumerable<GrupoDTO>>> Get()
+    {
+        var grupos = await _grupoService.GetGrupos();
+        return Ok(grupos);
+    }
 
     [HttpGet("{id:int}", Name = "GetGrupoId")]
     [ActionName("GetId")]
-    public async Task<ActionResult<GrupoDTO>> Get(int id) {
-        try {
-            var grupos = await _grupoService.GetGrupoById(id);
-            if (grupos is null) {
-                return NotFound();
-            }
-            return Ok(grupos);
-        }
-        catch (Exception ex) {
-            return StatusCode(StatusCodes.Status500InternalServerError,
-            $"Erro ao tentar buscar Grupo. Erro: {ex.Message}");
-    }}
+    public async Task<ActionResult<GrupoDTO>> Get(int id)
+    {
+        var grupos = await _grupoService.GetGrupoById(id);
+        return Ok(grupos);
+    }
 
     [HttpGet("{turmaId:int}", Name = "GetGruposTurma")]
     [ActionName("GetGruposTurma")]
-    public async Task<ActionResult<IEnumerable<GrupoDTO>>> GetGruposTurma(int turmaId) {
-        try {
-            var grupos = await _grupoService.GetGruposTurma(turmaId);
-            if (grupos is null) {
-                return NotFound();
-            }
-            return Ok(grupos);
-        }
-        catch (Exception ex) {
-            return StatusCode(StatusCodes.Status500InternalServerError,
-            $"Erro ao tentar buscar Grupo. Erro: {ex.Message}");
-    }}
+    public async Task<ActionResult<IEnumerable<GrupoDTO>>> GetGruposTurma(int turmaId)
+    {
+        var grupos = await _grupoService.GetGruposTurma(turmaId);
+        return Ok(grupos);
+    }
+
     [HttpGet("{turmaId:int}", Name = "GetAlunoGruposCheckbox")]
     [ActionName("GetAlunoGruposCheckbox")]
-    public async Task<ActionResult<IEnumerable<AlunoGrupoCheckboxDTO>>> GetAlunosGrupoCheckbox(int turmaId, int grupoId) {
-        try {
-            var alunosCheckbox = await _grupoService.GetAlunoGrupoTurma(turmaId, grupoId);
-            if (alunosCheckbox is null) {
-                return NotFound();
-            }
-            return Ok(alunosCheckbox);
-        }
-        catch (Exception ex) {
-            return StatusCode(StatusCodes.Status500InternalServerError,
-            $"Erro ao tentar buscar Grupo. Erro: {ex.Message}");
-    }}
+    public async Task<ActionResult<IEnumerable<AlunoGrupoCheckboxDTO>>> GetAlunosGrupoCheckbox(int turmaId, int grupoId)
+    {
+        var alunosCheckbox = await _grupoService.GetAlunoGrupoTurma(turmaId, grupoId);
+        return Ok(alunosCheckbox);
+        
+    }
+
     [HttpPost]
     [ActionName("Post")]
-    public async Task<ActionResult<GrupoDTO>> Post(GrupoDTO model) {
-        try {
-            var grupo = await _grupoService.Add(model);
-            if (model == null) {
-                return NoContent(); 
-            }
-            await _grupoNotifier.GrupoAtualizadoAsync(grupo.Id);
-            await _turmaNotifier.TurmaAtualizadaAsync(grupo.TurmaId);
-            return Ok(grupo);
-        }
-        catch (Exception ex) {
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                $"Erro ao tentar adicionar Grupo. Erro: {ex.Message}");
-    }}
+    public async Task<ActionResult<GrupoDTO>> Post(GrupoDTO model)
+    {
+        var grupo = await _grupoService.Add(model);
+
+        await _grupoNotifier.GrupoAtualizadoAsync(grupo.Id);
+        await _turmaNotifier.TurmaAtualizadaAsync(grupo.TurmaId);
+        return Ok(grupo);
+    }
+
     [HttpPut("{id:int}")]
     [ActionName("Put")]
-    public async Task<ActionResult> Put(int id, GrupoDTO model) {
-        try {
-            var grupo = await _grupoService.Update(id, model);
-            if (grupo == null)
-            {
-                return NoContent(); 
-            }
-            await _grupoNotifier.GrupoAtualizadoAsync(grupo.Id);
-            await _turmaNotifier.TurmaAtualizadaAsync(grupo.TurmaId);
-            return Ok(grupo);
-        }
-        catch (Exception ex) {
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                                            $"Erro ao tentar atualizar Grupos. Erro: {ex.Message}");
-    }}
-    // [HttpPut("", Name = "PutAlunoGrupo")]
-    // [ActionName("PutAlunoGrupo")]
-    // public async Task<ActionResult<GrupoDTO>> PutAlunoGrupo(AlunoGrupoDTO model)
-    // {
-    //     try
-    //     {
-    //         var turma = await _grupoService.AddAlunoGrupo(model);
-    //         await _turmaNotifier.TurmaAtualizadaAsync(model.grupoId);
-    //         return Ok(turma);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         return StatusCode(StatusCodes.Status500InternalServerError,
-    //             $"Erro ao tentar adicionar Grupo. Erro: {ex.Message}");
-    //     }
-    // }
+    public async Task<ActionResult> Put(int id, GrupoDTO model)
+    {
+        var grupo = await _grupoService.Update(id, model);
+
+        await _grupoNotifier.GrupoAtualizadoAsync(grupo.Id);
+        await _turmaNotifier.TurmaAtualizadaAsync(grupo.TurmaId);
+        return Ok(grupo);
+    }
+
     [HttpPut("", Name = "PutAtualizarGrupo")]
     [ActionName("PutAtualizarGrupo")]
-    public async Task<ActionResult<GrupoDTO>> PutAtualizarGrupo(AlunoGrupoDTO model) {
-        try {
-            await _grupoService.AtualizarGrupo(model.turmaId, model.grupoId, model.alunoIds);
-            await _grupoNotifier.GrupoAtualizadoAsync(model.grupoId);
-            await _turmaNotifier.TurmaAtualizadaAsync(model.turmaId);
-            var grupo = await _grupoService.GetGrupoById(model.grupoId);
+    public async Task<ActionResult<GrupoDTO>> PutAtualizarGrupo(AlunoGrupoDTO model)
+    {
+            await _grupoService.AtualizarGrupo(model.TurmaId, model.GrupoId, model.AlunoIds);
+
+            await _grupoNotifier.GrupoAtualizadoAsync(model.GrupoId);
+            await _turmaNotifier.TurmaAtualizadaAsync(model.TurmaId);
+            var grupo = await _grupoService.GetGrupoById(model.GrupoId);
             return Ok(grupo);
-        }
-        catch (Exception ex) {
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                $"Erro ao tentar adicionar Grupo. Erro: {ex.Message}");
-    }}
+    }
 }

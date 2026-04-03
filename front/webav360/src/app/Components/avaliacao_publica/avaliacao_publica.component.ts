@@ -11,9 +11,6 @@ import { AvaliacaoItem } from '../../Models/AvaliacaoItem';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AvaliacaoAgrupada } from '../../Models/AvaliacaoAgrupada';
-import { forkJoin } from 'rxjs';
-import { Turma } from '../../Models/Turma';
-import { TurmaService } from '../../Service/Turma.service';
 import { AvaliacaoEnvio } from '../../Models/AvaliacaoEnvio';
 import Swal from 'sweetalert2';
 
@@ -32,7 +29,6 @@ export class AvaliacaoPublicaComponent implements OnInit {
   step = 1;
   token!: string;
   dados!: AvaliacaoPublica;
-  turma!: Turma;
   grupos: Grupo[] = [];
   alunosGrupo: Aluno[] = [];
   criterios: Criterio[] = [];
@@ -50,7 +46,6 @@ export class AvaliacaoPublicaComponent implements OnInit {
     private route: ActivatedRoute,
     private avaliacaoService: AvaliacaoService,
     private alunoService: AlunoService,
-    private turmaService: TurmaService,
     private deviceService: DeviceService,
     private router: Router,
     public cdr: ChangeDetectorRef
@@ -75,7 +70,23 @@ export class AvaliacaoPublicaComponent implements OnInit {
 
         this.cdr.detectChanges();
       },
-      error: (erro) => {console.log(erro); this.router.navigate(['/avaliacao/encerrada'])}
+      error: (err) => {
+        Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        }).fire({
+        icon: 'error',
+        title: 'Erro',
+        text: err.error.message ?? 'Ocorreu um erro não identificado'
+      });
+      this.router.navigate(['/avaliacao/encerrada'])}
     });
   }
 
@@ -87,65 +98,62 @@ export class AvaliacaoPublicaComponent implements OnInit {
   public validarAluno(){
     if (!this.grupoSelecionado)
       return;
-    this.alunoService.getAlunoNomeIdGrupo(this.grupoSelecionado.id, this.nomeAluno).subscribe(
-      aluno => {
+    this.alunoService.getAlunoNomeIdGrupo(this.grupoSelecionado.id, this.nomeAluno).subscribe({
+      next: (aluno) => {
         this.alunoLogado = aluno;
         this.carregarAvaliacao();
+    },
+    error: (err) => {
+      Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        }
+      }).fire({
+          icon: 'error',
+          title: 'Erro',
+          text: err.error.message ?? 'Ocorreu um erro não identificado'
+        });
+      }
     });
   }
 
   public async carregarAvaliacao() {
-    const hash = await this.deviceService.getDeviceHash();
-  //   forkJoin({
-  //     avaliacao: this.avaliacaoService.GeraNovaAvaliacaoEnvio(
-  //       this.dados.sessaoId,
-  //       this.grupoSelecionado.id,
-  //       this.alunoLogado.id,
-  //       hash
-  //     ),
-  //     alunos: this.alunoService.getAlunosGrupo(this.grupoSelecionado.id),
-  //     turma: this.turmaService.getTurmaId(this.dados.turmaId)
-  //   }).subscribe({
-  //     next: ({avaliacao, alunos, turma}) => {
-  //       this.alunosGrupo = alunos;
-  //       this.avaliacaoEnvio = avaliacao;
-  //       console.log(this.avaliacaoEnvio)
-  //       this.avaliacoes =  this.agruparAvaliacao(avaliacao.itens);
-  //       this.turma = turma
-  //       this.indiceAtual = 0;
-  //       this.step = 3;
-  //       this.carregandoAvaliacao = false;
-
-  //       this.cdr.detectChanges();
-  //     },
-  //     error: (err) => {
-  // console.log("ERROR EXECUTADO", err);
-  //       Swal.fire({
-  //         icon: 'error',
-  //         title: 'Erro',
-  //         text: err.error?.message ?? `${err}`
-  //       });
-  //     }
-  //   });
-  forkJoin({
-  avaliacao: this.avaliacaoService.GeraNovaAvaliacaoEnvio(
-    this.dados.sessaoId,
-    this.grupoSelecionado.id,
-    this.alunoLogado.id,
-    hash
-  ),
-  alunos: this.alunoService.getAlunosGrupo(this.grupoSelecionado.id),
-  turma: this.turmaService.getTurmaId(this.dados.turmaId)
-})
-.subscribe({
-  next: (res) => {
-    console.log("NEXT EXECUTADO", res);
-  },
-  error: (err) => {
-    console.log("ERROR DO SUBSCRIBE EXECUTADO", err);
-    alert("Erro caiu aqui");
+    this.avaliacaoService.GeraNovaAvaliacaoEnvio(
+      this.dados.sessaoId,
+      this.grupoSelecionado.id,
+      this.alunoLogado.id,
+      await this.deviceService.getDeviceHash()
+    ).subscribe({
+      next: (data) => {
+        this.avaliacoes =  this.agruparAvaliacao(data.itens);
+        this.avaliacaoEnvio = {
+          avaliadorId: data.avaliadorId,
+          avaliador: data.avaliador,
+          deviceHash: data.deviceHash,
+          grupoId: data.grupoId,
+          itens: [],
+          sessaoId: data.sessaoId
+        }
+        this.indiceAtual = 0;
+        this.step = 3;
+        this.carregandoAvaliacao = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: err.error.message ?? 'Ocorreu um erro não identificado'
+        });
+      }
+    });
   }
-});}
 
 
   public proximo() {
@@ -168,10 +176,25 @@ export class AvaliacaoPublicaComponent implements OnInit {
 
     this.avaliacaoEnvio.itens = itens;
 
-    console.log(itens);
-
-    this.avaliacaoService.PostAvaliacao(this.avaliacaoEnvio).subscribe(() => {
+    this.avaliacaoService.PostAvaliacao(this.avaliacaoEnvio).subscribe({
+      next: (imported) =>{
       this.step = 5;
+      this.cdr.detectChanges();
+        Swal.fire({
+          icon: 'info',
+          title: 'Sucesso',
+          html: `${imported.total} notas processadas!<br>
+                ${imported.sucesso} importados com sucesso.<br>
+                ${imported.falhas} com falha.`
+        });
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: err.error?.message ?? `Erro ao importar Notas!`
+        });
+      }
     });
   }
 
@@ -181,7 +204,7 @@ export class AvaliacaoPublicaComponent implements OnInit {
   }
 
   public avaliacaoValida(item: any): boolean {
-    return item.criterios.every((c: any) => (c.nota >= 1 && c.nota <= this.turma.notaMax) || c.nota !== null);
+    return item.criterios.every((c: any) => (c.nota >= 1 && c.nota <= this.dados.turma.notaMax));
   }
 
   private agruparAvaliacao(itens: AvaliacaoItem[]): AvaliacaoAgrupada[] {
@@ -190,7 +213,7 @@ export class AvaliacaoPublicaComponent implements OnInit {
       if (!mapa.has(item.avaliadoId)) {
         mapa.set(item.avaliadoId, {
           avaliadoId: item.avaliadoId,
-          avaliadoNome: this.alunosGrupo.find(a => a.id == item.avaliadoId)?.nome ?? '',
+          avaliado: item.avaliado,
           criterios: []
         });
       }
@@ -205,15 +228,15 @@ export class AvaliacaoPublicaComponent implements OnInit {
       av.criterios.sort((a, b) => a.criterioId - b.criterioId)
     })
 
-    console.log(Array.from(mapa.values()));
     return Array.from(mapa.values());
   }
 
   private desagruparAvaliacao(avaliacoes: AvaliacaoAgrupada[]): AvaliacaoItem[] {
 
-    return avaliacoes.flatMap(aluno =>
-      aluno.criterios.map(c => ({
-        avaliadoId: aluno.avaliadoId,
+    return avaliacoes.flatMap(item =>
+      item.criterios.map(c => ({
+        avaliadoId: item.avaliadoId,
+        avaliado: item.avaliado,
         criterioId: c.criterioId,
         nota: c.nota
       }))

@@ -5,8 +5,8 @@ namespace Application.Contracts;
 public interface INotaFinalService
 {
     Task<NotaFinalDTO> GetById(int id);
-    Task<NotaFinalDTO> GetNotasFinaisAlunoSessao(int alunoId, int sessaoId); 
-    Task<IEnumerable<NotaFinalDTO>> GetNotasFinaisGrupoSessao(int grupoId, int sessaoId); 
+    Task<NotaFinalDTO> GetNotasFinaisAlunoSessao(int alunoId, int sessaoId);
+    Task<IEnumerable<NotaFinalDTO>> GetNotasFinaisGrupoSessao(int grupoId, int sessaoId);
     Task<NotaFinalDTO> Add(NotaFinalDTO notaFinal);
     Task<NotaFinalDTO> Update(int NotaFinalId, NotaFinalDTO notaFinal);
 }

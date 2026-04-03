@@ -26,7 +26,8 @@
     @else if(step === 3){
       <div>
       @if (!carregandoAvaliacao) {
-        <h3>Avaliando {{ atual.avaliadoNome }}</h3>
+        <h3>Avaliando {{ atual.avaliado.nome }}</h3>
+        <h4>Nota Máxima {{ dados.turma.notaMax }}</h4>
           <table>
             @for (criterio of atual.criterios; track criterio.criterioId) {
               <tr>
@@ -36,6 +37,11 @@
                   style="font-size: 1.6rem;"
                   [(ngModel)]="criterio.nota"
                   placeholder="Nota" />
+                  @if (criterio.nota < 1 || criterio.nota > dados.turma.notaMax) {
+                    <div class="alert alert-danger">
+                      <span class="text-danger fw-bold" >Critério deve estar entre 1 e {{dados.turma.notaMax}}...</span>
+                    </div>
+                  }
               </tr>
             }
           </table>
@@ -69,23 +75,21 @@
               </thead>
 
               <tbody>
-                @for (avaliacao of avaliacoes; track avaliacao.avaliadoId; let a = $index) {
+                @for (avaliacao of avaliacoes; track avaliacao.avaliadoId) {
                   <tr>
 
                     <td class="sticky-col nome-col">
-                      {{ avaliacao.avaliadoNome }}
+                      {{ avaliacao.avaliado.nome }}
                     </td>
 
                     @for (criterio of avaliacao.criterios; track criterio.criterioId) {
                       <td class="nota-col">
-                        <span class="nota-badge">
-                          {{ criterio.nota }}
-                        </span>
+                        {{criterio.nota}}
                       </td>
                     }
 
                     <td class="acao-col">
-                      <button class="btn-editar" (click)="editar(a)">Editar</button>
+                      <button class="btn-editar" (click)="editar(avaliacao.avaliadoId)">Editar</button>
                     </td>
 
                   </tr>

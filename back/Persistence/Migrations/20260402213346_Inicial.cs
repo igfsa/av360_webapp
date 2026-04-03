@@ -62,25 +62,6 @@ namespace Persistence.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Sessoes",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    TurmaId = table.Column<int>(type: "int", nullable: false),
-                    DataInicio = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    DataFim = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    TokenPublico = table.Column<string>(type: "varchar(33)", maxLength: 33, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Ativo = table.Column<bool>(type: "tinyint(1)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Sessoes", x => x.Id);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "Turmas",
                 columns: table => new
                 {
@@ -169,6 +150,31 @@ namespace Persistence.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Sessoes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    TurmaId = table.Column<int>(type: "int", nullable: false),
+                    DataInicio = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    DataFim = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    TokenPublico = table.Column<string>(type: "varchar(33)", maxLength: 33, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Ativo = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sessoes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Sessoes_Turmas_TurmaId",
+                        column: x => x.TurmaId,
+                        principalTable: "Turmas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "NotasFinais",
                 columns: table => new
                 {
@@ -220,11 +226,23 @@ namespace Persistence.Migrations
                 {
                     table.PrimaryKey("PK_NotasParciais", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_NotasParciais_Alunos_AvaliadoId",
+                        column: x => x.AvaliadoId,
+                        principalTable: "Alunos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_NotasParciais_Criterios_CriterioId",
+                        column: x => x.CriterioId,
+                        principalTable: "Criterios",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_NotasParciais_NotasFinais_NotaFinalId",
                         column: x => x.NotaFinalId,
                         principalTable: "NotasFinais",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -282,10 +300,25 @@ namespace Persistence.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_NotasParciais_AvaliadoId",
+                table: "NotasParciais",
+                column: "AvaliadoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_NotasParciais_CriterioId",
+                table: "NotasParciais",
+                column: "CriterioId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_NotasParciais_NotaFinalId_AvaliadoId_CriterioId",
                 table: "NotasParciais",
                 columns: new[] { "NotaFinalId", "AvaliadoId", "CriterioId" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessoes_TurmaId",
+                table: "Sessoes",
+                column: "TurmaId");
         }
 
         /// <inheritdoc />

@@ -12,7 +12,7 @@ using Persistence.Context;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(APIContext))]
-    [Migration("20260323181823_Inicial")]
+    [Migration("20260402213346_Inicial")]
     partial class Inicial
     {
         /// <inheritdoc />
@@ -240,6 +240,10 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AvaliadoId");
+
+                    b.HasIndex("CriterioId");
+
                     b.HasIndex("NotaFinalId", "AvaliadoId", "CriterioId")
                         .IsUnique();
 
@@ -272,6 +276,8 @@ namespace Persistence.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TurmaId");
 
                     b.ToTable("Sessoes");
                 });
@@ -368,11 +374,40 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.NotaParcial", b =>
                 {
-                    b.HasOne("Domain.Entities.NotaFinal", null)
-                        .WithMany("NotasParcial")
-                        .HasForeignKey("NotaFinalId")
+                    b.HasOne("Domain.Entities.Aluno", "Avaliado")
+                        .WithMany()
+                        .HasForeignKey("AvaliadoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Domain.Entities.Criterio", "Criterio")
+                        .WithMany()
+                        .HasForeignKey("CriterioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.NotaFinal", "NotaFinal")
+                        .WithMany("NotasParcial")
+                        .HasForeignKey("NotaFinalId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Avaliado");
+
+                    b.Navigation("Criterio");
+
+                    b.Navigation("NotaFinal");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Sessao", b =>
+                {
+                    b.HasOne("Domain.Entities.Turma", "Turma")
+                        .WithMany()
+                        .HasForeignKey("TurmaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Turma");
                 });
 
             modelBuilder.Entity("Domain.Entities.NotaFinal", b =>

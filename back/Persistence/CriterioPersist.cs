@@ -6,19 +6,18 @@ using Persistence.Context;
 
 namespace Persistence;
 
-public class CriterioPersist : ICriterioPersist
+public class CriterioPersist(APIContext context) : ICriterioPersist
 {
-    private readonly APIContext _context;
+    private readonly APIContext _context = context;
 
-    public CriterioPersist(APIContext context) {
-        _context = context;
-    }
-    public async Task<Criterio[]> GetAllCriteriosAsync() {
+    public async Task<Criterio[]> GetAllCriteriosAsync()
+    {
         return await _context.Criterios
             .OrderBy(a => a.Nome)
             .ToArrayAsync();
     }
-    public async Task<Criterio?> GetCriterioIdAsync(int criterioId){
+    public async Task<Criterio?> GetCriterioIdAsync(int criterioId)
+    {
         return await _context.Criterios
             .FirstOrDefaultAsync(c => c.Id == criterioId);
     }

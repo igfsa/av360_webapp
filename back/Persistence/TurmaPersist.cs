@@ -6,29 +6,28 @@ using Persistence.Context;
 
 namespace Persistence;
 
-public class TurmaPersist : ITurmaPersist
+public class TurmaPersist(APIContext context) : ITurmaPersist
 {
-    private readonly APIContext _context;
+    private readonly APIContext _context = context;
 
-    public TurmaPersist(APIContext context){
-        _context = context;
-    }
-    public async Task<Turma[]> GetAllTurmasAsync(){
-        return await  _context.Turmas
+    public async Task<Turma[]> GetAllTurmasAsync()
+    {
+        return await _context.Turmas
             .AsNoTracking()
             .OrderBy(a => a.Cod)
             .ToArrayAsync();
     }
-    public async Task<Turma?> GetTurmaIdAsync(int TurmaId){
+    public async Task<Turma?> GetTurmaIdAsync(int TurmaId)
+    {
         return await _context.Turmas
             .Include(t => t.Alunos)
             .Include(t => t.Criterios)
             .Include(t => t.Grupos)
             .FirstOrDefaultAsync(t => t.Id == TurmaId);
     }
-    public async Task<Turma?> GetTurmaGrupoIdAsync(int grupoId){
+    public async Task<Turma?> GetTurmaGrupoIdAsync(int grupoId)
+    {
         var grupo = await _context.Grupos
-            .Include(g => g.Turma)
             .FirstOrDefaultAsync(g => g.Id == grupoId)
                 ?? null!;
         return grupo.Turma;

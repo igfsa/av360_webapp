@@ -1,12 +1,12 @@
-using Domain.Exceptions;
-
 namespace Domain.Entities;
 
 public class NotaParcial
 {
-    private NotaParcial(){}
+    private NotaParcial() { }
     public NotaParcial(NotaFinal nFinal, Aluno avaliado, Criterio criterio, decimal nota)
     {
+        if (nFinal == null || avaliado == null || criterio == null)
+            throw new ArgumentNullException();
         NotaFinal = nFinal;
         NotaFinalId = nFinal.Id;
         Avaliado = avaliado;
@@ -15,12 +15,12 @@ public class NotaParcial
         CriterioId = criterio.Id;
         Nota = nota;
     }
-    public int Id { get; set; }
+    public int Id { get; private set; }
     public int NotaFinalId { get; private set; }
-    public readonly NotaFinal NotaFinal = null!;
+    public NotaFinal NotaFinal { get;  private set; } = null!;
     public int AvaliadoId { get; private set; }
-    public readonly Aluno Avaliado = null!;
+    public Aluno Avaliado { get;  private set; } = null!;
     public int CriterioId { get; private set; }
-    public readonly Criterio Criterio = null!;
-    public decimal Nota { get; set; }
+    public Criterio Criterio { get;  private set; } = null!;
+    public decimal Nota { get;  private set; }
 }

@@ -6,15 +6,12 @@ using Persistence.Context;
 
 namespace Persistence;
 
-public class CriterioTurmaPersist : ICriterioTurmaPersist
+public class CriterioTurmaPersist(APIContext context) : ICriterioTurmaPersist
 {
-    private readonly APIContext _context;
+    private readonly APIContext _context = context;
 
-    public CriterioTurmaPersist(APIContext context) {
-        _context = context;
-    }
-
-    public async Task<Criterio[]> GetCriteriosTurmaIdAsync(int turmaId) {
+    public async Task<Criterio[]> GetCriteriosTurmaIdAsync(int turmaId)
+    {
         return await _context.Criterios
                 .AsNoTracking()
                 .Where(c => c.Turmas
@@ -22,14 +19,8 @@ public class CriterioTurmaPersist : ICriterioTurmaPersist
                 .OrderBy(c => c.Nome)
                 .ToArrayAsync();
     }
-    // public async Task<CriterioTurma[]> GetCriteriosByIdTurmaIdAsync(int turmaId){
-    //     return await _context.CriterioTurma
-    //         .AsNoTracking()
-    //         .Where(ct => _context.Criterios
-    //             .Any(c => ct.TurmaId == turmaId && ct.CriterioId == c.Id))
-    //         .ToArrayAsync();
-    // }
-    public async Task<Turma[]> GetTurmasCriterioIdAsync(int criterioId){
+    public async Task<Turma[]> GetTurmasCriterioIdAsync(int criterioId)
+    {
         return await _context.Turmas
             .AsNoTracking()
             .Where(t => t.Criterios
@@ -37,7 +28,8 @@ public class CriterioTurmaPersist : ICriterioTurmaPersist
             .OrderBy(t => t.Cod)
             .ToArrayAsync();
     }
-    public async Task<Criterio?> GetExisteCriterioTurma(int turmaId, int criterioId){
+    public async Task<Criterio?> GetExisteCriterioTurma(int turmaId, int criterioId)
+    {
         var turma = await _context.Turmas
             .FirstOrDefaultAsync(t => t.Id == turmaId);
         return turma!.Criterios
