@@ -35,17 +35,17 @@ builder.Services.AddControllers()
 
 builder.Services.AddSignalR();
 
-string mySqlConnection = (
-    "Server=" + Environment.GetEnvironmentVariable("DB_AV360_SERVER") +
+string npgConnection = (
+    "Host=" + Environment.GetEnvironmentVariable("DB_AV360_SERVER") +
     ";DataBase=" + Environment.GetEnvironmentVariable("DB_AV360_NAME") +
     ";Uid=" + Environment.GetEnvironmentVariable("DB_AV360_USER") +
     ";Pwd=" + Environment.GetEnvironmentVariable("DB_AV360_PASSWORD")
 );
 
 builder.Services.AddDbContext<APIContext>(options =>
-    options.UseMySql(mySqlConnection,
-    ServerVersion.AutoDetect(mySqlConnection)
-));
+    options.UseNpgsql(npgConnection)
+        .UseSnakeCaseNamingConvention()
+    );
 
 var mapper_config = builder.Services.AddAutoMapper(cfg =>
 {

@@ -1,4 +1,3 @@
-using System.Data.Common;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -64,16 +63,19 @@ public class APIContext(DbContextOptions<APIContext> options) : DbContext(option
         _ = modelBuilder.Entity<Turma>()
             .HasMany(t => t.Alunos)
             .WithMany(a => a.Turmas)
-            .UsingEntity(j => j.ToTable("AlunoTurma"));
+            .UsingEntity(j => j.ToTable("aluno_turma"));
 
         _ = modelBuilder.Entity<Turma>()
             .HasMany(t => t.Criterios)
             .WithMany(c => c.Turmas)
-            .UsingEntity(j => j.ToTable("CriterioTurma"));
+            .UsingEntity(j => j.ToTable("criterio_turma"));
 
         _ = modelBuilder.Entity<Sessao>()
             .Property(s => s.TokenPublico)
-            .HasMaxLength(33);
+            .HasMaxLength(36);
+
+        _ = modelBuilder.Entity<NotaFinal>()
+            .HasIndex(x => x.SessaoId);
 
         _ = modelBuilder.Entity<NotaFinal>()
             .HasIndex(a => new { a.SessaoId, a.AvaliadorId })
@@ -85,11 +87,25 @@ public class APIContext(DbContextOptions<APIContext> options) : DbContext(option
 
         _ = modelBuilder.Entity<NotaFinal>()
             .Property(n => n.DeviceHash)
-            .HasMaxLength(65);
+            .HasMaxLength(65)
+            .IsFixedLength();
+        
+        _ = modelBuilder.Entity<NotaParcial>()
+                .HasIndex(x => x.AvaliadoId);
 
+        _ = modelBuilder.Entity<NotaParcial>()
+                .HasIndex(x => x.CriterioId);
+        
         _ = modelBuilder.Entity<NotaParcial>()
             .HasIndex(a => new { a.NotaFinalId, a.AvaliadoId, a.CriterioId })
             .IsUnique();
+
+        _ = modelBuilder.Entity<NotaParcial>()
+            .HasIndex(x => new { x.AvaliadoId, x.CriterioId });
+
+        _ = modelBuilder.Entity<NotaParcial>()
+            .HasIndex(x => x.AvaliadoId)
+            .IncludeProperties(x => new { x.Nota, x.CriterioId });
 
         _ = modelBuilder.Entity<NotaParcial>()
             .Property(n => n.Nota)

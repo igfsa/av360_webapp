@@ -3,4 +3,9 @@
   <Project Path="Application/Application.csproj" />
   <Project Path="Domain/Domain.csproj" />
   <Project Path="Persistence/Persistence.csproj" />
+
+  <PropertyGroup>
+  <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  <RestoreLockedMode>true</RestoreLockedMode>
+</PropertyGroup>
 </Solution>

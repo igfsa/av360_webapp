@@ -2,9 +2,9 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Persistence.Context;
 
 #nullable disable
@@ -12,7 +12,7 @@ using Persistence.Context;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(APIContext))]
-    [Migration("20260402213346_Inicial")]
+    [Migration("20260405055711_Inicial")]
     partial class Inicial
     {
         /// <inheritdoc />
@@ -20,91 +20,109 @@ namespace Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.11")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("AlunoTurma", b =>
                 {
                     b.Property<int>("AlunosId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("alunos_id");
 
                     b.Property<int>("TurmasId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("turmas_id");
 
-                    b.HasKey("AlunosId", "TurmasId");
+                    b.HasKey("AlunosId", "TurmasId")
+                        .HasName("pk_aluno_turma");
 
-                    b.HasIndex("TurmasId");
+                    b.HasIndex("TurmasId")
+                        .HasDatabaseName("ix_aluno_turma_turmas_id");
 
-                    b.ToTable("AlunoTurma", (string)null);
+                    b.ToTable("aluno_turma", (string)null);
                 });
 
             modelBuilder.Entity("CriterioTurma", b =>
                 {
                     b.Property<int>("CriteriosId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("criterios_id");
 
                     b.Property<int>("TurmasId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("turmas_id");
 
-                    b.HasKey("CriteriosId", "TurmasId");
+                    b.HasKey("CriteriosId", "TurmasId")
+                        .HasName("pk_criterio_turma");
 
-                    b.HasIndex("TurmasId");
+                    b.HasIndex("TurmasId")
+                        .HasDatabaseName("ix_criterio_turma_turmas_id");
 
-                    b.ToTable("CriterioTurma", (string)null);
+                    b.ToTable("criterio_turma", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Aluno", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("nome");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_alunos");
 
-                    b.ToTable("Alunos");
+                    b.ToTable("alunos", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.AlunoGrupo", b =>
                 {
                     b.Property<int>("AlunoId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("aluno_id");
 
                     b.Property<int>("GrupoId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("grupo_id");
 
                     b.Property<int>("TurmaId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("turma_id");
 
-                    b.HasKey("AlunoId", "GrupoId");
+                    b.HasKey("AlunoId", "GrupoId")
+                        .HasName("pk_aluno_grupo");
 
-                    b.ToTable("AlunoGrupo");
+                    b.ToTable("aluno_grupo", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Criterio", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("nome");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_criterios");
 
-                    b.ToTable("Criterios");
+                    b.ToTable("criterios", (string)null);
 
                     b.HasData(
                         new
@@ -158,150 +176,196 @@ namespace Persistence.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("nome");
 
                     b.Property<int>("TurmaId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("turma_id");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_grupos");
 
-                    b.HasIndex("TurmaId");
+                    b.HasIndex("TurmaId")
+                        .HasDatabaseName("ix_grupos_turma_id");
 
-                    b.ToTable("Grupos");
+                    b.ToTable("grupos", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.NotaFinal", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AvaliadorId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("avaliador_id");
 
                     b.Property<DateTime>("DataEnvio")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("data_envio");
 
                     b.Property<string>("DeviceHash")
                         .IsRequired()
                         .HasMaxLength(65)
-                        .HasColumnType("varchar(65)");
+                        .HasColumnType("character(65)")
+                        .HasColumnName("device_hash")
+                        .IsFixedLength();
 
                     b.Property<int>("GrupoId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("grupo_id");
 
                     b.Property<int>("SessaoId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("sessao_id");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_notas_finais");
 
-                    b.HasIndex("AvaliadorId");
+                    b.HasIndex("AvaliadorId")
+                        .HasDatabaseName("ix_notas_finais_avaliador_id");
 
-                    b.HasIndex("GrupoId");
+                    b.HasIndex("GrupoId")
+                        .HasDatabaseName("ix_notas_finais_grupo_id");
+
+                    b.HasIndex("SessaoId")
+                        .HasDatabaseName("ix_notas_finais_sessao_id");
 
                     b.HasIndex("SessaoId", "AvaliadorId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_notas_finais_sessao_id_avaliador_id");
 
                     b.HasIndex("SessaoId", "DeviceHash")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_notas_finais_sessao_id_device_hash");
 
-                    b.ToTable("NotasFinais");
+                    b.ToTable("notas_finais", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.NotaParcial", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AvaliadoId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("avaliado_id");
 
                     b.Property<int>("CriterioId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("criterio_id");
 
                     b.Property<decimal>("Nota")
                         .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("nota");
 
                     b.Property<int>("NotaFinalId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("nota_final_id");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_notas_parciais");
 
-                    b.HasIndex("AvaliadoId");
+                    b.HasIndex("AvaliadoId")
+                        .HasDatabaseName("ix_notas_parciais_avaliado_id");
 
-                    b.HasIndex("CriterioId");
+                    NpgsqlIndexBuilderExtensions.IncludeProperties(b.HasIndex("AvaliadoId"), new[] { "Nota", "CriterioId" });
+
+                    b.HasIndex("CriterioId")
+                        .HasDatabaseName("ix_notas_parciais_criterio_id");
+
+                    b.HasIndex("AvaliadoId", "CriterioId")
+                        .HasDatabaseName("ix_notas_parciais_avaliado_id_criterio_id");
 
                     b.HasIndex("NotaFinalId", "AvaliadoId", "CriterioId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_notas_parciais_nota_final_id_avaliado_id_criterio_id");
 
-                    b.ToTable("NotasParciais");
+                    b.ToTable("notas_parciais", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Sessao", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("Ativo")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean")
+                        .HasColumnName("ativo");
 
                     b.Property<DateTime?>("DataFim")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("data_fim");
 
                     b.Property<DateTime>("DataInicio")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("data_inicio");
 
                     b.Property<string>("TokenPublico")
                         .IsRequired()
-                        .HasMaxLength(33)
-                        .HasColumnType("varchar(33)");
+                        .HasMaxLength(36)
+                        .HasColumnType("character varying(36)")
+                        .HasColumnName("token_publico");
 
                     b.Property<int>("TurmaId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("turma_id");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_sessoes");
 
-                    b.HasIndex("TurmaId");
+                    b.HasIndex("TurmaId")
+                        .HasDatabaseName("ix_sessoes_turma_id");
 
-                    b.ToTable("Sessoes");
+                    b.ToTable("sessoes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Turma", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Cod")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("varchar(30)");
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("cod");
 
                     b.Property<decimal>("NotaMax")
                         .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("nota_max");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_turmas");
 
-                    b.ToTable("Turmas");
+                    b.ToTable("turmas", (string)null);
                 });
 
             modelBuilder.Entity("AlunoTurma", b =>
@@ -310,13 +374,15 @@ namespace Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("AlunosId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_aluno_turma_alunos_alunos_id");
 
                     b.HasOne("Domain.Entities.Turma", null)
                         .WithMany()
                         .HasForeignKey("TurmasId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_aluno_turma_turmas_turmas_id");
                 });
 
             modelBuilder.Entity("CriterioTurma", b =>
@@ -325,13 +391,15 @@ namespace Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("CriteriosId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_criterio_turma_criterios_criterios_id");
 
                     b.HasOne("Domain.Entities.Turma", null)
                         .WithMany()
                         .HasForeignKey("TurmasId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_criterio_turma_turmas_turmas_id");
                 });
 
             modelBuilder.Entity("Domain.Entities.Grupo", b =>
@@ -340,7 +408,8 @@ namespace Persistence.Migrations
                         .WithMany("Grupos")
                         .HasForeignKey("TurmaId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_grupos_turmas_turma_id");
 
                     b.Navigation("Turma");
                 });
@@ -351,19 +420,22 @@ namespace Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("AvaliadorId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_notas_finais_alunos_avaliador_id");
 
                     b.HasOne("Domain.Entities.Grupo", "Grupo")
                         .WithMany()
                         .HasForeignKey("GrupoId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_notas_finais_grupos_grupo_id");
 
                     b.HasOne("Domain.Entities.Sessao", "Sessao")
                         .WithMany("Notasfinais")
                         .HasForeignKey("SessaoId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_notas_finais_sessoes_sessao_id");
 
                     b.Navigation("Avaliador");
 
@@ -378,19 +450,22 @@ namespace Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("AvaliadoId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_notas_parciais_alunos_avaliado_id");
 
                     b.HasOne("Domain.Entities.Criterio", "Criterio")
                         .WithMany()
                         .HasForeignKey("CriterioId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_notas_parciais_criterios_criterio_id");
 
                     b.HasOne("Domain.Entities.NotaFinal", "NotaFinal")
                         .WithMany("NotasParcial")
                         .HasForeignKey("NotaFinalId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_notas_parciais_notas_finais_nota_final_id");
 
                     b.Navigation("Avaliado");
 
@@ -405,7 +480,8 @@ namespace Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("TurmaId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_sessoes_turmas_turma_id");
 
                     b.Navigation("Turma");
                 });
