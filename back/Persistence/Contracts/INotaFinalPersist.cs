@@ -8,4 +8,5 @@ public interface INotaFinalPersist
     Task<NotaFinal?> GetNotaFinalAlunoSessaoIdAsync(int alunoId, int sessaoId);
     Task<NotaFinal[]> GetNotaFinalGrupoSessaoIdAsync(int grupoId, int sessaoId);
     Task<NotaFinal?> GetNotaFinalHashAsync(string deviceHash, int sessaoId);
+    Task<NotaFinal[]> GetNotasFinalSessaoIdAsync(int sessaoId);
 }

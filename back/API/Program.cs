@@ -10,6 +10,7 @@ using Domain.Entities;
 using Application.DTOs;
 using API.Hubs;
 using API.Notifier;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +47,12 @@ builder.Services.AddDbContext<APIContext>(options =>
     options.UseNpgsql(npgConnection)
         .UseSnakeCaseNamingConvention()
     );
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    return ConnectionMultiplexer.Connect(config["Redis:ConnectionString"]);
+});
 
 var mapper_config = builder.Services.AddAutoMapper(cfg =>
 {
@@ -92,6 +99,9 @@ builder.Services.AddScoped<ITurmaNotifier, TurmaNotifier>();
 builder.Services.AddScoped<IAlunoTurmaPersist, AlunoTurmaPersist>();
 builder.Services.AddScoped<ICriterioTurmaPersist, CriterioTurmaPersist>();
 builder.Services.AddScoped<IAlunoGrupoPersist, AlunoGrupoPersist>();
+
+builder.Services.AddScoped<IDashboardCacheService, DashboardCacheService>();
+builder.Services.AddScoped<IDashboardSessaoService, DashboardSessaoService>();
 
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 

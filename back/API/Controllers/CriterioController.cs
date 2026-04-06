@@ -7,18 +7,12 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]")]
-public class CriterioController : ControllerBase
+public class CriterioController(
+                    ICriterioService criterioService,
+                    ICriterioNotifier criterioNotifier) : ControllerBase
 {
-    private readonly ICriterioService _criterioService;
-    private readonly ICriterioNotifier _criterioNotifier;
-
-    public CriterioController(
-                        ICriterioService criterioService,
-                        ICriterioNotifier criterioNotifier)
-    {
-        _criterioService = criterioService;
-        _criterioNotifier = criterioNotifier;
-    }
+    private readonly ICriterioService _criterioService = criterioService;
+    private readonly ICriterioNotifier _criterioNotifier = criterioNotifier;
 
     [HttpGet]
     [ActionName("GetAllCriterios")]

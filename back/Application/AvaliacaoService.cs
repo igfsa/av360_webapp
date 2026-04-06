@@ -18,6 +18,7 @@ public class AvaliacaoService(IGeralPersist geralPersist,
                     IGrupoService grupoService,
                     IGrupoPersist grupoPersist,
                     ITurmaService turmaService,
+                    IDashboardCacheService dashboardCache,
                     IMapper mapper) : IAvaliacaoService
 {
     private readonly IGeralPersist _geralPersist = geralPersist;
@@ -30,6 +31,7 @@ public class AvaliacaoService(IGeralPersist geralPersist,
     private readonly IGrupoService _grupoService = grupoService;
     private readonly IGrupoPersist _grupoPersist = grupoPersist;
     private readonly ITurmaService _turmaService = turmaService;
+    private readonly IDashboardCacheService _dashboardCache = dashboardCache;
     private readonly IMapper _mapper = mapper;
 
     #region get
@@ -147,6 +149,14 @@ public class AvaliacaoService(IGeralPersist geralPersist,
                         criterio: criterio,
                         nota: np.Nota);
 
+                    await _dashboardCache.AtualizarNotaAsync(
+                        sessaoId: model.SessaoId,
+                        alunoId: np.AvaliadoId,
+                        criterioId: np.CriterioId,
+                        grupoId: model.GrupoId,
+                        nota: np.Nota
+                    );
+
                     resultado.Sucesso++;
                 }
                 catch (Exception ex)
@@ -163,6 +173,8 @@ public class AvaliacaoService(IGeralPersist geralPersist,
             }
 
             _ = await _geralPersist.SaveChangesAsync();
+            await _dashboardCache.AtualizarAlunoAsync(model.SessaoId, model.AvaliadorId);
+            
             return resultado;
         }
         catch

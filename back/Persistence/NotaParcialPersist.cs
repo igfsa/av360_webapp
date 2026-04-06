@@ -25,4 +25,12 @@ public class NotaParcialPersist(APIContext context) : INotaParcialPersist
             .OrderByDescending(np => np.Id)
             .ToArrayAsync();
     }
+    public async Task<NotaParcial[]> GetNotaParcialSessaoIdAsync(int sessaoId)
+    {
+        return await _context.NotasParciais
+            .Where(np => np.NotaFinal.SessaoId == sessaoId)
+            .OrderByDescending(np => np.Id)
+            .ToArrayAsync();
+    }
+    
 }

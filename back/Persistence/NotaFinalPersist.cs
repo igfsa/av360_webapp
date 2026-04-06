@@ -34,4 +34,12 @@ public class NotaFinalPersist(APIContext context) : INotaFinalPersist
             .AsNoTracking()
             .FirstOrDefaultAsync(nf => nf.DeviceHash == deviceHash && nf.SessaoId == sessaoId);
     }
+    public async Task<NotaFinal[]> GetNotasFinalSessaoIdAsync(int sessaoId)
+    {
+        return await _context.NotasFinais
+            .AsNoTracking()
+            .Where(nf => nf.SessaoId == sessaoId)
+            .Include(nf => nf.NotasParcial)
+            .ToArrayAsync();
+    }
 }

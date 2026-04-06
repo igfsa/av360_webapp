@@ -72,10 +72,10 @@ export class TurmaCriarModalComponent implements OnInit {
   }
 
   salvar(): void {
-    this.modal.close({Turma: this.turmaForm, ImportAlunos: false});
+    this.modal.close({Turma: this.turmaForm(), ImportAlunos: false});
   }
 
   salvarImport(): void {
-    this.modal.close({Turma: this.turmaForm, ImportAlunos:  true});
+    this.modal.close({Turma: this.turmaModel(), ImportAlunos:  true});
   }
 }

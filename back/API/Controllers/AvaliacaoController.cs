@@ -7,18 +7,12 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]")]
-public class AvaliacaoController : ControllerBase
+public class AvaliacaoController(
+    IAvaliacaoService avaliacaoService,
+    IAvaliacaoNotifier avaliacaoNotifier) : ControllerBase
 {
-    private readonly IAvaliacaoService _avaliacaoService;
-    private readonly IAvaliacaoNotifier _avaliacaoNotifier;
-
-    public AvaliacaoController(
-        IAvaliacaoService avaliacaoService,
-        IAvaliacaoNotifier avaliacaoNotifier)
-    {
-        _avaliacaoService = avaliacaoService;
-        _avaliacaoNotifier = avaliacaoNotifier;
-    }
+    private readonly IAvaliacaoService _avaliacaoService = avaliacaoService;
+    private readonly IAvaliacaoNotifier _avaliacaoNotifier = avaliacaoNotifier;
 
     [HttpGet(Name = "GetValidaSessaoChavePub")]
     [ActionName("GetValidaSessaoChavePub")]
