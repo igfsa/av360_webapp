@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 using Application.Contracts;
 using Application.DTOs;
@@ -14,6 +15,7 @@ public class AvaliacaoController(
     private readonly IAvaliacaoService _avaliacaoService = avaliacaoService;
     private readonly IAvaliacaoNotifier _avaliacaoNotifier = avaliacaoNotifier;
 
+    [AllowAnonymous]
     [HttpGet(Name = "GetValidaSessaoChavePub")]
     [ActionName("GetValidaSessaoChavePub")]
     public async Task<ActionResult<AvaliacaoPublicaDTO>> GetValidaSessaoChavePub(string token) {
@@ -21,6 +23,7 @@ public class AvaliacaoController(
         return Ok(avaliacao);
     }
 
+    [AllowAnonymous]
     [HttpGet(Name = "GeraNovaAvaliacaoEnvio")]
     [ActionName("GeraNovaAvaliacaoEnvio")]
     public async Task<ActionResult<AvaliacaoEnvioDTO>> GeraNovaAvaliacaoEnvio(int sessaoId, int grupoId, int avaliadorId, string deviceHash) {
@@ -35,6 +38,7 @@ public class AvaliacaoController(
         return Ok(avaliacaoRes);
     }
 
+    [AllowAnonymous]
     [HttpPost("")]
     [ActionName("Post")]
     public async Task<ActionResult> Post(AvaliacaoEnvioDTO model)

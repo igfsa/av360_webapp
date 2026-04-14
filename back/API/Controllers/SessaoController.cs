@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 using Application.Contracts;
 using Application.DTOs;
@@ -14,6 +15,7 @@ public class SessaoController(ISessaoService SessoesService,
     private readonly ISessaoService _SessoesService = SessoesService;
     private readonly ITurmaNotifier _turmaNotifier = turmaNotifier;
 
+    [Authorize]
     [HttpGet]
     [ActionName("GetAllSessoes")]
     public async Task<ActionResult<IEnumerable<SessaoDTO>>> Get()
@@ -22,6 +24,7 @@ public class SessaoController(ISessaoService SessoesService,
         return Ok(Sessoes);
     }
 
+    [Authorize]
     [HttpGet("{id:int}", Name = "GetSessaoId")]
     [ActionName("GetId")]
     public async Task<ActionResult<SessaoDTO>> Get(int id)
@@ -30,6 +33,7 @@ public class SessaoController(ISessaoService SessoesService,
         return Ok(Sessao);
     }
 
+    [Authorize]
     [HttpGet("{turmaId:int}", Name = "GetSessoesTurma")]
     [ActionName("GetSessoesTurma")]
     public async Task<ActionResult<IEnumerable<SessaoDTO>>> GetSessoesTurma(int turmaId)
@@ -38,6 +42,7 @@ public class SessaoController(ISessaoService SessoesService,
         return Ok(Sessoes);
     }
 
+    [Authorize]
     [HttpGet("{turmaId:int}", Name = "GetSessaoAtivaTurma")]
     [ActionName("GetSessaoAtivaTurma")]
     public async Task<ActionResult<SessaoDTO>> GetSessaoAtivaTurmaIdAsync(int turmaId)
@@ -46,6 +51,7 @@ public class SessaoController(ISessaoService SessoesService,
         return Ok(sessao);
     }
 
+    [Authorize]
     [HttpGet("{sessaoId}/qrcode")]
     public async Task<IActionResult> GetQrCode(int sessaoId)
     {
@@ -56,6 +62,7 @@ public class SessaoController(ISessaoService SessoesService,
         return File(qrBytes, "image/png");
     }
 
+    [Authorize]
     [HttpPost]
     [ActionName("Post")]
     public async Task<ActionResult<SessaoDTO>> Post(SessaoDTO model)
@@ -66,6 +73,7 @@ public class SessaoController(ISessaoService SessoesService,
         return Ok(Sessao);
     }
 
+    [Authorize]
     [HttpPut("{id:int}")]
     [ActionName("Put")]
     public async Task<ActionResult> Put(int id, SessaoDTO model)
@@ -74,6 +82,7 @@ public class SessaoController(ISessaoService SessoesService,
         return Ok(Sessao);
     }
 
+    [Authorize]
     [HttpPut("{id:int}")]
     [ActionName("PutEncerra")]
     public async Task<ActionResult> PutEncerra(int id, SessaoDTO model)

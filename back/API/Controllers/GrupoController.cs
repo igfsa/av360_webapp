@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 using Application.Contracts;
 using Application.DTOs;
@@ -18,6 +19,7 @@ public class GrupoController(
     private readonly ITurmaNotifier _turmaNotifier = turmaNotifier;
     private readonly IGrupoNotifier _grupoNotifier = grupoNotifier;
 
+    [Authorize]
     [HttpGet]
     [ActionName("GetAllGrupos")]
     public async Task<ActionResult<IEnumerable<GrupoDTO>>> Get()
@@ -26,6 +28,7 @@ public class GrupoController(
         return Ok(grupos);
     }
 
+    [Authorize]
     [HttpGet("{id:int}", Name = "GetGrupoId")]
     [ActionName("GetId")]
     public async Task<ActionResult<GrupoDTO>> Get(int id)
@@ -34,6 +37,7 @@ public class GrupoController(
         return Ok(grupos);
     }
 
+    [Authorize]
     [HttpGet("{turmaId:int}", Name = "GetGruposTurma")]
     [ActionName("GetGruposTurma")]
     public async Task<ActionResult<IEnumerable<GrupoDTO>>> GetGruposTurma(int turmaId)
@@ -42,6 +46,7 @@ public class GrupoController(
         return Ok(grupos);
     }
 
+    [Authorize]
     [HttpGet("{turmaId:int}", Name = "GetAlunoGruposCheckbox")]
     [ActionName("GetAlunoGruposCheckbox")]
     public async Task<ActionResult<IEnumerable<AlunoGrupoCheckboxDTO>>> GetAlunosGrupoCheckbox(int turmaId, int grupoId)
@@ -62,6 +67,7 @@ public class GrupoController(
         return Ok(grupo);
     }
 
+    [Authorize]
     [HttpPut("{id:int}")]
     [ActionName("Put")]
     public async Task<ActionResult> Put(int id, GrupoDTO model)
@@ -73,6 +79,7 @@ public class GrupoController(
         return Ok(grupo);
     }
 
+    [Authorize]
     [HttpPut("", Name = "PutAtualizarGrupo")]
     [ActionName("PutAtualizarGrupo")]
     public async Task<ActionResult<GrupoDTO>> PutAtualizarGrupo(AlunoGrupoDTO model)

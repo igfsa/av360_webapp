@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 using Application.Contracts;
 using Application.DTOs;
@@ -14,6 +15,7 @@ public class CriterioController(
     private readonly ICriterioService _criterioService = criterioService;
     private readonly ICriterioNotifier _criterioNotifier = criterioNotifier;
 
+    [Authorize]
     [HttpGet]
     [ActionName("GetAllCriterios")]
     public async Task<ActionResult<IEnumerable<CriterioDTO>>> Get()
@@ -22,6 +24,7 @@ public class CriterioController(
         return Ok(criterios);
     }
 
+    [Authorize]
     [HttpGet("{id:int}", Name = "GetCriterioId")]
     [ActionName("GetId")]
     public async Task<ActionResult<CriterioDTO>> Get(int id)
@@ -30,6 +33,7 @@ public class CriterioController(
         return Ok(criterios);
     }
 
+    [Authorize]
     [HttpGet("{turmaId:int}", Name = "GetCriteriosTurma")]
     [ActionName("GetCriteriosTurma")]
     public async Task<ActionResult<CriterioDTO>> GetCriterioTurma(int turmaId)
@@ -39,6 +43,7 @@ public class CriterioController(
         return Ok(criterios);
     }
 
+    [Authorize]
     [HttpPost]
     [ActionName("Post")]
     public async Task<ActionResult<CriterioDTO>> Post(CriterioDTO model)
@@ -49,6 +54,7 @@ public class CriterioController(
         return Ok(criterio);
     }
 
+    [Authorize]
     [HttpPut("{id:int}")]
     [ActionName("Put")]
     public async Task<ActionResult> Put(int id, CriterioDTO model)

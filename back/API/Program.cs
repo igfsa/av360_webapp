@@ -2,6 +2,8 @@ using Application.Contracts;
 using Application.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
+using StackExchange.Redis;
+using Microsoft.IdentityModel.Tokens;
 
 using Persistence;
 using Persistence.Context;
@@ -10,7 +12,6 @@ using Domain.Entities;
 using Application.DTOs;
 using API.Hubs;
 using API.Notifier;
-using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +19,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("Allowlocalhost",
         policy => policy
-            .WithOrigins("http://localhost:4200") // seu front-end
+            .WithOrigins("http://localhost:4200")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials());
@@ -103,11 +104,65 @@ builder.Services.AddScoped<IAlunoGrupoPersist, AlunoGrupoPersist>();
 builder.Services.AddScoped<IDashboardCacheService, DashboardCacheService>();
 builder.Services.AddScoped<IDashboardSessaoService, DashboardSessaoService>();
 
+builder.Services.AddScoped<IProfessorPersist, ProfessorPersist>();
+
+builder.Services.AddScoped<IAutenticacaoService, AutenticacaoService>();
+
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", jwtOptions =>
+    {
+        jwtOptions.TokenValidationParameters = new()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            ValidIssuer = Environment.GetEnvironmentVariable("AV360_ISSUER"),
+            ValidAudience = Environment.GetEnvironmentVariable("AV360_AUDIENCE"),
+            
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("AV360_KEY")
+            ))
+        };
+        jwtOptions.Events = new ()
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+
+                var path = context.HttpContext.Request.Path;
+
+                if (!string.IsNullOrEmpty(accessToken) &&
+                    path.StartsWithSegments("/hubs"))
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            }
+        };
+    });
+
+builder.Services.AddAuthorization();
+
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 var app = builder.Build();
 
 app.UseCors("Allowlocalhost");
+
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.ContentSecurityPolicy =
+        "default-src 'self'; " +
+        "img-src 'self' data: http://localhost:4200; " +
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+        "style-src 'self' 'unsafe-inline'; " +
+        "connect-src 'self' http://localhost:5074 http://localhost:4200; " ;
+
+    await next();
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -118,11 +173,12 @@ if (app.Environment.IsDevelopment())
     {
         options.SwaggerEndpoint("/openapi/v1.json", "v1");
     });
-}
 
 app.UseHttpsRedirection();
 
 app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
@@ -140,5 +196,11 @@ app.UseEndpoints(endpoints =>
 {
     _ = endpoints.MapControllers();
 });
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    await DbInitializer.Seed(scope.ServiceProvider);
+}
 
 app.Run();

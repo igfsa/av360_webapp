@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 using Application.Contracts;
 using Application.DTOs;
@@ -13,6 +14,7 @@ public class TurmaController(ITurmaService turmaService,
     private readonly ITurmaService _turmaService = turmaService;
     private readonly ITurmaNotifier _turmaNotifier = turmaNotifier;
 
+    [Authorize]
     [HttpGet]
     [ActionName("GetAllTurmas")]
     public async Task<ActionResult<IEnumerable<TurmaDTO>>> Get()
@@ -21,6 +23,7 @@ public class TurmaController(ITurmaService turmaService,
         return Ok(turmas);
     }
 
+    [Authorize]
     [HttpGet("{id:int}", Name = "GetTurmaId")]
     [ActionName("GetId")]
     public async Task<ActionResult<TurmaDTO>> Get(int id)
@@ -29,6 +32,7 @@ public class TurmaController(ITurmaService turmaService,
         return Ok(turma);
     }
 
+    [Authorize]
     [HttpGet("{alunoId:int}", Name = "GetTurmasAluno")]
     [ActionName("GetTurmasAluno")]
     public async Task<ActionResult<IEnumerable<TurmaDTO>>> GetTurmasAluno(int alunoId)
@@ -37,6 +41,7 @@ public class TurmaController(ITurmaService turmaService,
         return Ok(turmas);
     }
 
+    [Authorize]
     [HttpGet("{criterioId:int}", Name = "GetTurmasCriterio")]
     [ActionName("GetTurmasCriterio")]
     public async Task<ActionResult<IEnumerable<TurmaDTO>>> GetCriteriosTurma(int criterioId)
@@ -45,6 +50,7 @@ public class TurmaController(ITurmaService turmaService,
         return Ok(criterios);
     }
 
+    [Authorize]
     [HttpPost]
     [ActionName("Post")]
     public async Task<ActionResult<TurmaDTO>> Post(TurmaDTO model)
@@ -55,6 +61,7 @@ public class TurmaController(ITurmaService turmaService,
         return Ok(Turma);
     }
 
+    [Authorize]
     [HttpPost("{turmaId:int}", Name = "AddAlunoTurma")]
     [ActionName("PostAlunoTurma")]
     public async Task<ActionResult<AlunoDTO>> PostAlunoTurma(int turmaId, int alunoId)
@@ -65,7 +72,8 @@ public class TurmaController(ITurmaService turmaService,
         return Ok(aluno);
     }
 
-    [HttpPost("{turmaId:int}", Name = "ImportAlunosTurma")]
+    [Authorize]
+    [HttpPost("", Name = "ImportAlunosTurma")]
     [ActionName("ImportAlunosTurma")]
     public async Task<ActionResult<CsvImportResultDTO>> ImportAlunosTurma([FromForm] CsvImportRequestDTO dto)
     {
@@ -75,6 +83,7 @@ public class TurmaController(ITurmaService turmaService,
         return Ok(result);
     }
 
+    [Authorize]
     [HttpPut("", Name = "PutCriterioTurma")]
     [ActionName("PutCriterioTurma")]
     public async Task<ActionResult<TurmaDTO>> PutCriterioTurma(TurmaCriterioDTO model)
@@ -85,6 +94,7 @@ public class TurmaController(ITurmaService turmaService,
         return Ok(turma);
     }
 
+    [Authorize]
     [HttpPut("{id:int}")]
     [ActionName("Put")]
     public async Task<ActionResult> Put(int id, TurmaDTO model)

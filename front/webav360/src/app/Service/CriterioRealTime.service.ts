@@ -23,7 +23,8 @@ export class CriterioRealTime {
 
     this.hub = new HubConnectionBuilder()
       .withUrl(`${baseURL}hubs/criterio`, {
-         withCredentials: true
+          withCredentials: true,
+          accessTokenFactory: () => localStorage.getItem('token')!
        })
       .withAutomaticReconnect()
       .build();

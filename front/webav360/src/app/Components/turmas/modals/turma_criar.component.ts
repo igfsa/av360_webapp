@@ -32,7 +32,7 @@ import { Turma } from '../../../Models/Turma';
       <div class="input-group mb-3 row" >
         <span class="input-group-text col-2" style = "font-size: 1.6rem;">Nota Máxima: </span>
         <input type="number" class="form-control" [formField]="turmaForm.notaMax" aria-label="Nota Máxima" style = "font-size: 1.6rem;">
-        @if (turmaForm.cod().touched() && (turmaForm.notaMax().value() < 1 || turmaForm.notaMax().value() > 100 || turmaForm.cod().value() === '')){
+        @if (turmaForm.notaMax().touched() && (turmaForm.notaMax().value() < 1 || turmaForm.notaMax().value() > 100 || turmaForm.notaMax().invalid())){
           <div class="alert alert-danger">
             <span class="text-danger fw-bold" >Nota deve ser entre 1 e 100...</span>
           </div>

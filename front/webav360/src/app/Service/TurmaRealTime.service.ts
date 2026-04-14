@@ -25,7 +25,8 @@ export class TurmaRealTime {
 
     this.hub = new HubConnectionBuilder()
       .withUrl(`${baseURL}hubs/turma`, {
-         withCredentials: true
+          withCredentials: true,
+          accessTokenFactory: () => localStorage.getItem('token')!
        })
       .withAutomaticReconnect()
       .build();

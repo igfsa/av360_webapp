@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 using Application.Contracts;
 using Application.DTOs;
@@ -11,6 +12,7 @@ public class NotaParcialController(INotaParcialService NotasParciaisService) : C
 {
     private readonly INotaParcialService _NotasParciaisService = NotasParciaisService;
 
+    [Authorize]
     [HttpGet("{id:int}", Name = "GetNotaParcialId")]
     [ActionName("GetId")]
     public async Task<ActionResult<NotaParcialDTO>> Get(int id)
@@ -19,7 +21,8 @@ public class NotaParcialController(INotaParcialService NotasParciaisService) : C
         return Ok(NotaParcial);
     }
 
-    [HttpGet("{turmaId:int}", Name = "GetNotaParcialNFinalId")]
+    [Authorize]
+    [HttpGet("{notaFinalId:int}", Name = "GetNotaParcialNFinalId")]
     [ActionName("GetNotaParcialNFinalId")]
     public async Task<ActionResult<IEnumerable<NotaParcialDTO>>> GetNotaParcialNFinalId(int notaFinalId)
     {
@@ -27,6 +30,7 @@ public class NotaParcialController(INotaParcialService NotasParciaisService) : C
         return Ok(NotasParciais);
     }
 
+    [Authorize]
     [HttpPost]
     [ActionName("Post")]
     public async Task<ActionResult<NotaParcialDTO>> Post(NotaParcialDTO model)
@@ -35,6 +39,7 @@ public class NotaParcialController(INotaParcialService NotasParciaisService) : C
         return Ok(NotaParcial);
     }
 
+    [Authorize]
     [HttpPut("{id:int}")]
     [ActionName("Put")]
     public async Task<ActionResult> Put(int id, NotaParcialDTO model)

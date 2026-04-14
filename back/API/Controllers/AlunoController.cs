@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 using Application.Contracts;
 using Application.DTOs;
@@ -11,6 +12,7 @@ public class AlunoController(IAlunoService alunoService) : ControllerBase
 {
     private readonly IAlunoService _alunoService = alunoService;
 
+    [Authorize]
     [HttpGet]
     [ActionName("GetAllAlunos")]
     public async Task<ActionResult<IEnumerable<AlunoDTO>>> Get()
@@ -19,6 +21,7 @@ public class AlunoController(IAlunoService alunoService) : ControllerBase
         return Ok(alunos);
     }
 
+    [Authorize]
     [HttpGet("{id:int}", Name = "ObterAlunoId")]
     [ActionName("GetId")]
     public async Task<ActionResult<AlunoDTO>> Get(int id)
@@ -27,6 +30,7 @@ public class AlunoController(IAlunoService alunoService) : ControllerBase
         return Ok(alunos);
     }
 
+    [Authorize]
     [HttpGet("{grupoId:int}", Name = "ObterAlunoNomeIdGrupo")]
     [ActionName("ObterAlunoNomeIdGrupo")]
     public async Task<ActionResult<AlunoDTO>> GetAlunoByNomeIdGrupo(int grupoId, string nome)
@@ -35,6 +39,7 @@ public class AlunoController(IAlunoService alunoService) : ControllerBase
         return Ok(alunos);
     }
 
+    [Authorize]
     [HttpGet("{turmaId:int}", Name = "ObterAlunosTurma")]
     [ActionName("GetAlunosTurma")]
     public async Task<ActionResult<IEnumerable<AlunoDTO>>> GetAlunosTurma(int turmaId)
@@ -43,6 +48,7 @@ public class AlunoController(IAlunoService alunoService) : ControllerBase
         return Ok(aluno);
     }
 
+    [Authorize]
     [HttpGet("{turmaId:int}", Name = "GetAlunoGrupoNome")]
     [ActionName("GetAlunoGrupoNome")]
     public async Task<ActionResult<IEnumerable<AlunoGrupoNomeDTO>>> GetAlunoGrupoNome(int turmaId)
@@ -51,6 +57,7 @@ public class AlunoController(IAlunoService alunoService) : ControllerBase
         return Ok(alunos);
     }
 
+    [Authorize]
     [HttpGet("{grupoId:int}", Name = "GetAlunosGrupo")]
     [ActionName("GetAlunosGrupo")]
     public async Task<ActionResult<IEnumerable<AlunoDTO>>> GetAlunosGrupo(int grupoId)
@@ -59,6 +66,7 @@ public class AlunoController(IAlunoService alunoService) : ControllerBase
         return Ok(alunos);
     }
 
+    [Authorize]
     [HttpPost]
     [ActionName("Post")]
     public async Task<ActionResult<AlunoDTO>> Post(AlunoDTO model)
@@ -67,6 +75,7 @@ public class AlunoController(IAlunoService alunoService) : ControllerBase
         return Ok(aluno);
     }
 
+    [Authorize]
     [HttpPut("{id:int}")]
     [ActionName("Put")]
     public async Task<ActionResult> Put(int id, AlunoDTO model)

@@ -23,7 +23,8 @@ export class GrupoRealTime {
 
     this.hub = new HubConnectionBuilder()
       .withUrl(`${baseURL}hubs/grupo`, {
-         withCredentials: true
+          withCredentials: true,
+          accessTokenFactory: () => localStorage.getItem('token')!
        })
       .withAutomaticReconnect()
       .build();

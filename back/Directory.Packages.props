@@ -19,10 +19,12 @@
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0" />
     <PackageVersion Include="EFCore.NamingConventions" Version="10.0.1" />
     <PackageVersion Include="QRCoder" Version="1.7.0" />
-    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.6" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.7" />
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
     <PackageVersion Include="Ude.NetStandard" Version="1.2.0" />
     <PackageVersion Include="StackExchange.Redis" Version="2.12.14" />
+    <PackageVersion Include="BCrypt.Net-Next" Version="4.1.0"/>
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0" />
 
     
   </ItemGroup>

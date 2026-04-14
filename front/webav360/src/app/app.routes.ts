@@ -8,14 +8,21 @@ import { AlunoTurmaComponent } from './Components/alunos_turma/alunos_turma.comp
 import { SessaoComponent } from './Components/sessao/sessao.component';
 import { AvaliacaoPublicaComponent } from './Components/avaliacao_publica/avaliacao_publica.component';
 import { AvaliacaoEncerradaComponent } from './Components/avaliacao_publica/Aux/avaliacao_encerrada.component';
+import { AuthGuard } from './auth/auth.guard';
+import { LoginComponent } from './Components/login/login.component';
 
 export const routes: Routes = [
-  {path: '', component: TurmasComponent},
-  {path: 'Turmas', component: TurmasComponent},
-  {path: 'AlunosTurma/:id', component: AlunoTurmaComponent},
-  // {path: 'Alunos', component: AlunosComponent},
-  {path: 'Criterios', component: CriteriosComponent},
-  {path: 'Sessao/:id', component: SessaoComponent},
+  {path: '',
+    canActivate: [AuthGuard],
+    children: [
+      {path: 'Turmas', component: TurmasComponent},
+      {path: 'AlunosTurma/:id', component: AlunoTurmaComponent},
+      {path: 'Criterios', component: CriteriosComponent},
+      {path: 'Sessao/:id', component: SessaoComponent},
+      {path: '', redirectTo: 'Turmas', pathMatch: 'full' },
+    ]},
+  {path: 'login', component: LoginComponent},
   {path: 'avaliacao/publica/:token', component: AvaliacaoPublicaComponent},
   {path: 'avaliacao/encerrada', component: AvaliacaoEncerradaComponent},
+  {path: '', redirectTo: '', pathMatch: 'full' },
 ];

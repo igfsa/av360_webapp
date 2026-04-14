@@ -14,10 +14,30 @@ public class APIContext(DbContextOptions<APIContext> options) : DbContext(option
     public DbSet<NotaParcial> NotasParciais { get; set; }
     public DbSet<Sessao> Sessoes { get; set; }
     public DbSet<Turma> Turmas { get; set; }
-
+    public DbSet<Professor> Professores { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
+        _ = modelBuilder.Entity<Professor>()
+            .HasKey(p => new {p.Id});
+
+        _ = modelBuilder.Entity<Professor>()
+            .HasIndex(p => new {p.UserName})
+            .IsUnique();
+
+        _ = modelBuilder.Entity<Professor>()
+            .Property(p => p.UserName)
+            .HasMaxLength(100);
+
+        _ = modelBuilder.Entity<Professor>()
+            .Property(p => p.Nome)
+            .HasMaxLength(100);
+
+        _ = modelBuilder.Entity<Professor>()
+            .Property(p => p.SenhaHash)
+            .IsRequired();
+
         _ = modelBuilder.Entity<AlunoGrupo>()
             .HasKey(ag => new { ag.AlunoId, ag.GrupoId });
 

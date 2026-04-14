@@ -23,6 +23,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI"/>
     <PackageReference Include="EFCore.NamingConventions"/>
     <PackageReference Include="StackExchange.Redis" />
+    <PackageReference Include="BCrypt.Net-Next"/>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
   </ItemGroup>
 
   <ItemGroup>

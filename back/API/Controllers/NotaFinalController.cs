@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 using Application.Contracts;
 using Application.DTOs;
@@ -11,6 +12,7 @@ public class NotaFinalController(INotaFinalService NotasFinaisService) : Control
 {
     private readonly INotaFinalService _NotasFinaisService = NotasFinaisService;
 
+    [Authorize]
     [HttpGet("{id:int}", Name = "GetNotaFinalId")]
     [ActionName("GetId")]
     public async Task<ActionResult<NotaFinalDTO>> Get(int id)
@@ -19,6 +21,7 @@ public class NotaFinalController(INotaFinalService NotasFinaisService) : Control
         return Ok(NotaFinal);
     }
 
+    [Authorize]
     [HttpGet("{sessaoId:int}", Name = "GetNotasFinaisAlunoSessao")]
     [ActionName("GetNotasFinaisAlunoSessao")]
     public async Task<ActionResult<IEnumerable<NotaFinalDTO>>> GetNotasFinaisAlunoSessao(int alunoId, int sessaoId)
@@ -27,7 +30,8 @@ public class NotaFinalController(INotaFinalService NotasFinaisService) : Control
         return Ok(NotasFinais);
     }
 
-    [HttpGet("{turmaId:int}", Name = "GetNotasFinaisGrupoSessao")]
+    [Authorize]
+    [HttpGet("{sessaoId:int}", Name = "GetNotasFinaisGrupoSessao")]
     [ActionName("GetNotasFinaisGrupoSessao")]
     public async Task<ActionResult<IEnumerable<NotaFinalDTO>>> GetNotasFinaisGrupoSessao(int grupoId, int sessaoId)
     {
@@ -35,6 +39,7 @@ public class NotaFinalController(INotaFinalService NotasFinaisService) : Control
         return Ok(NotasFinais);
     }
 
+    [Authorize]
     [HttpPost]
     [ActionName("Post")]
     public async Task<ActionResult<NotaFinalDTO>> Post(NotaFinalDTO model)
@@ -43,6 +48,7 @@ public class NotaFinalController(INotaFinalService NotasFinaisService) : Control
         return Ok(NotaFinal);
     }
 
+    [Authorize]
     [HttpPut("{id:int}")]
     [ActionName("Put")]
     public async Task<ActionResult> Put(int id, NotaFinalDTO model)

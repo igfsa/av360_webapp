@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 using Application.Contracts;
 using Application.DTOs;
@@ -12,6 +13,7 @@ public class DashboardController(
 {
     private readonly IDashboardSessaoService _dashboardService = dashboardService;
 
+    [Authorize]
     [HttpGet("{sessaoId:int}/dashboard")]
     public async Task<ActionResult<DashboardSessaoDTO>> GetDashboard(int sessaoId)
     {
