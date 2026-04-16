@@ -3,6 +3,7 @@ using StackExchange.Redis;
 
 using Application.Contracts;
 using Application.DTOs;
+using Domain.Entities;
 
 namespace Application.Services;
 
@@ -33,6 +34,11 @@ public class DashboardCacheService(IConnectionMultiplexer connection) : IDashboa
         );
     }
 
+    public async Task RemoveAsync(int sessaoId)
+    {
+        await _redis.KeyDeleteAsync(Key(sessaoId));
+    }
+
     public async Task AtualizarNotaAsync(
         int sessaoId,
         int alunoId,
@@ -40,17 +46,14 @@ public class DashboardCacheService(IConnectionMultiplexer connection) : IDashboa
         int grupoId,
         decimal nota)
     {
-        static decimal AtualizarMedia(decimal mediaAtual, int totalAtual, decimal novaNota)
-        {
-            return ((mediaAtual * totalAtual) + novaNota) / (totalAtual + 1);
-        }
 
         var dto = await GetAsync(sessaoId);
 
         if (dto == null)
             return; 
         
-        var aluno = dto.Alunos.First(a => a.AlunoId == alunoId);
+        var grupo = dto.Grupos.First(g => g.GrupoId == grupoId);
+        var aluno = grupo.Alunos.First(a => a.AlunoId == alunoId);
 
         aluno.Media = AtualizarMedia(aluno.Media, aluno.TotalNotas, nota);
         aluno.TotalNotas++;
@@ -75,8 +78,6 @@ public class DashboardCacheService(IConnectionMultiplexer connection) : IDashboa
 
         criterioGlobal.TotalNotas++;
 
-        var grupo = dto.Grupos.First(g => g.GrupoId == grupoId);
-
         grupo.Media = AtualizarMedia(
             grupo.Media,
             grupo.TotalNotas,
@@ -84,7 +85,42 @@ public class DashboardCacheService(IConnectionMultiplexer connection) : IDashboa
 
         grupo.TotalNotas++;
 
-        var avaliaram = dto.Alunos.Count(a => a.Avaliou);
+        dto.MediaGeral = AtualizarMedia(
+            dto.MediaGeral,
+            dto.TotalNotas,
+            aluno.Media
+        );
+
+        await SetAsync(sessaoId, dto);
+    }
+
+    public async Task AtualizarAlunoAsync(int sessaoId, int alunoId, int grupoId)
+    {
+        var dto = await GetAsync(sessaoId);
+        if (dto == null)
+            return; 
+
+        var grupo = dto.Grupos.FirstOrDefault(g => g.GrupoId == grupoId);
+        if (grupo == null)
+            return;
+
+        var aluno = grupo.Alunos.FirstOrDefault(a => a.AlunoId == alunoId);
+        if (aluno == null)
+            return;
+
+        if(aluno.Avaliou)
+            return;
+
+        aluno.Avaliou = true;
+
+        var avaliaramGrupo = grupo.Alunos.Count(a => a.Avaliou);
+
+        grupo.Avaliaram = avaliaramGrupo;
+        grupo.Pendentes = grupo.Alunos.Count - avaliaramGrupo;
+
+        var todosAlunos = dto.Grupos.SelectMany(g => g.Alunos);
+
+        var avaliaram = todosAlunos.Count(a => a.Avaliou);
 
         dto.Avaliaram = avaliaram;
         dto.Pendentes = dto.TotalAlunos - avaliaram;
@@ -92,19 +128,8 @@ public class DashboardCacheService(IConnectionMultiplexer connection) : IDashboa
         await SetAsync(sessaoId, dto);
     }
 
-    public async Task AtualizarAlunoAsync(int sessaoId, int alunoId)
+    static decimal AtualizarMedia(decimal mediaAtual, int totalAtual, decimal novaNota)
     {
-        var dto = await GetAsync(sessaoId);
-        if (dto == null)
-            return; 
-
-        var aluno = dto.Alunos.FirstOrDefault(a => a.AlunoId == alunoId);
-        if (aluno == null)
-            return; 
-
-        aluno.Avaliou = true;
-
-        await SetAsync(sessaoId, dto);
+        return ((mediaAtual * totalAtual) + novaNota) / (totalAtual + 1);
     }
-
 }

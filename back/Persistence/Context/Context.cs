@@ -107,8 +107,7 @@ public class APIContext(DbContextOptions<APIContext> options) : DbContext(option
 
         _ = modelBuilder.Entity<NotaFinal>()
             .Property(n => n.DeviceHash)
-            .HasMaxLength(65)
-            .IsFixedLength();
+            .HasMaxLength(65);
         
         _ = modelBuilder.Entity<NotaParcial>()
                 .HasIndex(x => x.AvaliadoId);

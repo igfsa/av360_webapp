@@ -17,70 +17,162 @@
       </button>
     }
   </div>
-  <div class="d-flex">
-    <div class="flex-fill p-2 w-50">
-      <table class="table table-striped text-center table-hover">
-        <thead class="table-dark">
-          <tr  style ='height: 2.4rem;'>
-            <th style = 'width: 10%; text-align: center;'>#</th>
-            <th>Nome</th>
-          </tr>
-        </thead>
-        <tbody>
-          @if (criterios && criterios.length){
-            @for (criterio of criterios; track criterio.id){
-              <tr  style ='height: 2.4rem;'>
-                <td style= 'text-align: center'>{{criterio.id}}</td>
-                <td>{{criterio.nome}}</td>
-              </tr>
-            }
-          }
-        </tbody>
-        <tfoot >
-          @if (!criterios.length){
-            <tr>
-              <td colspan="8" class="text-center">
-                <h4>Nenhum Criterio encontrado!</h4>
-              </td>
-            </tr>
-          }
-        </tfoot>
-      </table>
-    </div>
-    <div class="flex-fill p-2 w-50" style=" border-left: 0.2rem solid var(--secondary);">
-      <table class="table table-striped text-center table-hover">
-        <thead class="table-dark">
-          <tr  style ='height: 2.4rem;'>
-            <th style = 'width: 10%; text-align: center;'>#</th>
-            <th>Nome</th>
-          </tr>
-        </thead>
-        <tbody>
-          @if (grupos && grupos.length){
-            @for (grupo of grupos; track grupo.id){
-              <tr  style ='height: 2.4rem;'>
-                <td style= 'text-align: center'>{{grupo.id}}</td>
-                <td>{{grupo.nome}}</td>
-              </tr>
-            }
-          }
-        </tbody>
-        <tfoot >
-          @if (!grupos.length){
-            <tr>
-              <td colspan="8" class="text-center">
-                <h4>Nenhuma Equipe encontrada!</h4>
-              </td>
-            </tr>
-          }
-        </tfoot>
-      </table>
-    </div>
-  </div>
   @if (sessaoAtiva) {
+      <button id="btn-dashboard" class="btn btn-info w-100" (click)="dashboardReset(sessaoAtiva.id);">
+        Recarregar
+      </button>
+
+    <div class="d-flex justify-content-evenly w-100">
+      <div>
+        <h3>
+          Média Geral
+        </h3>
+        <div>
+          {{ dashboard?.mediaGeral | number:'1.0-1' }}
+        </div>
+      </div>
+      <div>
+        <h3>
+          Total de Alunos
+        </h3>
+        <div>
+          {{ dashboard?.totalAlunos }}
+        </div>
+      </div>
+      <div>
+        <h3>
+          Já Avaliaram
+        </h3>
+        <div>
+          {{ dashboard?.avaliaram }}
+        </div>
+      </div>
+      <div>
+        <h3>
+          Faltam Avaliar
+        </h3>
+        <div>
+          {{ dashboard?.pendentes }}
+        </div>
+      </div>
+    </div>
+
+    <div class="tabela-wrapper">
+      <table class="tabela-criterio table text-center table-hover">
+
+        <thead class="table-dark">
+          <tr class="first-row">
+
+            <th>
+              Critério
+            </th>
+
+            <th>
+              Média Global
+            </th>
+
+            <th>
+              Total de notas
+            </th>
+
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (criterio of dashboard?.criterios; track criterio.criterioId) {
+            <tr>
+
+              <td>
+                {{criterio.nome}}
+              </td>
+
+              <td>
+                {{criterio.mediaGlobal | number:'1.0-1'}}
+              </td>
+
+              <td>
+                {{criterio.totalNotas}}
+              </td>
+            </tr>
+          }
+        </tbody>
+
+      </table>
+    </div>
+
+    @for(grupo of dashboard?.grupos; track grupo.grupoId){
+      <div ngbAccordion>
+        <div ngbAccordionItem>
+          <h2 ngbAccordionHeader>
+            <button ngbAccordionButton>
+              <h2>{{ grupo?.nome }}</h2>
+            </button>
+          </h2>
+          <div ngbAccordionCollapse>
+            <div ngbAccordionBody>
+              <ng-template>
+                <div class="d-flex justify-content-evenly w-100">
+                  <div>
+                    <h3>
+                      Média Geral
+                    </h3>
+                    <div>
+                      {{ grupo?.media | number:'1.0-1' }}
+                    </div>
+                  </div>
+                  <div>
+                    <h3>
+                      Total de Alunos
+                    </h3>
+                    <div>
+                      {{ grupo?.alunos?.length }}
+                    </div>
+                  </div>
+                  <div>
+                    <h3>
+                      Já Avaliaram
+                    </h3>
+                    <div>
+                      {{ grupo?.avaliaram }}
+                    </div>
+                  </div>
+                  <div>
+                    <h3>
+                      Faltam Avaliar
+                    </h3>
+                    <div>
+                      {{ grupo?.pendentes }}
+                    </div>
+                  </div>
+                </div>
+
+                <table id="main-table" class="table table-striped text-center table-hover">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>Nome</th>
+                      <th>Avaliou</th>
+                      <th>Média</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (aluno of grupo.alunos; track aluno.alunoId){
+                        <tr>
+                          <td>{{aluno.nome}}</td>
+                          <td>{{aluno.avaliou}}</td>
+                          <td>{{aluno.media | number:'1.0-1'}}</td>
+                        </tr>
+                    }
+                  </tbody>
+                </table>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
     <figure class="figure w-50 p-2">
       <img [src]="qrCode" alt="QR Code da Avaliação" class="figure-img img-fluid rounded" >
-      <figcaption class="figure-caption">http://localhost:4200/avaliacao/publica/{{sessaoAtiva.tokenPublico}}</figcaption>
+      <figcaption class="figure-caption">http://localhost:5074/avaliacao/publica/{{sessaoAtiva.tokenPublico}}</figcaption>
     </figure>
   }
 </div>

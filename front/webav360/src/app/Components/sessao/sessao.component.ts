@@ -1,7 +1,15 @@
 import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { DecimalPipe } from '@angular/common'
 import { ActivatedRoute } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { forkJoin } from 'rxjs';import {
+	NgbAccordionButton,
+	NgbAccordionDirective,
+	NgbAccordionItem,
+	NgbAccordionHeader,
+	NgbAccordionToggle,
+	NgbAccordionBody,
+	NgbAccordionCollapse,
+} from '@ng-bootstrap/ng-bootstrap/accordion';
 import Swal from 'sweetalert2';
 
 import { createEmptyTurma, Turma } from '../../Models/Turma';
@@ -16,15 +24,26 @@ import { CriterioService } from '../../Service/Criterio.service';
 import { GrupoService } from '../../Service/Grupo.service';
 import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
 import { SessaoService } from '../../Service/Sessao.service';
+import { SessaoRealTime } from '../../Service/SessaoRealTime.service';
+import { DashboardSessao } from '../../Models/Dashboard/DashboardSessao';
 
 @Component({
   selector: 'app-sessao',
+  imports: [
+		NgbAccordionButton,
+		NgbAccordionDirective,
+		NgbAccordionItem,
+		NgbAccordionHeader,
+		NgbAccordionToggle,
+		NgbAccordionBody,
+	  NgbAccordionCollapse,
+    DecimalPipe
+  ],
   templateUrl: './sessao.component.html',
   styleUrls: ['./sessao.component.scss', '../../app.scss']
 })
 export class SessaoComponent implements OnInit {
 
-	private modalService = inject(NgbModal);
   @Input() turmaEditar!: Turma;
 
   public alunos: Aluno[]  = [];
@@ -33,6 +52,7 @@ export class SessaoComponent implements OnInit {
   public turma: Turma = createEmptyTurma();
   public sessaoAtiva?: Sessao;
   public qrCode: string = '';
+  public dashboard?: DashboardSessao;
 
   constructor(
     private alunoService: AlunoService,
@@ -43,6 +63,7 @@ export class SessaoComponent implements OnInit {
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private turmaRealTime: TurmaRealTime,
+    private sessaoRealTime: SessaoRealTime,
   ){}
 
   ngOnInit() {
@@ -78,8 +99,38 @@ export class SessaoComponent implements OnInit {
 
       if (sessaoAtiva){
         this.qrCode = `http://localhost:5074/api/Sessao/GetQrCode/${sessaoAtiva.id}/qrcode`
+
+        this.loadSessao(sessaoAtiva.id);
+
+        this.sessaoRealTime.connect()?.then(() => {
+          this.sessaoRealTime.acessarSessao(sessaoAtiva.id);
+        });
+
+        this.sessaoRealTime.sessaoAtualizada$
+          .subscribe(id => {
+            if (id === sessaoAtiva.id) {
+              this.loadSessao(sessaoAtiva.id);
+            }
+        });
       }
+
       this.cdr.detectChanges();
+    });
+  }
+
+  public loadSessao(sessaoId: number){
+    this.sessaoService.dashboardSessao(sessaoId).subscribe({
+      next: (res) => {
+        this.dashboard = res;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: err.error?.message ?? `Erro ao buscar dashboard`
+        });
+      }
     });
   }
 
@@ -130,5 +181,19 @@ export class SessaoComponent implements OnInit {
       });
     }
   }
-
+  public dashboardReset(sessaoId: number){
+    this.sessaoService.dashboardResetSessao(sessaoId).subscribe({
+      next: (res) => {
+        this.dashboard = res;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: err.error?.message ?? `Erro ao buscar dashboard`
+        });
+      }
+    });
+  }
 }

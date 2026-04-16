@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:webav360": "node dist/webav360/server/server.mjs"
+    "dev:ssr": "ng build --watch & node dist/webav360/server/server.mjs",
+    "build:ssr": "ng build && ng run webav360:server"
   },
   "prettier": {
     "printWidth": 100,

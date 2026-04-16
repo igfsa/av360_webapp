@@ -71,17 +71,7 @@ export class AvaliacaoPublicaComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        Swal.mixin({
-          toast: true,
-          position: "top-end",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          }
-        }).fire({
+        Swal.fire({
         icon: 'error',
         title: 'Erro',
         text: err.error.message ?? 'Ocorreu um erro não identificado'
@@ -104,17 +94,7 @@ export class AvaliacaoPublicaComponent implements OnInit {
         this.carregarAvaliacao();
     },
     error: (err) => {
-      Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        }
-      }).fire({
+      Swal.fire({
           icon: 'error',
           title: 'Erro',
           text: err.error.message ?? 'Ocorreu um erro não identificado'

@@ -6,4 +6,8 @@ public class GrupoDashboardDTO
     public string Nome { get; set; } = null!;
     public decimal Media { get; set; }
     public int TotalNotas { get; set; }
+    public int Avaliaram { get; set; }
+    public int Pendentes { get; set; }
+
+    public List<AlunoDashboardDTO> Alunos { get; set; } = [];
 }

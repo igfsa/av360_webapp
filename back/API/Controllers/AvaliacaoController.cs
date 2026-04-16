@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 
 using Application.Contracts;
 using Application.DTOs;
+using API.Notifier;
 
 namespace API.Controllers;
 
@@ -10,10 +11,10 @@ namespace API.Controllers;
 [Route("api/[controller]/[action]")]
 public class AvaliacaoController(
     IAvaliacaoService avaliacaoService,
-    IAvaliacaoNotifier avaliacaoNotifier) : ControllerBase
+    ISessaoNotifier sessaoNotifier) : ControllerBase
 {
     private readonly IAvaliacaoService _avaliacaoService = avaliacaoService;
-    private readonly IAvaliacaoNotifier _avaliacaoNotifier = avaliacaoNotifier;
+    private readonly ISessaoNotifier _sessaoNotifier = sessaoNotifier;
 
     [AllowAnonymous]
     [HttpGet(Name = "GetValidaSessaoChavePub")]
@@ -44,7 +45,9 @@ public class AvaliacaoController(
     public async Task<ActionResult> Post(AvaliacaoEnvioDTO model)
     {
         var avaliacao = await _avaliacaoService.AddAvaliacao(model);
-        await _avaliacaoNotifier.NovaAvaliacao(model.SessaoId);
-        return Ok(avaliacao);            
+        
+        await _sessaoNotifier.NovaAvaliacao(model.SessaoId);
+
+        return Ok(avaliacao);
     }
 }

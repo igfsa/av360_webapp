@@ -121,7 +121,6 @@ public class AvaliacaoService(IGeralPersist geralPersist,
                 dataEnvio: DateTime.UtcNow
             );
             _geralPersist.Add(final);
-            Console.Write(final);
             _ = await _geralPersist.SaveChangesAsync();
             AvaliacaoPostResultDTO resultado = new();
             foreach (var np in model.Itens)
@@ -149,14 +148,6 @@ public class AvaliacaoService(IGeralPersist geralPersist,
                         criterio: criterio,
                         nota: np.Nota);
 
-                    await _dashboardCache.AtualizarNotaAsync(
-                        sessaoId: model.SessaoId,
-                        alunoId: np.AvaliadoId,
-                        criterioId: np.CriterioId,
-                        grupoId: model.GrupoId,
-                        nota: np.Nota
-                    );
-
                     resultado.Sucesso++;
                 }
                 catch (Exception ex)
@@ -173,7 +164,16 @@ public class AvaliacaoService(IGeralPersist geralPersist,
             }
 
             _ = await _geralPersist.SaveChangesAsync();
-            await _dashboardCache.AtualizarAlunoAsync(model.SessaoId, model.AvaliadorId);
+
+            foreach (var np in model.Itens)
+                    await _dashboardCache.AtualizarNotaAsync(
+                        sessaoId: model.SessaoId,
+                        alunoId: np.AvaliadoId,
+                        criterioId: np.CriterioId,
+                        grupoId: model.GrupoId,
+                        nota: np.Nota
+                    );
+            await _dashboardCache.AtualizarAlunoAsync(model.SessaoId, model.AvaliadorId, model.GrupoId);
             
             return resultado;
         }

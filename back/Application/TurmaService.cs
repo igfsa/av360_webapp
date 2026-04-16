@@ -159,8 +159,8 @@ public class TurmaService(IGeralPersist geralPersist,
         {
             Console.WriteLine($"HEADER: '{h}'");
         }
-        if (!headers.Any(h => Texto.Normalizar(h) == Texto.Normalizar(dto.ColunaNome)))
-            throw new BusinessException($"Coluna '{dto.ColunaNome}' não encontrada.");
+        var colunaNome = headers.FirstOrDefault(h => Texto.Normalizar(h) == Texto.Normalizar(dto.ColunaNome))
+            ?? throw new BusinessException($"Coluna '{dto.ColunaNome}' não encontrada.");
         Turma turma = await _turmaPersist.GetTurmaIdAsync(turmaId)
             ?? throw new NotFoundException("Turma não encontrada");
         int linha = 1;
@@ -168,7 +168,7 @@ public class TurmaService(IGeralPersist geralPersist,
         {
             linha++;
             resultado.Total++;
-            var nome = csv.GetField(dto.ColunaNome);
+            var nome = csv.GetField(colunaNome);
             try
             {
                 if (string.IsNullOrWhiteSpace(nome))

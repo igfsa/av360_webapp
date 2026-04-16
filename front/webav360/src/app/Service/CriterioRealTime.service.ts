@@ -1,6 +1,5 @@
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr'
-import { baseURL } from '../../main.server';
 import { isPlatformBrowser } from '@angular/common';
 import { Subject } from 'rxjs';
 
@@ -22,7 +21,7 @@ export class CriterioRealTime {
     }
 
     this.hub = new HubConnectionBuilder()
-      .withUrl(`${baseURL}hubs/criterio`, {
+      .withUrl(`/hubs/criterio`, {
           withCredentials: true,
           accessTokenFactory: () => localStorage.getItem('token')!
        })

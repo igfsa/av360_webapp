@@ -1,6 +1,5 @@
-import { Inject, Injectable, PLATFORM_ID, Signal } from '@angular/core';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr'
-import { baseURL } from '../../main.server';
 import { isPlatformBrowser } from '@angular/common';
 import { Subject } from 'rxjs';
 
@@ -24,7 +23,7 @@ export class TurmaRealTime {
     }
 
     this.hub = new HubConnectionBuilder()
-      .withUrl(`${baseURL}hubs/turma`, {
+      .withUrl(`/hubs/turma`, {
           withCredentials: true,
           accessTokenFactory: () => localStorage.getItem('token')!
        })

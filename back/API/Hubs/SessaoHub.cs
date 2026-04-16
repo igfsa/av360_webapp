@@ -8,6 +8,10 @@ public class SessaoHub : Hub
     {
         await Clients.All.SendAsync("SessoesAtualizadas", sessaoId);
     }
+    public async Task NovaAvaliacao(int sessaoId)
+    {
+        await Clients.All.SendAsync("NovaAvaliacao", sessaoId);
+    }
 
     [HubMethodName("AcessarSessao")]
     public async Task AcessarTurmaSessao(int sessaoId)

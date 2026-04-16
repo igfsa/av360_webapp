@@ -51,13 +51,13 @@ public class SessaoController(ISessaoService SessoesService,
         return Ok(sessao);
     }
 
-    [Authorize]
+    [AllowAnonymous]
     [HttpGet("{sessaoId}/qrcode")]
     public async Task<IActionResult> GetQrCode(int sessaoId)
     {
         var sessao = await _SessoesService.GetSessaoById(sessaoId);
 
-        var qrBytes = GeradorQrCode.GenerateQrCode($"http://localhost:4200/avaliacao/publica/{sessao.TokenPublico}");
+        var qrBytes = GeradorQrCode.GenerateQrCode($"http://localhost:5074/avaliacao/publica/{sessao.TokenPublico}");
 
         return File(qrBytes, "image/png");
     }

@@ -30,7 +30,7 @@ public class AlunoController(IAlunoService alunoService) : ControllerBase
         return Ok(alunos);
     }
 
-    [Authorize]
+    [AllowAnonymous]
     [HttpGet("{grupoId:int}", Name = "ObterAlunoNomeIdGrupo")]
     [ActionName("ObterAlunoNomeIdGrupo")]
     public async Task<ActionResult<AlunoDTO>> GetAlunoByNomeIdGrupo(int grupoId, string nome)

@@ -31,7 +31,13 @@ public class Sessao
     {
         if (_notasFinais.Any(nf => nf.Avaliador == avaliador))
             throw new BusinessException("Aluno já avaliou nesta sessão");
-        if (_notasFinais.Any(nf => nf.DeviceHash == deviceHash))
+            
+        Console.WriteLine(deviceHash);
+        Console.WriteLine(_notasFinais.FirstOrDefault(nf => nf.DeviceHash == deviceHash));
+        Console.WriteLine(_notasFinais.Any(nf => nf.DeviceHash == deviceHash));
+        Console.WriteLine(_notasFinais.Count);
+        
+        if (_notasFinais.FirstOrDefault(nf => nf.DeviceHash == deviceHash) != null)
             throw new BusinessException("Dispositivo já usado nesta sessão");
         if (DataFim != null || !Ativo)
             throw new BusinessException("Sessão encerrada");

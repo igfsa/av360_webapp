@@ -15,15 +15,15 @@ using API.Notifier;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("Allowlocalhost",
-        policy => policy
-            .WithOrigins("http://localhost:4200")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials());
-});
+// builder.Services.AddCors(options =>
+// {
+//     options.AddPolicy("Allowlocalhost",
+//         policy => policy
+//             .WithOrigins("http://localhost:4000")
+//             .AllowAnyHeader()
+//             .AllowAnyMethod()
+//             .AllowCredentials());
+// });
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -73,7 +73,6 @@ builder.Services.AddScoped<IAlunoService, AlunoService>();
 builder.Services.AddScoped<IAlunoPersist, AlunoPersist>();
 
 builder.Services.AddScoped<IAvaliacaoService, AvaliacaoService>();
-builder.Services.AddScoped<IAvaliacaoNotifier, AvaliacaoNotifier>();
 
 builder.Services.AddScoped<ICriterioService, CriterioService>();
 builder.Services.AddScoped<ICriterioPersist, CriterioPersist>();
@@ -146,23 +145,12 @@ builder.Services.AddAuthentication("Bearer")
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddReverseProxy()
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 var app = builder.Build();
-
-app.UseCors("Allowlocalhost");
-
-app.Use(async (context, next) =>
-{
-    context.Response.Headers.ContentSecurityPolicy =
-        "default-src 'self'; " +
-        "img-src 'self' data: http://localhost:4200; " +
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-        "style-src 'self' 'unsafe-inline'; " +
-        "connect-src 'self' http://localhost:5074 http://localhost:4200; " ;
-
-    await next();
-});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -173,6 +161,7 @@ if (app.Environment.IsDevelopment())
     {
         options.SwaggerEndpoint("/openapi/v1.json", "v1");
     });
+}
 
 app.UseHttpsRedirection();
 
@@ -182,6 +171,18 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.ContentSecurityPolicy =
+        "default-src 'self'; " +
+        "img-src 'self' data: http://localhost:4000; " +
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+        "style-src 'self' 'unsafe-inline'; " +
+        "connect-src 'self' http://localhost:5074 http://localhost:4000 ws://localhost:* wss://localhost:*; " ;
+        // Atenção para prod
+    await next();
+});
+
 app.UseMiddleware<ExceptionMiddleware>();
 
 app.MapControllers();
@@ -189,14 +190,9 @@ app.MapControllers();
 app.MapHub<TurmaHub>("/hubs/turma");
 app.MapHub<CriterioHub>("/hubs/criterio");
 app.MapHub<GrupoHub>("/hubs/grupo");
-app.MapHub<AvaliacaoHub>("/hubs/avaliacao");
 app.MapHub<SessaoHub>("/hubs/sessao");
 
-app.UseEndpoints(endpoints =>
-{
-    _ = endpoints.MapControllers();
-});
-}
+app.MapReverseProxy();
 
 using (var scope = app.Services.CreateScope())
 {

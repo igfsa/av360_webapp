@@ -75,7 +75,7 @@
               </thead>
 
               <tbody>
-                @for (avaliacao of avaliacoes; track avaliacao.avaliadoId) {
+                @for (avaliacao of avaliacoes; track avaliacao.avaliadoId; let a = $index) {
                   <tr>
 
                     <td class="sticky-col nome-col">
@@ -89,7 +89,7 @@
                     }
 
                     <td class="acao-col">
-                      <button class="btn-editar" (click)="editar(avaliacao.avaliadoId)">Editar</button>
+                      <button class="btn-editar" (click)="editar(a)">Editar</button>
                     </td>
 
                   </tr>

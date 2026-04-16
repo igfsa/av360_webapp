@@ -82,6 +82,7 @@ public class DashboardSessaoService(
                 Nome = a.Nome,
                 TotalNotas = totalNotas,
                 Media = totalNotas > 0 ? notasAluno.Average(n => n.Nota) : 0,
+                GrupoId = alunosGrupo.FirstOrDefault(ag => ag.AlunoId == a.Id)?.GrupoId ?? 0,
                 Avaliou = notasFinais.Any(nf => nf.AvaliadorId == a.Id),
                 CriterioAluno = mediasCriterios
             };
@@ -103,22 +104,29 @@ public class DashboardSessaoService(
 
         var gruposDto = gruposTurma.Select(g =>
         {
-            var alunos  = alunosPorGrupo.GetValueOrDefault(g.Id, []);
+            var notasAluno  = alunosPorGrupo.GetValueOrDefault(g.Id, []);
             var notasGrupo = notasSessao
-                .Where(ng => alunos
+                .Where(ng => notasAluno
                     .Contains(ng.AvaliadoId)).ToList();
             var totalnotasGrupo = notasGrupo.Count;
+            var alunosGrupo = alunosDto.Where(a => a.GrupoId == g.Id).ToList();
 
             return new GrupoDashboardDTO
             {
                 GrupoId = g.Id,
                 Nome = g.Nome,
                 Media = totalnotasGrupo != 0 ? notasGrupo.Average(n => n.Nota) : 0,
-                TotalNotas = totalnotasGrupo
+                TotalNotas = totalnotasGrupo,
+                Avaliaram = alunosGrupo.Count(a => a.Avaliou),
+                Pendentes = alunosGrupo.Count - alunosGrupo.Count(a => a.Avaliou),
+                Alunos = alunosGrupo
             };
         }).ToList();
 
         var avaliaram = alunosDto.Count(a => a.Avaliou);
+
+        var mediaGeral = notasSessao.Length != 0 ? notasSessao.Average(n => n.Nota) : 0;
+        var totalNotas = notasSessao.Length;
 
         return new DashboardSessaoDTO
         {
@@ -126,7 +134,8 @@ public class DashboardSessaoService(
             TotalAlunos = alunos.Length,
             Avaliaram = avaliaram,
             Pendentes = alunos.Length - avaliaram,
-            Alunos = alunosDto,
+            MediaGeral = mediaGeral,
+            TotalNotas = totalNotas,
             Criterios = criteriosDto,
             Grupos = gruposDto
         };
@@ -136,6 +145,16 @@ public class DashboardSessaoService(
         var cached = await _cache.GetAsync(sessaoId);
         if (cached != null)
             return cached;
+
+        var dto = await BuildFromDatabase(sessaoId);
+
+        await _cache.SetAsync(sessaoId, dto);
+
+        return dto;
+    }
+    public async Task<DashboardSessaoDTO?> ResetDashboard(int sessaoId)
+    {
+        await _cache.RemoveAsync(sessaoId);
 
         var dto = await BuildFromDatabase(sessaoId);
 

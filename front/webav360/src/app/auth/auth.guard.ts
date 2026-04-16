@@ -1,18 +1,19 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
+import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
 
-  constructor(private router: Router) {}
+  constructor(private router: Router,
+    private authService: AuthService
+  ) {}
 
   canActivate(): boolean {
-    const token = localStorage.getItem('token');
-    console.log(token);
+    const token = this.authService.token;
 
     if (!token) {
-      console.log('sem token: ', token);
       this.router.navigate(['/login']);
       return false;
     }
@@ -22,15 +23,13 @@ export class AuthGuard implements CanActivate {
       const exp = decoded.exp * 1000;
 
       if (Date.now() > exp) {
-        localStorage.removeItem('token');
-        this.router.navigate(['/login']);
+        this.authService.logout();
         return false;
       }
 
       return true;
     } catch {
-      localStorage.removeItem('token');
-      this.router.navigate(['/login']);
+      this.authService.logout();
       return false;
     }
   }
