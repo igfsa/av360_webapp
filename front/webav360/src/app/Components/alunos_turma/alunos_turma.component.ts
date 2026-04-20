@@ -1,8 +1,8 @@
-import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, inject, Input, OnInit, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { catchError, forkJoin, map, ObservableInput, of  } from 'rxjs';
+import { catchError, filter, forkJoin, map, ObservableInput, of, take  } from 'rxjs';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
 import {
@@ -37,6 +37,7 @@ import { AlunoGrupo } from '../../Models/AlunoGrupo';
 import { Sessao } from '../../Models/Sessao';
 import { SessaoService } from '../../Service/Sessao.service';
 import { AlunoGrupoNomes } from '../../Models/AlunoGrupoNomes';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-alunos-turma',
@@ -59,6 +60,7 @@ import { AlunoGrupoNomes } from '../../Models/AlunoGrupoNomes';
 export class AlunoTurmaComponent implements OnInit {
 
 	private modalService = inject(NgbModal);
+  private platformId = inject(PLATFORM_ID);
   @Input() turmaEditar!: Turma;
 
   public alunos: Aluno[]  = [];
@@ -135,24 +137,29 @@ export class AlunoTurmaComponent implements OnInit {
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private turmaRealTime: TurmaRealTime,
+    private authService: AuthService,
   ){}
 
   ngOnInit(): void {
     const turmaId = Number(this.route.snapshot.paramMap.get('id'));
 
-    this.loadData(turmaId);
+    if (this.authService.isLogged()){
+      this.loadData(turmaId);
 
-    this.turmaRealTime.connect()?.then(() => {
-      this.turmaRealTime.acessarTurma(turmaId);
-    });
+      if (isPlatformBrowser(this.platformId)) {
+        this.turmaRealTime.connect()?.then(() => {
+          this.turmaRealTime.acessarTurma(turmaId);
+        });
 
-    this.turmaRealTime.turmaAtualizada$
-      .subscribe(id => {
-        if (id === turmaId) {
-          this.loadData(turmaId);
-        }
-      });
-  }
+        this.turmaRealTime.turmaAtualizada$
+          .pipe(takeUntilDestroyed())
+          .subscribe(id => {
+            if (id === turmaId) {
+              this.loadData(turmaId);
+            }
+          });
+    }}
+  };
 
   public loadData(turmaId: number) {
     forkJoin({
@@ -450,5 +457,9 @@ export class AlunoTurmaComponent implements OnInit {
     return this.alunoGrupo.find(ag => ag.alunoId == id)?.grupoNome;
   }
 
+}
+
+function takeUntilDestroyed(): import("rxjs").OperatorFunction<number, unknown> {
+  throw new Error('Function not implemented.');
 }
 

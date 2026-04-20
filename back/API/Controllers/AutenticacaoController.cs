@@ -13,14 +13,13 @@ public class AutenticacaoController(IAutenticacaoService autenticacaoService) : 
     private readonly IAutenticacaoService _autenticacaoService = autenticacaoService;
 
     [AllowAnonymous]
-    [HttpPost("")]
-    [ActionName("Register")]
-    public async Task<ActionResult<ProfessorDTO>> Register(ProfessorDTO model)
+    [HttpPost]
+    public async Task<ActionResult> Register(ProfessorDTO model)
     {
         try
         {
             var professor = await _autenticacaoService.Add(model);
-            return Ok(professor);
+            return Ok();
         }
         catch
         {
@@ -28,20 +27,55 @@ public class AutenticacaoController(IAutenticacaoService autenticacaoService) : 
         }
 
     }
-
     [AllowAnonymous]
-    [HttpPost("")]
-    [ActionName("Login")]
+    [HttpPost]
     public async Task<ActionResult<string>> Login(LoginDTO login)
     {
         try
         {
-            var token = await _autenticacaoService.Login(login.UserName, login.Senha);
-            return Ok(new {token});
+            await _autenticacaoService.Login(login.UserName, login.Senha, Response);
+            return Ok();
         }
         catch
         {
             throw;
         }
+    }
+
+    [AllowAnonymous]
+    [HttpPost]
+    public async Task<IActionResult> Refresh()
+    {
+        try
+        {
+            await _autenticacaoService.Refresh(Request, Response);
+            return Ok();
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+    [AllowAnonymous]
+    [HttpPost]
+    public async Task<IActionResult> Logout()
+    {
+        try
+        {
+            await _autenticacaoService.Logout(Request, Response);
+            return Ok();
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+    [Authorize]
+    [HttpGet]
+    public IActionResult Me()
+    {
+        return Ok( new {autenticado = true});
     }
 }

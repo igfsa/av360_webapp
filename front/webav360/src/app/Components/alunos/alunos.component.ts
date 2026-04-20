@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { AlunoService } from '../../Service/Aluno.service';
 import { Aluno } from '../../Models/Aluno';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CriterioService } from '../../Service/Criterio.service';
 import { Criterio } from '../../Models/Criterio';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-alunos',
@@ -19,7 +19,6 @@ import { Criterio } from '../../Models/Criterio';
   styleUrls: ['./alunos.component.scss', '../../app.scss'],
 })
 export class AlunosComponent implements OnInit {
-	private modalService = inject(NgbModal);
   public loaded = false;
 
   public alunos: Aluno[]  = [];
@@ -49,15 +48,20 @@ export class AlunosComponent implements OnInit {
   constructor(
     private alunoService: AlunoService,
     private criterioService: CriterioService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService
   ){}
 
   ngOnInit() {
-    this.getAlunos();
-      this.criterioService.getCriterios().subscribe((criterios) => {
-      this.criterios = criterios;
-      this.loaded = true;
-    })
+    this.authService.checkAuth().subscribe((isAuth: any) => {
+      if (isAuth) {
+        this.getAlunos();
+        this.criterioService.getCriterios().subscribe((criterios) => {
+          this.criterios = criterios;
+          this.loaded = true;
+        })
+      }
+    });
   }
 
   public getAlunos (): void{

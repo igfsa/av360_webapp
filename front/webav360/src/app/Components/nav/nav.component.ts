@@ -21,14 +21,8 @@ export class NavComponent {
 
   constructor(
     private router: Router,
-    private authService: AuthService
+    public authService: AuthService
   ) {}
-
-  isPublicRoute(): boolean {
-     const aux = this.router.url.includes('avaliacao')
-        || this.router.url.includes('login');
-    return aux;
-  }
 
   open(content: TemplateRef<any>) {
     setTimeout(() => this.offcanvasService.open(content));

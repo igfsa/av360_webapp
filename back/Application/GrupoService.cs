@@ -140,11 +140,11 @@ public class GrupoService(IGeralPersist geralPersist,
         // Adiciona os novos
         var novos = alunosSelecionados.Select(alunoId =>
             new AlunoGrupo
-            {
-                TurmaId = turmaId,
-                GrupoId = grupoId,
-                AlunoId = alunoId
-            });
+            (
+                alunoId,
+                grupoId,
+                turmaId
+            ));
 
         _geralPersist.AddRangeAsync(novos);
         _ = await _geralPersist.SaveChangesAsync();

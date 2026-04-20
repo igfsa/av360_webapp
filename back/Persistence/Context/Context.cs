@@ -15,9 +15,19 @@ public class APIContext(DbContextOptions<APIContext> options) : DbContext(option
     public DbSet<Sessao> Sessoes { get; set; }
     public DbSet<Turma> Turmas { get; set; }
     public DbSet<Professor> Professores { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
+        _ = modelBuilder.Entity<RefreshToken>()
+            .HasIndex(t => t.Token)
+            .IsUnique();
+
+        _ = modelBuilder.Entity<RefreshToken>()
+            .HasOne(t => t.Professor)
+            .WithMany(p => p.RefreshTokens)
+            .HasForeignKey(x => x.ProfessorId);
 
         _ = modelBuilder.Entity<Professor>()
             .HasKey(p => new {p.Id});

@@ -1,5 +1,5 @@
-import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -11,6 +11,8 @@ import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
 import Swal from 'sweetalert2';
 import { ImportAlunos } from '../../Models/TurmaImport';
 import { TurmaImportModalComponent } from './Modals/turma_import.component';
+import { AuthService } from '../../auth/auth.service';
+import { Console } from 'console';
 
 @Component({
   selector: 'app-turmas',
@@ -26,6 +28,7 @@ import { TurmaImportModalComponent } from './Modals/turma_import.component';
 export class TurmasComponent implements OnInit {
 
 	private modalService = inject(NgbModal);
+  private platformId = inject(PLATFORM_ID);
 
   public turmas: Turma[] = [];
   public turmasFiltradas : Turma[] = [];
@@ -55,18 +58,26 @@ export class TurmasComponent implements OnInit {
     private turmaService: TurmaService,
     private cdr: ChangeDetectorRef,
     private turmaRealTime: TurmaRealTime,
+    private authService: AuthService
   ) { }
 
   ngOnInit() {
-    this.getTurmas();
-    this.turmaRealTime.connect();
+    if (this.authService.isLogged())
+    {
+      this.getTurmas();
 
-    this.turmaRealTime.turmaAtualizada$
-      .subscribe(id => {
-        if (id) {
-          this.getTurmas();
-        }
-      });
+      if (isPlatformBrowser(this.platformId)) {
+        this.turmaRealTime.connect();
+
+        this.turmaRealTime.turmaAtualizada$
+          .pipe(takeUntilDestroyed())
+          .subscribe(id => {
+            if (id) {
+              this.getTurmas();
+            }
+          });
+
+    }};
   }
 
   public getTurmas (): void{
@@ -155,3 +166,7 @@ export class TurmasComponent implements OnInit {
       }).catch(() => {});
   }
 }
+function takeUntilDestroyed(): import("rxjs").OperatorFunction<number, unknown> {
+  throw new Error('Function not implemented.');
+}
+

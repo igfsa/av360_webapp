@@ -29,9 +29,10 @@ const angularApp = new AngularNodeAppEngine();
  */
 app.use(
   express.static(browserDistFolder, {
-    maxAge: '1y',
+    maxAge: '1h',
     index: false,
     redirect: false,
+    etag: true,
   }),
 );
 
@@ -40,11 +41,22 @@ app.use(
  */
 app.use((req, res, next) => {
   angularApp
-    .handle(req)
+    .handle(req, {
+      headers: {
+        ...req.headers,
+        host: req.headers.host,
+        cookie: req.headers.cookie ?? ''
+      }
+    })
     .then((response) =>
       response ? writeResponseToNodeResponse(response, res) : next(),
     )
     .catch(next);
+});
+
+app.use((err: any, req: any, res: any, next: any) => {
+  console.error('SSR Error:', err);
+  res.status(500).send('Erro interno no servidor');
 });
 
 /**
@@ -53,12 +65,11 @@ app.use((req, res, next) => {
  */
 if (isMainModule(import.meta.url) || process.env['pm_id']) {
   const port = process.env['PORT'] || 4000;
-  app.listen(port, (error) => {
-    if (error) {
-      throw error;
-    }
 
-    console.log(`Node Express server listening on http://localhost:${port}`);
+  app.listen(port, (error) => {
+    if (error) throw error;
+
+    console.log(`🚀 SSR rodando em http://localhost:${port}`);
   });
 }
 

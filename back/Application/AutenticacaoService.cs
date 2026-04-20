@@ -6,19 +6,23 @@ using Application.Helpers;
 using Domain.Entities;
 using Persistence.Contracts;
 using Domain.Exceptions;
+using Microsoft.AspNetCore.Http;
+using Persistence;
 
 namespace Application.Services;
 
 public class AutenticacaoService(IGeralPersist geralPersist,
                     IProfessorPersist professorPersist,
+                    IRefreshTokenPersist refreshTokenPersist,
                     IMapper mapper) : IAutenticacaoService
 {
     private readonly IGeralPersist _geralPersist = geralPersist;
     private readonly IProfessorPersist _professorPersist = professorPersist;
+    private readonly IRefreshTokenPersist _refreshTokenPersist = refreshTokenPersist;
     private readonly IMapper _mapper = mapper;
 
     #region get
-    public async Task<string> Login(string userName, string senha)
+    public async Task Login(string userName, string senha, HttpResponse response)
     {
         try
         {
@@ -27,9 +31,18 @@ public class AutenticacaoService(IGeralPersist geralPersist,
             if (professor == null || !BCrypt.Net.BCrypt.Verify(senha, professor.SenhaHash))
                 throw new UnauthorizedException("Acesso inválido");
 
-            var token = JWTToken.GenerateJWTToken();
+            var refreshToken = new RefreshToken
+            (
+                professor
+            );
 
-            return token;
+            _geralPersist.Add(refreshToken);
+
+            var novoAccessToken = JWTToken.GenerateJWTToken();
+
+            await _geralPersist.SaveChangesAsync();
+
+            CookiesHelper.SetCookies(response, novoAccessToken, refreshToken.Token);
         }
         catch
         {
@@ -62,5 +75,66 @@ public class AutenticacaoService(IGeralPersist geralPersist,
     }
     #endregion
     #region update
+    public async Task Refresh(HttpRequest request, HttpResponse response)
+    {
+        try
+        {
+            Console.WriteLine("refresh request", request);
+            Console.WriteLine("cookies", request.Cookies["refresh_token"]);
+            var token = request.Cookies["refresh_token"]
+                ?? throw new UnauthorizedException("Cookie Refresh inválido");
+
+            var refreshToken = await _refreshTokenPersist.GetRefreshToken(token);
+
+            if (refreshToken == null || !refreshToken.Validar())
+                throw new UnauthorizedException("Token inválido ou expirado");
+
+            refreshToken.Revogar();
+
+            var novoRefresh = new RefreshToken
+            (
+                refreshToken.Professor
+            );
+
+            _geralPersist.Add(novoRefresh);
+
+            var novoAccessToken = JWTToken.GenerateJWTToken();
+
+            await _geralPersist.SaveChangesAsync();
+
+            CookiesHelper.SetCookies(response, novoAccessToken, novoRefresh.Token);
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+    public async Task Logout(HttpRequest request, HttpResponse response)
+    {
+        try
+        {
+            Console.WriteLine("logout request", request);
+            Console.WriteLine("cookies", request.Cookies["refresh_token"]);
+            var token = request.Cookies["refresh_token"] ??
+                throw new ValidationException("Cookie Inválido");
+
+            var refreshToken = await _refreshTokenPersist.GetRefreshToken(token);
+
+            if (refreshToken != null)
+            {
+                refreshToken.Revogar();
+
+                await _geralPersist.SaveChangesAsync();
+            }
+
+            response.Cookies.Delete("auth_token");
+            response.Cookies.Delete("refresh_token");
+        }
+        catch
+        {
+            throw;
+        }
+    }
     #endregion
 }

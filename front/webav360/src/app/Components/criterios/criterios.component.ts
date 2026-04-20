@@ -103,35 +103,35 @@ export class CriteriosComponent implements OnInit {
     }).catch(() => {});
   }
 
-    public editarCriterio (criterio: Criterio): void{
-      const ref = this.modalService.open(CriterioEditarModalComponent, {
-        size: 'lg',
-        backdrop: 'static',
-        centered: true
+  public editarCriterio (criterio: Criterio): void{
+    const ref = this.modalService.open(CriterioEditarModalComponent, {
+      size: 'lg',
+      backdrop: 'static',
+      centered: true
+    });
+
+    ref.componentInstance.criterio = criterio;
+
+    ref.result.then((criterioEditado: Criterio) => {
+      if (!criterioEditado) return;
+
+      this.criterioService.putCriterio(criterioEditado).subscribe({
+        next: (c) => {
+          criterio = c;
+          Swal.fire({
+            icon: 'success',
+            title: 'Sucesso',
+            text: `Critério ${c.nome} editado com sucesso!`
+          });
+        },
+        error: (err) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: err.error?.message ?? `Erro ao editar critério ${criterioEditado.nome}`
+          });
+        }
       });
-
-      ref.componentInstance.criterio = criterio;
-
-      ref.result.then((criterioEditado: Criterio) => {
-        if (!criterioEditado) return;
-
-        this.criterioService.putCriterio(criterioEditado).subscribe({
-          next: (c) => {
-            criterio = c;
-            Swal.fire({
-              icon: 'success',
-              title: 'Sucesso',
-              text: `Critério ${c.nome} editado com sucesso!`
-            });
-          },
-          error: (err) => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Erro',
-              text: err.error?.message ?? `Erro ao editar critério ${criterioEditado.nome}`
-            });
-          }
-        });
-      }).catch(() => {});
-    }
+    }).catch(() => {});
+  }
 }

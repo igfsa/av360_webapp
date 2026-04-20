@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
 using Persistence.Contracts;
 using Persistence.Context;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Persistence;
 
@@ -25,10 +26,12 @@ public class GrupoPersist(APIContext context) : IGrupoPersist
     }
     public async Task<Grupo[]> GetGruposTurmaIdAsync(int turmaId)
     {
-        return await _context.Grupos
-            .AsNoTracking()
-            .Where(g => g.TurmaId == turmaId)
-            .OrderBy(g => g.Nome)
-            .ToArrayAsync();
+        var turma = await _context.Turmas
+            .Include(t => t.Grupos)
+            .FirstOrDefaultAsync(t => t.Id == turmaId);
+        if (turma == null)
+            return [];
+
+        return [.. turma.Grupos];
     }
 }

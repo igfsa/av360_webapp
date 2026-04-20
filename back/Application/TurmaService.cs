@@ -17,7 +17,6 @@ public class TurmaService(IGeralPersist geralPersist,
                     ICriterioPersist criterioPersist,
                     IAlunoPersist alunoPersist,
                     IAlunoTurmaPersist alunoTurmaPersist,
-                    ICriterioTurmaPersist criterioTurmaPersist,
                     IMapper mapper) : ITurmaService
 {
     private readonly IGeralPersist _geralPersist = geralPersist;
@@ -25,7 +24,6 @@ public class TurmaService(IGeralPersist geralPersist,
     private readonly ICriterioPersist _criterioPersist = criterioPersist;
     private readonly IAlunoPersist _alunoPersist = alunoPersist;
     private readonly IAlunoTurmaPersist _alunoTurmaPersist = alunoTurmaPersist;
-    private readonly ICriterioTurmaPersist _criterioTurmaPersist = criterioTurmaPersist;
     private readonly IMapper _mapper = mapper;
 
     #region get
@@ -72,8 +70,11 @@ public class TurmaService(IGeralPersist geralPersist,
     {
         try
         {
-            var turmas = await _criterioTurmaPersist.GetTurmasCriterioIdAsync(criterioId)
-                ?? throw new NotFoundException("Turmas não encontradas");
+            var criterio = await _criterioPersist.GetCriterioIdAsync(criterioId)
+                ?? throw new NotFoundException("Critério não encontradas");
+
+            var turmas = criterio.Turmas;
+
             return _mapper.Map<IEnumerable<TurmaDTO>>(turmas);
         }
         catch

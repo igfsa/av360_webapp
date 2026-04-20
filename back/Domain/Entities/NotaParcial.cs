@@ -1,3 +1,5 @@
+using Domain.Exceptions;
+
 namespace Domain.Entities;
 
 public class NotaParcial
@@ -5,14 +7,18 @@ public class NotaParcial
     private NotaParcial() { }
     public NotaParcial(NotaFinal nFinal, Aluno avaliado, Criterio criterio, decimal nota)
     {
-        if (nFinal == null || avaliado == null || criterio == null)
-            throw new ArgumentNullException();
-        NotaFinal = nFinal;
+        NotaFinal = nFinal 
+            ?? throw new NotFoundException("Nota final não encontrada");
         NotaFinalId = nFinal.Id;
-        Avaliado = avaliado;
+
+        Avaliado = avaliado 
+            ?? throw new NotFoundException("Avaliado não encontrado");
         AvaliadoId = avaliado.Id;
-        Criterio = criterio;
+
+        Criterio = criterio 
+            ?? throw new NotFoundException("Critério não encontrado");
         CriterioId = criterio.Id;
+        
         Nota = nota;
     }
     public int Id { get; private set; }

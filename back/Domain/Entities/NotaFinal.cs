@@ -10,12 +10,15 @@ public class NotaFinal
         Sessao = sessao
             ?? throw new BusinessException("Sessão é obrigatória");
         SessaoId = sessao.Id;
+
         Avaliador = avaliador
             ?? throw new BusinessException("Avaliador é obrigatório");
         AvaliadorId = avaliador.Id;
+
         Grupo = grupo
             ?? throw new BusinessException("Grupo é obrigatório");
         GrupoId = grupo.Id;
+        
         DeviceHash = deviceHash;
         DataEnvio = dataEnvio;
     }

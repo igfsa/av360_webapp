@@ -32,9 +32,8 @@ export class LoginComponent implements OnInit {
 
   login(): void {
     this.authService.login(this.loginModel().userName, this.loginModel().senha).subscribe({
-      next: res => {
-        this.authService.setSession(res.token);
-        this.router.navigate(['/turmas']);
+      next: () => {
+        this.router.navigate(['']);
       },
       error: err => {
         Swal.fire({

@@ -22,43 +22,43 @@
         Recarregar
       </button>
 
-    <div class="d-flex justify-content-evenly w-100">
-      <div>
-        <h3>
+    <div class="dashboard-section">
+      <div class="dashboard-item">
+        <h3 class="item-titulo">
           Média Geral
         </h3>
-        <div>
+        <div class="item-conteudo">
           {{ dashboard?.mediaGeral | number:'1.0-1' }}
         </div>
       </div>
-      <div>
-        <h3>
+      <div class="dashboard-item">
+        <h3 class="item-titulo">
           Total de Alunos
         </h3>
-        <div>
+        <div class="item-conteudo">
           {{ dashboard?.totalAlunos }}
         </div>
       </div>
-      <div>
-        <h3>
+      <div class="dashboard-item">
+        <h3 class="item-titulo">
           Já Avaliaram
         </h3>
-        <div>
+        <div class="item-conteudo">
           {{ dashboard?.avaliaram }}
         </div>
       </div>
-      <div>
-        <h3>
-          Faltam Avaliar
+      <div class="dashboard-item">
+        <h3 class="item-titulo">
+          Pendentes
         </h3>
-        <div>
+        <div class="item-conteudo">
           {{ dashboard?.pendentes }}
         </div>
       </div>
     </div>
 
     <div class="tabela-wrapper">
-      <table class="tabela-criterio table text-center table-hover">
+      <table class="table table-striped text-center table-hover">
 
         <thead class="table-dark">
           <tr class="first-row">
@@ -66,11 +66,9 @@
             <th>
               Critério
             </th>
-
             <th>
               Média Global
             </th>
-
             <th>
               Total de notas
             </th>
@@ -82,15 +80,15 @@
           @for (criterio of dashboard?.criterios; track criterio.criterioId) {
             <tr>
 
-              <td>
+              <td style="width: 70%;">
                 {{criterio.nome}}
               </td>
 
-              <td>
+              <td style="width: 15%;">
                 {{criterio.mediaGlobal | number:'1.0-1'}}
               </td>
 
-              <td>
+              <td style="width: 15%;">
                 {{criterio.totalNotas}}
               </td>
             </tr>
@@ -111,42 +109,42 @@
           <div ngbAccordionCollapse>
             <div ngbAccordionBody>
               <ng-template>
-                <div class="d-flex justify-content-evenly w-100">
-                  <div>
-                    <h3>
+                <div class="dashboard-section">
+                  <div class="dashboard-item">
+                    <h3 class="item-titulo">
                       Média Geral
                     </h3>
-                    <div>
+                    <div class="item-conteudo">
                       {{ grupo?.media | number:'1.0-1' }}
                     </div>
                   </div>
-                  <div>
-                    <h3>
+                  <div class="dashboard-item">
+                    <h3 class="item-titulo">
                       Total de Alunos
                     </h3>
-                    <div>
+                    <div class="item-conteudo">
                       {{ grupo?.alunos?.length }}
                     </div>
                   </div>
-                  <div>
-                    <h3>
+                  <div class="dashboard-item">
+                    <h3 class="item-titulo">
                       Já Avaliaram
                     </h3>
-                    <div>
+                    <div class="item-conteudo">
                       {{ grupo?.avaliaram }}
                     </div>
                   </div>
-                  <div>
-                    <h3>
-                      Faltam Avaliar
+                  <div class="dashboard-item">
+                    <h3 class="item-titulo">
+                       Pendentes
                     </h3>
-                    <div>
+                    <div class="item-conteudo">
                       {{ grupo?.pendentes }}
                     </div>
                   </div>
                 </div>
 
-                <table id="main-table" class="table table-striped text-center table-hover">
+                <table class="table table-striped text-center table-hover">
                   <thead class="table-dark">
                     <tr>
                       <th>Nome</th>
@@ -157,9 +155,21 @@
                   <tbody>
                     @for (aluno of grupo.alunos; track aluno.alunoId){
                         <tr>
-                          <td>{{aluno.nome}}</td>
-                          <td>{{aluno.avaliou}}</td>
-                          <td>{{aluno.media | number:'1.0-1'}}</td>
+                          <td style="width: 70%;">{{aluno.nome}}</td>
+                          <td style="width: 15%;">
+                            @if (aluno.avaliou) {
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-circle" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>
+                              </svg>
+                            } @else {
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#dc3545" class="bi bi-x-circle" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                              </svg>
+                            }
+                          </td>
+                          <td style="width: 15%;">{{aluno.media | number:'1.0-1'}}</td>
                         </tr>
                     }
                   </tbody>

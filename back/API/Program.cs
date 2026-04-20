@@ -105,6 +105,8 @@ builder.Services.AddScoped<IDashboardSessaoService, DashboardSessaoService>();
 
 builder.Services.AddScoped<IProfessorPersist, ProfessorPersist>();
 
+builder.Services.AddScoped<IRefreshTokenPersist, RefreshTokenPersist>();
+
 builder.Services.AddScoped<IAutenticacaoService, AutenticacaoService>();
 
 builder.Services.AddAuthentication("Bearer")
@@ -128,14 +130,11 @@ builder.Services.AddAuthentication("Bearer")
         {
             OnMessageReceived = context =>
             {
-                var accessToken = context.Request.Query["access_token"];
+                var token = context.Request.Cookies["auth_token"];
 
-                var path = context.HttpContext.Request.Path;
-
-                if (!string.IsNullOrEmpty(accessToken) &&
-                    path.StartsWithSegments("/hubs"))
+                if (!string.IsNullOrEmpty(token))
                 {
-                    context.Token = accessToken;
+                    context.Token = token;
                 }
 
                 return Task.CompletedTask;
@@ -170,6 +169,37 @@ app.UseRouting();
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+// 🔐 PROTEÇÃO SSR
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path.Value?.ToLower() ?? "";
+
+    var isApi = path.StartsWith("/api");
+    var isHub = path.StartsWith("/hubs");
+    var isStatic = Path.HasExtension(path);
+
+    var rotasPublicas = new [] 
+    {
+        "/login",
+        "/avaliacao/publica"
+    };
+
+    var isPublic = rotasPublicas.Any(p => path.StartsWith(p));
+
+    var isHtmlRequest = context.Request.Headers.Accept.Any(h => h.Contains("text/html"));
+
+    if (!isApi && !isHub && !isPublic && !isStatic && isHtmlRequest)
+    {
+        if (!context.User.Identity?.IsAuthenticated ?? true)
+        {
+            context.Response.Redirect("/login");
+            return;
+        }
+    }
+
+    await next();
+});
 
 app.Use(async (context, next) =>
 {

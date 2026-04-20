@@ -9,13 +9,11 @@ public class Sessao
     {
         if (string.IsNullOrWhiteSpace(tokenPublico))
             throw new BusinessException("Token é obrigatório");
-        if (turma == null)
-            throw new BusinessException("Turma é obrigatória");
+        Turma = turma
+            ?? throw new BusinessException("Turma é obrigatória");
         TurmaId = turma.Id;
-        Turma = turma;
         DataInicio = dataInicio;
         TokenPublico = tokenPublico;
-        Ativo = true;
     }
     public int Id { get; private set; }
     public int TurmaId { get; private set; }
@@ -23,7 +21,7 @@ public class Sessao
     public DateTime DataInicio { get; private set; }
     public DateTime? DataFim { get; private set; }
     public string TokenPublico { get; private set; } = null!;
-    public bool Ativo { get; private set; }
+    public bool Ativo { get; private set; } = true;
     private readonly List<NotaFinal> _notasFinais = [];
     public IReadOnlyCollection<NotaFinal> Notasfinais => _notasFinais;
 
