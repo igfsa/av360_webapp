@@ -23,20 +23,6 @@ public class GrupoService(IGeralPersist geralPersist,
     private readonly IMapper _mapper = mapper;
 
     #region get
-    public async Task<IEnumerable<GrupoDTO>> GetGrupos()
-    {
-        try
-        {
-            var grupos = await _grupoPersist.GetAllGruposAsync()
-                ?? throw new NotFoundException("Nenhum grupo encontrado");
-            return _mapper.Map<IEnumerable<GrupoDTO>>(grupos);
-        }
-        catch
-        {
-            throw;
-        }
-    }
-
     public async Task<GrupoDTO> GetGrupoById(int Id)
     {
         try
@@ -131,13 +117,11 @@ public class GrupoService(IGeralPersist geralPersist,
     }
     public async Task AtualizarGrupo(int turmaId, int grupoId, List<int> alunosSelecionados)
     {
-        // Remove apenas relações do grupo atual
         AlunoGrupo[] alunos = await _alunoGrupoPersist.GetAlunosGrupoTurmaId(turmaId);
         var remover = alunos.Where(ag => ag.GrupoId == grupoId);
 
         _geralPersist.DeleteRange(remover);
 
-        // Adiciona os novos
         var novos = alunosSelecionados.Select(alunoId =>
             new AlunoGrupo
             (

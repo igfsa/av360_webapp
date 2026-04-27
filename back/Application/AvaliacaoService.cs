@@ -18,8 +18,8 @@ public class AvaliacaoService(IGeralPersist geralPersist,
                     IGrupoService grupoService,
                     IGrupoPersist grupoPersist,
                     ITurmaService turmaService,
-                    IDashboardCacheService dashboardCache,
-                    IMapper mapper) : IAvaliacaoService
+                    IDashboardCacheService dashboardCache
+                    ) : IAvaliacaoService
 {
     private readonly IGeralPersist _geralPersist = geralPersist;
     private readonly ISessaoService _sessaoService = sessaoService;
@@ -32,18 +32,13 @@ public class AvaliacaoService(IGeralPersist geralPersist,
     private readonly IGrupoPersist _grupoPersist = grupoPersist;
     private readonly ITurmaService _turmaService = turmaService;
     private readonly IDashboardCacheService _dashboardCache = dashboardCache;
-    private readonly IMapper _mapper = mapper;
 
     #region get
     public async Task<AvaliacaoPublicaDTO> GetValidaSessaoChavePub(string token)
     {
         try
         {
-            var sessoes = await _sessaoService.GetSessoes() ?? [];
-            var sessao = sessoes.FirstOrDefault(s =>
-                    s.TokenPublico == token &&
-                    s.Ativo &&
-                    s.DataFim == null)
+            var sessao = await _sessaoPersist.GetValidaSessaoChavePubAsync(token)
                 ?? throw new NotFoundException("Sessão não encontrada");
             var turma = await _turmaService.GetTurmaById(sessao.TurmaId)
                 ?? throw new NotFoundException("Turma não encontrada");
@@ -73,7 +68,7 @@ public class AvaliacaoService(IGeralPersist geralPersist,
             sessao.ValidaAvaliacao(
                 await _alunoPersist.GetAlunoIdAsync(avaliacao.AvaliadorId) ?? null!, 
                 avaliacao.DeviceHash
-                );
+            );
 
             var grupo = await _grupoService.GetGrupoById(avaliacao.GrupoId)
                 ?? throw new NotFoundException("Grupo inválido");

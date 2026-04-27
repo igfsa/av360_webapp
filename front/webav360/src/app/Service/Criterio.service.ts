@@ -14,20 +14,16 @@ export class CriterioService {
     return this.http.get<Criterio[]>(`/api/Criterio/GetAllCriterios`);
   }
 
-  public getCriterioId(id: number): Observable<Criterio[]> {
-    return this.http.get<Criterio[]>(`/api/Criterio/GetId/${id}`);
-  }
-
   public getCriteriosTurma(id: number): Observable<Criterio[]> {
     return this.http.get<Criterio[]>(`/api/Criterio/GetCriteriosTurma/${id}`);
   }
 
   public putCriterio (criterio: Criterio): Observable<Criterio>{
-    return this.http.put<Criterio>(`/api/Criterio/Put/${criterio.id}`, criterio);
+    return this.http.put<Criterio>(`/api/Criterio/PutCriterio/${criterio.id}`, criterio);
   }
 
   public postCriterio (criterio: Criterio): Observable<Criterio>{
-    return this.http.post<Criterio>(`/api/Criterio/Post`, criterio);
+    return this.http.post<Criterio>(`/api/Criterio/PostCriterio`, criterio);
   }
 
 }

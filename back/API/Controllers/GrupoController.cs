@@ -10,35 +10,15 @@ namespace API.Controllers;
 [Route("api/[controller]/[action]")]
 public class GrupoController(
     IGrupoService grupoService,
-    IAlunoService alunoService,
     ITurmaNotifier turmaNotifier,
     IGrupoNotifier grupoNotifier) : ControllerBase
 {
     private readonly IGrupoService _grupoService = grupoService;
-    private readonly IAlunoService _alunoService = alunoService;
     private readonly ITurmaNotifier _turmaNotifier = turmaNotifier;
     private readonly IGrupoNotifier _grupoNotifier = grupoNotifier;
 
     [Authorize]
-    [HttpGet]
-    [ActionName("GetAllGrupos")]
-    public async Task<ActionResult<IEnumerable<GrupoDTO>>> Get()
-    {
-        var grupos = await _grupoService.GetGrupos();
-        return Ok(grupos);
-    }
-
-    [Authorize]
-    [HttpGet("{id:int}", Name = "GetGrupoId")]
-    [ActionName("GetId")]
-    public async Task<ActionResult<GrupoDTO>> Get(int id)
-    {
-        var grupos = await _grupoService.GetGrupoById(id);
-        return Ok(grupos);
-    }
-
-    [Authorize]
-    [HttpGet("{turmaId:int}", Name = "GetGruposTurma")]
+    [HttpGet("{turmaId:int}")]
     [ActionName("GetGruposTurma")]
     public async Task<ActionResult<IEnumerable<GrupoDTO>>> GetGruposTurma(int turmaId)
     {
@@ -47,7 +27,7 @@ public class GrupoController(
     }
 
     [Authorize]
-    [HttpGet("{turmaId:int}", Name = "GetAlunoGruposCheckbox")]
+    [HttpGet("{turmaId:int}")]
     [ActionName("GetAlunoGruposCheckbox")]
     public async Task<ActionResult<IEnumerable<AlunoGrupoCheckboxDTO>>> GetAlunosGrupoCheckbox(int turmaId, int grupoId)
     {
@@ -57,7 +37,7 @@ public class GrupoController(
     }
 
     [HttpPost]
-    [ActionName("Post")]
+    [ActionName("PostGrupo")]
     public async Task<ActionResult<GrupoDTO>> Post(GrupoDTO model)
     {
         var grupo = await _grupoService.Add(model);
@@ -69,7 +49,7 @@ public class GrupoController(
 
     [Authorize]
     [HttpPut("{id:int}")]
-    [ActionName("Put")]
+    [ActionName("PutGrupo")]
     public async Task<ActionResult> Put(int id, GrupoDTO model)
     {
         var grupo = await _grupoService.Update(id, model);
@@ -80,7 +60,7 @@ public class GrupoController(
     }
 
     [Authorize]
-    [HttpPut("", Name = "PutAtualizarGrupo")]
+    [HttpPut("")]
     [ActionName("PutAtualizarGrupo")]
     public async Task<ActionResult<GrupoDTO>> PutAtualizarGrupo(AlunoGrupoDTO model)
     {

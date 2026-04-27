@@ -11,13 +11,6 @@ public class GrupoPersist(APIContext context) : IGrupoPersist
 {
     private readonly APIContext _context = context;
 
-    public async Task<Grupo[]> GetAllGruposAsync()
-    {
-        return await _context.Grupos
-            .AsNoTracking()
-            .OrderBy(g => g.Nome)
-            .ToArrayAsync();
-    }
     public async Task<Grupo?> GetGrupoIdAsync(int grupoId)
     {
         return await _context.Grupos
@@ -29,9 +22,7 @@ public class GrupoPersist(APIContext context) : IGrupoPersist
         var turma = await _context.Turmas
             .Include(t => t.Grupos)
             .FirstOrDefaultAsync(t => t.Id == turmaId);
-        if (turma == null)
-            return [];
 
-        return [.. turma.Grupos];
+        return [.. turma?.Grupos ?? []];
     }
 }

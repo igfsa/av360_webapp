@@ -15,15 +15,11 @@ namespace Application.Services;
 public class TurmaService(IGeralPersist geralPersist,
                     ITurmaPersist turmaPersist,
                     ICriterioPersist criterioPersist,
-                    IAlunoPersist alunoPersist,
-                    IAlunoTurmaPersist alunoTurmaPersist,
                     IMapper mapper) : ITurmaService
 {
     private readonly IGeralPersist _geralPersist = geralPersist;
     private readonly ITurmaPersist _turmaPersist = turmaPersist;
     private readonly ICriterioPersist _criterioPersist = criterioPersist;
-    private readonly IAlunoPersist _alunoPersist = alunoPersist;
-    private readonly IAlunoTurmaPersist _alunoTurmaPersist = alunoTurmaPersist;
     private readonly IMapper _mapper = mapper;
 
     #region get
@@ -53,35 +49,6 @@ public class TurmaService(IGeralPersist geralPersist,
             throw;
         }
     }
-    public async Task<IEnumerable<TurmaDTO>> GetTurmasAluno(int alunoId)
-    {
-        try
-        {
-            var turmas = await _alunoTurmaPersist.GetTurmasAlunoIdAsync(alunoId)
-                ?? throw new NotFoundException("Turmas não encontradas");
-            return _mapper.Map<IEnumerable<TurmaDTO>>(turmas);
-        }
-        catch
-        {
-            throw;
-        }
-    }
-    public async Task<IEnumerable<TurmaDTO>> GetTurmasCriterio(int criterioId)
-    {
-        try
-        {
-            var criterio = await _criterioPersist.GetCriterioIdAsync(criterioId)
-                ?? throw new NotFoundException("Critério não encontradas");
-
-            var turmas = criterio.Turmas;
-
-            return _mapper.Map<IEnumerable<TurmaDTO>>(turmas);
-        }
-        catch
-        {
-            throw;
-        }
-    }
     #endregion
     #region add
     public async Task<TurmaDTO> Add(TurmaDTO model)
@@ -92,24 +59,6 @@ public class TurmaService(IGeralPersist geralPersist,
             _geralPersist.Add(turma);
             await _geralPersist.SaveChangesAsync();
             return _mapper.Map<TurmaDTO>(turma);
-        }
-        catch
-        {
-            throw;
-        }
-    }
-    public async Task<AlunoDTO> AddTurmaAluno(int turmaId, int alunoId)
-    {
-        try
-        {
-            var aluno = await _alunoPersist.GetAlunoIdAsync(alunoId)
-                ?? throw new NotFoundException("Aluno não encontrado");
-            var turma = await _turmaPersist.GetTurmaIdAsync(turmaId)
-                ?? throw new NotFoundException("Turma não encontrada");
-            turma.AdicionarAluno(aluno);
-            await _geralPersist.SaveChangesAsync();
-            var alunoRetorno = await _alunoTurmaPersist.GetExisteAlunoTurma(turma.Id, aluno.Id);
-            return _mapper.Map<AlunoDTO>(alunoRetorno);
         }
         catch
         {

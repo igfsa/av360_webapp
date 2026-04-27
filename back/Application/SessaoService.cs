@@ -15,45 +15,18 @@ public class SessaoService(IGeralPersist geralPersist,
                     IMapper mapper) : ISessaoService
 {
     private readonly IGeralPersist _geralPersist = geralPersist;
-    private readonly ISessaoPersist _SessaoPersist = SessaoPersist;
+    private readonly ISessaoPersist _sessaoPersist = SessaoPersist;
     private readonly ITurmaPersist _turmaPersist = turmaPersist;
     private readonly IMapper _mapper = mapper;
 
     #region get
-    public async Task<IEnumerable<SessaoDTO>> GetSessoes()
-    {
-        try
-        {
-            var Sessoes = await _SessaoPersist.GetAllSessoesAsync()
-                ?? throw new NotFoundException("Nenhuma sessão encontrada");
-            return _mapper.Map<IEnumerable<SessaoDTO>>(Sessoes);
-        }
-        catch
-        {
-            throw;
-        }
-    }
-
     public async Task<SessaoDTO> GetSessaoById(int Id)
     {
         try
         {
-            var Sessao = await _SessaoPersist.GetSessaoIdAsync(Id)
+            var Sessao = await _sessaoPersist.GetSessaoIdAsync(Id)
                 ?? throw new NotFoundException("Sessão não encontrada");
             return _mapper.Map<SessaoDTO>(Sessao);
-        }
-        catch
-        {
-            throw;
-        }
-    }
-    public async Task<IEnumerable<SessaoDTO>> GetSessoesTurma(int turmaId)
-    {
-        try
-        {
-            var Sessoes = await _SessaoPersist.GetSessoesTurmaIdAsync(turmaId)
-                ?? throw new NotFoundException("Nenhuma sessão encontrada");
-            return _mapper.Map<IEnumerable<SessaoDTO>>(Sessoes);
         }
         catch
         {
@@ -64,7 +37,7 @@ public class SessaoService(IGeralPersist geralPersist,
     {
         try
         {
-            var sessao = await _SessaoPersist.GetSessaoAtivaTurmaIdAsync(TurmaId)
+            var sessao = await _sessaoPersist.GetSessaoAtivaTurmaIdAsync(TurmaId)
                 ?? null!;
             return _mapper.Map<SessaoDTO>(sessao);
         }
@@ -89,7 +62,7 @@ public class SessaoService(IGeralPersist geralPersist,
             );
             _geralPersist.Add(sessao);
             _ = await _geralPersist.SaveChangesAsync();
-            var SessaoRetorno = await _SessaoPersist.GetSessaoIdAsync(sessao.Id);
+            var SessaoRetorno = await _sessaoPersist.GetSessaoIdAsync(sessao.Id);
             return _mapper.Map<SessaoDTO>(SessaoRetorno);
         }
         catch
@@ -99,41 +72,17 @@ public class SessaoService(IGeralPersist geralPersist,
     }
     #endregion
     #region update
-    public async Task<SessaoDTO> Update(int SessaoId, SessaoDTO model)
-    {
-        try
-        {
-            var Sessao = await _SessaoPersist.GetSessaoIdAsync(SessaoId) ??
-                throw new NotFoundException("Sessão não encontrada");
-
-            model.Id = Sessao.Id;
-            _ = _mapper.Map(model, Sessao);
-            _geralPersist.Update(Sessao);
-
-            if (await _geralPersist.SaveChangesAsync())
-            {
-                var SessaoRetorno = await _SessaoPersist.GetSessaoIdAsync(SessaoId);
-
-                return _mapper.Map<SessaoDTO>(SessaoRetorno);
-            }
-            throw new Exception("Ocorreu um erro inesperado");
-        }
-        catch
-        {
-            throw;
-        }
-    }
     public async Task<SessaoDTO> EncerrarSessao(int SessaoId, SessaoDTO model)
     {
         try
         {
-            var Sessao = await _SessaoPersist.GetSessaoIdAsync(SessaoId)
+            var Sessao = await _sessaoPersist.GetSessaoIdAsync(SessaoId)
                 ?? throw new NotFoundException("Sessão não encontrada");
 
             Sessao.EncerrarSessao(DateTime.UtcNow);
             _ = await _geralPersist.SaveChangesAsync();
 
-            var SessaoRetorno = await _SessaoPersist.GetSessaoIdAsync(SessaoId);
+            var SessaoRetorno = await _sessaoPersist.GetSessaoIdAsync(SessaoId);
             return _mapper.Map<SessaoDTO>(SessaoRetorno);
         }
         catch

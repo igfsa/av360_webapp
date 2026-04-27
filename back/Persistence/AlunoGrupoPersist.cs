@@ -26,12 +26,4 @@ public class AlunoGrupoPersist(APIContext context) : IAlunoGrupoPersist
             .Where(ag => ag.TurmaId == turmaId)
             .ToArrayAsync();
     }
-    public async Task<Aluno?> GetExisteAlunoGrupo(int grupoId, int alunoId)
-    // Retorna um Aluno caso exista o AlunoGrupo
-    {
-        if (await _context.AlunoGrupo.AnyAsync(ag => ag.GrupoId == grupoId && ag.AlunoId == alunoId))
-            return await _context.Alunos.AsNoTracking().FirstOrDefaultAsync(a => a.Id == alunoId);
-        else
-            return null;
-    }
 }

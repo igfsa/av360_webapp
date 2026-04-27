@@ -10,7 +10,6 @@ using Domain.Exceptions;
 namespace Application.Services;
 
 public class AlunoService(IGeralPersist geralPersist,
-                    IAlunoPersist alunoPersist,
                     IAlunoTurmaPersist alunoTurmaPersist,
                     IAlunoGrupoPersist alunoGrupoPersist,
                     IGrupoPersist grupoPersist,
@@ -18,7 +17,6 @@ public class AlunoService(IGeralPersist geralPersist,
                     IMapper mapper) : IAlunoService
 {
     private readonly IGeralPersist _geralPersist = geralPersist;
-    private readonly IAlunoPersist _alunoPersist = alunoPersist;
     private readonly IAlunoTurmaPersist _alunoTurmaPersist = alunoTurmaPersist;
     private readonly IAlunoGrupoPersist _alunoGrupoPersist = alunoGrupoPersist;
     private readonly IGrupoPersist _grupoPersist = grupoPersist;
@@ -26,33 +24,6 @@ public class AlunoService(IGeralPersist geralPersist,
     private readonly IMapper _mapper = mapper;
 
     #region get
-    public async Task<IEnumerable<AlunoDTO>> GetAlunos()
-    {
-        try
-        {
-            var alunos = await _alunoPersist.GetAllAlunosAsync()
-                ?? throw new NotFoundException("Nenhum aluno encontrado");
-            return _mapper.Map<IEnumerable<AlunoDTO>>(alunos);
-        }
-        catch
-        {
-            throw ; 
-        }
-    }
-
-    public async Task<AlunoDTO> GetAlunoById(int Id)
-    {
-        try
-        {
-            var aluno = await _alunoPersist.GetAlunoIdAsync(Id)
-                ?? throw new NotFoundException("Aluno não encontrado");
-            return _mapper.Map<AlunoDTO>(aluno);
-        }
-        catch
-        {
-            throw;
-        }
-    }
 
     public async Task<AlunoDTO> GetAlunoByNomeIdGrupo(string nome, int grupoId)
     {
@@ -135,16 +106,20 @@ public class AlunoService(IGeralPersist geralPersist,
     }
     #endregion
     #region add
-    public async Task<AlunoDTO> Add(AlunoDTO model)
+    public async Task<AlunoDTO> AddAlunoTurma(int turmaId, AlunoDTO alunoDto)
     {
         try
         {
-            var aluno = new Aluno(model.Nome);
+            var aluno = new Aluno(alunoDto.Nome);
+            var turma = await _turmaPersist.GetTurmaIdAsync(turmaId)
+                ?? throw new NotFoundException("Turma não encontrada");
 
             _geralPersist.Add(aluno);
-
-            _ = await _geralPersist.SaveChangesAsync();
-            return _mapper.Map<AlunoDTO>(aluno);
+            turma.AdicionarAluno(aluno);
+            await _geralPersist.SaveChangesAsync();
+            
+            var alunoRetorno = await _alunoTurmaPersist.GetExisteAlunoTurma(turma.Id, aluno.Id);
+            return _mapper.Map<AlunoDTO>(alunoRetorno);
         }
         catch
         {
@@ -153,24 +128,5 @@ public class AlunoService(IGeralPersist geralPersist,
     }
     #endregion
     #region update
-    public async Task<AlunoDTO> Update(int alunoId, AlunoDTO model)
-    {
-        try
-        {
-            var aluno = await _alunoPersist.GetAlunoIdAsync(alunoId)
-                ?? throw new NotFoundException("Aluno não encontrado");
-
-            model.Id = aluno.Id;
-            _ = _mapper.Map(model, aluno);
-            aluno.AtualizarAluno(aluno.Nome);
-            _ = await _geralPersist.SaveChangesAsync();
-            var alunoRetorno = await _alunoPersist.GetAlunoIdAsync(alunoId);
-            return _mapper.Map<AlunoDTO>(alunoRetorno);
-        }
-        catch
-        {
-            throw;
-        }
-    }
     #endregion
 }

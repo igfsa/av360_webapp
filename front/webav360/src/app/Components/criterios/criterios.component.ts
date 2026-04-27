@@ -1,5 +1,5 @@
-import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, DestroyRef, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CriterioService } from '../../Service/Criterio.service';
 import { Criterio } from '../../Models/Criterio';
@@ -8,6 +8,8 @@ import { CriterioCriarModalComponent } from './Modals/criterio_criar.component';
 import { CriterioRealTime } from '../../Service/CriterioRealTime.service';
 import { CriterioEditarModalComponent } from './Modals/criterio_editar.component';
 import Swal from 'sweetalert2';
+import { AuthService } from '../../auth/auth.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-criterios',
@@ -20,8 +22,6 @@ import Swal from 'sweetalert2';
   styleUrls: ['./criterios.component.scss', '../../app.scss'],
 })
 export class CriteriosComponent implements OnInit {
-
-	private modalService = inject(NgbModal);
 
   public criterios: Criterio[]  = [];
   public criteriosFiltrados : Criterio[] = [];
@@ -50,18 +50,28 @@ export class CriteriosComponent implements OnInit {
     private criterioService: CriterioService,
     private cdr: ChangeDetectorRef,
     private criterioRealTime: CriterioRealTime,
+    private authService: AuthService,
+    @Inject(NgbModal) private modalService: NgbModal,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    @Inject(DestroyRef) private destroyRef: DestroyRef
   ){}
 
   ngOnInit() {
-    this.getCriterios();
-    this.criterioRealTime.connect();
+    if (this.authService.isLogged())
+    {
+      this.getCriterios();
 
-    this.criterioRealTime.criterioAtualizado$
-      .subscribe(id => {
-        if (id) {
-          this.getCriterios();
-        }
-      });
+      if (isPlatformBrowser(this.platformId)) {
+        this.criterioRealTime.connect();
+
+        this.criterioRealTime.criterioAtualizado$
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(id => {
+            if (id) {
+              this.getCriterios();
+            }
+          });
+    }};
   }
 
   public getCriterios (): void{

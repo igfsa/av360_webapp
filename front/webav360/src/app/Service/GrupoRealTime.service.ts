@@ -7,7 +7,6 @@ import { Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class GrupoRealTime {
-
   private hub!: HubConnection;
 
   grupoAtualizado$ = new Subject<number>();

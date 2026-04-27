@@ -1,8 +1,9 @@
-import { ChangeDetectorRef, Component, inject, Input, OnInit, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, Input, OnInit, PLATFORM_ID, DestroyRef } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { catchError, filter, forkJoin, map, ObservableInput, of, take  } from 'rxjs';
+import { catchError, forkJoin, map, ObservableInput, of  } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
 import {
@@ -38,6 +39,7 @@ import { Sessao } from '../../Models/Sessao';
 import { SessaoService } from '../../Service/Sessao.service';
 import { AlunoGrupoNomes } from '../../Models/AlunoGrupoNomes';
 import { AuthService } from '../../auth/auth.service';
+import { AlunoTurmaAddModalComponent } from './Modals/aluno_turma_add.component';
 
 @Component({
   selector: 'app-alunos-turma',
@@ -59,8 +61,6 @@ import { AuthService } from '../../auth/auth.service';
 })
 export class AlunoTurmaComponent implements OnInit {
 
-	private modalService = inject(NgbModal);
-  private platformId = inject(PLATFORM_ID);
   @Input() turmaEditar!: Turma;
 
   public alunos: Aluno[]  = [];
@@ -138,6 +138,9 @@ export class AlunoTurmaComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private turmaRealTime: TurmaRealTime,
     private authService: AuthService,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    @Inject(NgbModal) private modalService: NgbModal,
+    @Inject(DestroyRef) private destroyRef: DestroyRef
   ){}
 
   ngOnInit(): void {
@@ -152,7 +155,7 @@ export class AlunoTurmaComponent implements OnInit {
         });
 
         this.turmaRealTime.turmaAtualizada$
-          .pipe(takeUntilDestroyed())
+          .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe(id => {
             if (id === turmaId) {
               this.loadData(turmaId);
@@ -167,7 +170,7 @@ export class AlunoTurmaComponent implements OnInit {
       criterios: this.criterioService.getCriteriosTurma(turmaId),
       grupos: this.grupoService.getGruposTurma(turmaId),
       turma: this.turmaService.getTurmaId(turmaId),
-      sessao: this.sessaoService.GetSessaoAtivaTurma(turmaId),
+      sessao: this.sessaoService.getSessaoAtivaTurma(turmaId),
       alunoGrupo: this.alunoService.getAlunoGrupoNome(turmaId)
     }).subscribe(({ alunos, criterios, grupos, turma, sessao, alunoGrupo }) => {
       this.turma = turma;
@@ -340,7 +343,7 @@ export class AlunoTurmaComponent implements OnInit {
 
   public alterarAlunosGrupo (grupo: Grupo): void{
     forkJoin({
-      alunoGrupoCheckbox: this.grupoService.GetAlunoGruposCheckbox(grupo.id, this.turma.id),
+      alunoGrupoCheckbox: this.grupoService.getAlunoGruposCheckbox(grupo.id, this.turma.id),
     }).subscribe(res => {
       const ref = this.modalService.open(AlunoGrupoModalComponent, {
         size: 'lg',
@@ -425,7 +428,6 @@ export class AlunoTurmaComponent implements OnInit {
 
       this.criterioService.putCriterio(criterioEditado).subscribe({
         next: (c) => {
-          criterio = c;
           Swal.mixin({
             toast: true,
             position: "top-end",
@@ -457,9 +459,45 @@ export class AlunoTurmaComponent implements OnInit {
     return this.alunoGrupo.find(ag => ag.alunoId == id)?.grupoNome;
   }
 
-}
+  public adicionarAluno(){
+    const ref = this.modalService.open(AlunoTurmaAddModalComponent, {
+      size: 'lg',
+      backdrop: 'static',
+      centered: true
+    });
 
-function takeUntilDestroyed(): import("rxjs").OperatorFunction<number, unknown> {
-  throw new Error('Function not implemented.');
-}
+    ref.result.then((aluno: Aluno) => {
+      if (!aluno)
+        return
+      console.log('aluno', aluno);
 
+      this.alunoService.postAlunoTurma( this.turma.id, aluno).subscribe({
+        next: (a) => {
+          console.log('aluno', a);
+          Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            }
+          }).fire({
+            icon: 'success',
+            title: 'Sucesso',
+            text: `Aluno ${a.nome} adicionado com sucesso!`
+          });
+        },
+        error: (err) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: err.message ?? `Erro ao adicionar aluno`
+          })
+        }
+      })
+    }).catch(() => {});
+  }
+}

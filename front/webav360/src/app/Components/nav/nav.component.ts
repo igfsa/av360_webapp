@@ -1,4 +1,4 @@
-import { Component, inject, TemplateRef  } from '@angular/core';
+import { Component, Inject, TemplateRef  } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Router } from '@angular/router';
 
@@ -17,11 +17,11 @@ import { AuthService } from '../../auth/auth.service';
   styleUrls: ['./nav.component.scss', '../../app.scss'],
 })
 export class NavComponent {
-  private offcanvasService = inject(NgbOffcanvas);
 
   constructor(
     private router: Router,
-    public authService: AuthService
+    public authService: AuthService,
+    @Inject(NgbOffcanvas) private offcanvasService: NgbOffcanvas
   ) {}
 
   open(content: TemplateRef<any>) {

@@ -10,8 +10,6 @@ const AUTH_KEY = makeStateKey<boolean>('auth');
 })
 export class AuthService {
   private http = inject(HttpClient);
-  private transferState = inject(TransferState);
-  private platformId = inject(PLATFORM_ID);
 
   isLogged = signal<boolean>(false);
   loading = signal<boolean>(true);

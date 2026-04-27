@@ -8,9 +8,9 @@ public class SessaoHub : Hub
     {
         await Clients.All.SendAsync("SessoesAtualizadas", sessaoId);
     }
-    public async Task NovaAvaliacao(int sessaoId)
+    public async Task SessaoAtualizada(int sessaoId)
     {
-        await Clients.All.SendAsync("NovaAvaliacao", sessaoId);
+        await Clients.All.SendAsync("SessaoAtualizada", sessaoId);
     }
 
     [HubMethodName("AcessarSessao")]

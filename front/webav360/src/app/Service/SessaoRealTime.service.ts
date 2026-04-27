@@ -7,13 +7,11 @@ import { Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class SessaoRealTime {
-
-
   private hub!: HubConnection;
 
   sessaoAtualizada$ = new Subject<number>();
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   connect() {
 
@@ -28,6 +26,10 @@ export class SessaoRealTime {
       })
       .withAutomaticReconnect()
       .build();
+
+    this.hub.on('SessaoAtualizada', (sessaoId: number) => {
+      this.sessaoAtualizada$.next(sessaoId);
+    });
 
     this.hub.on('NovaAvaliacao', (sessaoId: number) => {
       this.sessaoAtualizada$.next(sessaoId);

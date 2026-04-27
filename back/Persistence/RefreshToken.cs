@@ -13,6 +13,7 @@ public class RefreshTokenPersist(APIContext context) : IRefreshTokenPersist
     public async Task<RefreshToken?> GetRefreshToken(string token)
     {
         return await _context.RefreshTokens
+            .Include(t => t.Professor)
             .FirstOrDefaultAsync(t => t.Token == token);
     }
 }

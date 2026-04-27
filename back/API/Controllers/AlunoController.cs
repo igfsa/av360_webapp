@@ -8,31 +8,15 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]")]
-public class AlunoController(IAlunoService alunoService) : ControllerBase
+public class AlunoController(IAlunoService alunoService,
+                    ITurmaNotifier turmaNotifier) : ControllerBase
 {
     private readonly IAlunoService _alunoService = alunoService;
-
-    [Authorize]
-    [HttpGet]
-    [ActionName("GetAllAlunos")]
-    public async Task<ActionResult<IEnumerable<AlunoDTO>>> Get()
-    {
-        var alunos = await _alunoService.GetAlunos();
-        return Ok(alunos);
-    }
-
-    [Authorize]
-    [HttpGet("{id:int}", Name = "ObterAlunoId")]
-    [ActionName("GetId")]
-    public async Task<ActionResult<AlunoDTO>> Get(int id)
-    {
-        var alunos = await _alunoService.GetAlunoById(id);
-        return Ok(alunos);
-    }
+    private readonly ITurmaNotifier _turmaNotifier = turmaNotifier;
 
     [AllowAnonymous]
-    [HttpGet("{grupoId:int}", Name = "ObterAlunoNomeIdGrupo")]
-    [ActionName("ObterAlunoNomeIdGrupo")]
+    [HttpGet("{grupoId:int}")]
+    [ActionName("GetAlunoNomeIdGrupo")]
     public async Task<ActionResult<AlunoDTO>> GetAlunoByNomeIdGrupo(int grupoId, string nome)
     {
         var alunos = await _alunoService.GetAlunoByNomeIdGrupo(nome, grupoId);
@@ -40,7 +24,7 @@ public class AlunoController(IAlunoService alunoService) : ControllerBase
     }
 
     [Authorize]
-    [HttpGet("{turmaId:int}", Name = "ObterAlunosTurma")]
+    [HttpGet("{turmaId:int}")]
     [ActionName("GetAlunosTurma")]
     public async Task<ActionResult<IEnumerable<AlunoDTO>>> GetAlunosTurma(int turmaId)
     {
@@ -49,7 +33,7 @@ public class AlunoController(IAlunoService alunoService) : ControllerBase
     }
 
     [Authorize]
-    [HttpGet("{turmaId:int}", Name = "GetAlunoGrupoNome")]
+    [HttpGet("{turmaId:int}")]
     [ActionName("GetAlunoGrupoNome")]
     public async Task<ActionResult<IEnumerable<AlunoGrupoNomeDTO>>> GetAlunoGrupoNome(int turmaId)
     {
@@ -58,29 +42,13 @@ public class AlunoController(IAlunoService alunoService) : ControllerBase
     }
 
     [Authorize]
-    [HttpGet("{grupoId:int}", Name = "GetAlunosGrupo")]
-    [ActionName("GetAlunosGrupo")]
-    public async Task<ActionResult<IEnumerable<AlunoDTO>>> GetAlunosGrupo(int grupoId)
+    [HttpPost("{turmaId:int}")]
+    [ActionName("PostAlunoTurma")]
+    public async Task<ActionResult<AlunoDTO>> PostAlunoTurma(int turmaId, AlunoDTO alunoModel)
     {
-        var alunos = await _alunoService.GetAlunosGrupo(grupoId);
-        return Ok(alunos);
-    }
+        var aluno = await _alunoService.AddAlunoTurma(turmaId, alunoModel);
 
-    [Authorize]
-    [HttpPost]
-    [ActionName("Post")]
-    public async Task<ActionResult<AlunoDTO>> Post(AlunoDTO model)
-    {
-        var aluno = await _alunoService.Add(model);
-        return Ok(aluno);
-    }
-
-    [Authorize]
-    [HttpPut("{id:int}")]
-    [ActionName("Put")]
-    public async Task<ActionResult> Put(int id, AlunoDTO model)
-    {
-        var aluno = await _alunoService.Update(id, model);
+        await _turmaNotifier.TurmaAtualizadaAsync(turmaId);
         return Ok(aluno);
     }
 }

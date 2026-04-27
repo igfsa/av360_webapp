@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ChangeDetectionStrategy, inject, } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy, Inject, } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -64,8 +64,8 @@ export class TurmaGrupoModalComponent implements OnInit {
 
   @Input() turma!: Turma;
   @Input() gruposOrig: Grupo[] = [];
+  @Inject(FormBuilder) private fb: FormBuilder = new FormBuilder;
 
-  private fb = inject(FormBuilder)
   public gruposEdit: Grupo[] = [];
 
   form = this.fb.group({

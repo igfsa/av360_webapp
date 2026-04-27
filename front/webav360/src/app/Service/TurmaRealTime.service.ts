@@ -7,7 +7,6 @@ import { Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class TurmaRealTime {
-
   private hub!: HubConnection;
 
   turmaAtualizada$ = new Subject<number>();

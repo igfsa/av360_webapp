@@ -4,7 +4,6 @@ namespace Application.Contracts;
 
 public interface IGrupoService
 {
-    Task<IEnumerable<GrupoDTO>> GetGrupos();
     Task<GrupoDTO> GetGrupoById(int Id);
     Task<IEnumerable<GrupoDTO>> GetGruposTurma(int turmaId);
     Task<IEnumerable<AlunoGrupoCheckboxDTO>> GetAlunoGrupoTurma(int turmaId, int grupoId);

@@ -12,28 +12,20 @@ export class AlunoService {
 
   constructor(private http :HttpClient) { }
 
-  public getAlunos(): Observable<Aluno[]> {
-    return this.http.get<Aluno[]>(`/api/Aluno/GetAllAlunos`);
-  }
-
-  public getAlunoId(id: number): Observable<Aluno[]> {
-    return this.http.get<Aluno[]>(`/api/Aluno/GetId/${id}`);
-  }
-
   public getAlunosTurma(id: number): Observable<Aluno[]> {
     return this.http.get<Aluno[]>(`/api/Aluno/GetAlunosTurma/${id}`);
   }
 
   public getAlunoNomeIdGrupo(id: number, nome: string): Observable<Aluno> {
-    return this.http.get<Aluno>(`/api/Aluno/ObterAlunoNomeIdGrupo/${id}`, {params: {nome: nome}});
+    return this.http.get<Aluno>(`/api/Aluno/GetAlunoNomeIdGrupo/${id}`, {params: {nome: nome}});
+  }
+
+  public postAlunoTurma (turmaId: number, aluno: Aluno): Observable<Aluno>{
+    return this.http.post<Aluno>(`/api/Aluno/PostAlunoTurma/${turmaId}`, aluno);
   }
 
   public getAlunoGrupoNome(id: number): Observable<AlunoGrupoNomes[]> {
     return this.http.get<AlunoGrupoNomes[]>(`/api/Aluno/GetAlunoGrupoNome/${id}`);
-  }
-
-  public getAlunosGrupo(grupoId: number): Observable<Aluno[]> {
-    return this.http.get<Aluno[]>(`/api/Aluno/GetAlunosGrupo/${grupoId}`);
   }
 }
 

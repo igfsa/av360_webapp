@@ -15,6 +15,7 @@ public class DashboardController(
 
     [Authorize]
     [HttpGet("{sessaoId:int}")]
+    [ActionName("GetDashboard")]
     public async Task<ActionResult<DashboardSessaoDTO>> GetDashboard(int sessaoId)
     {
         var result = await _dashboardService.GetDashboard(sessaoId);
@@ -23,7 +24,8 @@ public class DashboardController(
 
     [Authorize]
     [HttpPost("{sessaoId:int}")]
-    public async Task<ActionResult<DashboardSessaoDTO>> Reset(int sessaoId)
+    [ActionName("PostDashboardReset")]
+    public async Task<ActionResult<DashboardSessaoDTO>> PostDashboardReset(int sessaoId)
     {
         var result = await _dashboardService.ResetDashboard(sessaoId);
         return Ok(result);

@@ -82,10 +82,8 @@ builder.Services.AddScoped<IGrupoService, GrupoService>();
 builder.Services.AddScoped<IGrupoPersist, GrupoPersist>();
 builder.Services.AddScoped<IGrupoNotifier, GrupoNotifier>();
 
-builder.Services.AddScoped<INotaFinalService, NotaFinalService>();
 builder.Services.AddScoped<INotaFinalPersist, NotaFinalPersist>();
 
-builder.Services.AddScoped<INotaParcialService, NotaParcialService>();
 builder.Services.AddScoped<INotaParcialPersist, NotaParcialPersist>();
 
 builder.Services.AddScoped<ISessaoService, SessaoService>();

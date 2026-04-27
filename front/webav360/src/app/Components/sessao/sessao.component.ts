@@ -1,5 +1,5 @@
-import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/core';
-import { DecimalPipe } from '@angular/common'
+import { ChangeDetectorRef, Component, DestroyRef, Inject, Input, OnInit, PLATFORM_ID } from '@angular/core';
+import { DecimalPipe, isPlatformBrowser } from '@angular/common'
 import { ActivatedRoute } from '@angular/router';
 import { forkJoin } from 'rxjs';import {
 	NgbAccordionButton,
@@ -22,10 +22,11 @@ import { AlunoService } from '../../Service/Aluno.service';
 import { TurmaService } from '../../Service/Turma.service';
 import { CriterioService } from '../../Service/Criterio.service';
 import { GrupoService } from '../../Service/Grupo.service';
-import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
 import { SessaoService } from '../../Service/Sessao.service';
 import { SessaoRealTime } from '../../Service/SessaoRealTime.service';
 import { DashboardSessao } from '../../Models/Dashboard/DashboardSessao';
+import { AuthService } from '../../auth/auth.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-sessao',
@@ -62,25 +63,32 @@ export class SessaoComponent implements OnInit {
     private sessaoService: SessaoService,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
-    private turmaRealTime: TurmaRealTime,
     private sessaoRealTime: SessaoRealTime,
+    private authService: AuthService,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    @Inject(DestroyRef) private destroyRef: DestroyRef
   ){}
 
   ngOnInit() {
-    const turmaId = Number(this.route.snapshot.paramMap.get('id'));
+    if (this.authService.isLogged()){
+      const turmaId = Number(this.route.snapshot.paramMap.get('id'));
 
-    this.loadData(turmaId);
+      this.loadData(turmaId);
 
-    this.turmaRealTime.connect()?.then(() => {
-      this.turmaRealTime.acessarTurma(turmaId);
-    });
+      if (isPlatformBrowser(this.platformId) && this.sessaoAtiva) {
+        const sessaoId = this.sessaoAtiva.id;
+        this.sessaoRealTime.connect()?.then(() => {
+          this.sessaoRealTime.acessarSessao(sessaoId);
+        });
 
-    this.turmaRealTime.turmaAtualizada$
-      .subscribe(id => {
-        if (id === turmaId) {
-          this.loadData(turmaId);
-        }
-      });
+        this.sessaoRealTime.sessaoAtualizada$
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(id => {
+            if (id === turmaId) {
+              this.loadData(turmaId);
+            }
+          });
+    }}
   }
 
   public loadData(turmaId: number) {
@@ -89,7 +97,7 @@ export class SessaoComponent implements OnInit {
       criterios: this.criterioService.getCriteriosTurma(turmaId),
       grupos: this.grupoService.getGruposTurma(turmaId),
       turma: this.turmaService.getTurmaId(turmaId),
-      sessaoAtiva: this.sessaoService.GetSessaoAtivaTurma(turmaId),
+      sessaoAtiva: this.sessaoService.getSessaoAtivaTurma(turmaId),
     }).subscribe(({ alunos, criterios, grupos, turma, sessaoAtiva }) => {
       this.turma = turma;
       this.alunos = alunos;
@@ -98,7 +106,7 @@ export class SessaoComponent implements OnInit {
       this.sessaoAtiva = sessaoAtiva;
 
       if (sessaoAtiva){
-        this.qrCode = `http://localhost:5074/api/Sessao/GetQrCode/${sessaoAtiva.id}/qrcode`
+        this.qrCode = `/api/Sessao/GetQrCode/${sessaoAtiva.id}`
 
         this.loadSessao(sessaoAtiva.id);
 

@@ -25,27 +25,17 @@ public class CriterioController(
     }
 
     [Authorize]
-    [HttpGet("{id:int}", Name = "GetCriterioId")]
-    [ActionName("GetId")]
-    public async Task<ActionResult<CriterioDTO>> Get(int id)
-    {
-        var criterios = await _criterioService.GetCriterioById(id);
-        return Ok(criterios);
-    }
-
-    [Authorize]
-    [HttpGet("{turmaId:int}", Name = "GetCriteriosTurma")]
+    [HttpGet("{turmaId:int}")]
     [ActionName("GetCriteriosTurma")]
     public async Task<ActionResult<CriterioDTO>> GetCriterioTurma(int turmaId)
     {
         var criterios = await _criterioService.GetCriteriosTurma(turmaId);
-
         return Ok(criterios);
     }
 
     [Authorize]
     [HttpPost]
-    [ActionName("Post")]
+    [ActionName("PostCriterio")]
     public async Task<ActionResult<CriterioDTO>> Post(CriterioDTO model)
     {
         var criterio = await _criterioService.Add(model);
@@ -56,7 +46,7 @@ public class CriterioController(
 
     [Authorize]
     [HttpPut("{id:int}")]
-    [ActionName("Put")]
+    [ActionName("PutCriterio")]
     public async Task<ActionResult> Put(int id, CriterioDTO model)
     {
         var criterio = await _criterioService.Update(id, model);

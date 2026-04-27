@@ -24,35 +24,17 @@ public class TurmaController(ITurmaService turmaService,
     }
 
     [Authorize]
-    [HttpGet("{id:int}", Name = "GetTurmaId")]
-    [ActionName("GetId")]
-    public async Task<ActionResult<TurmaDTO>> Get(int id)
+    [HttpGet("{id:int}")]
+    [ActionName("GetTurmaById")]
+    public async Task<ActionResult<TurmaDTO>> GetTurmaById(int id)
     {
         var turma = await _turmaService.GetTurmaById(id);
         return Ok(turma);
     }
 
     [Authorize]
-    [HttpGet("{alunoId:int}", Name = "GetTurmasAluno")]
-    [ActionName("GetTurmasAluno")]
-    public async Task<ActionResult<IEnumerable<TurmaDTO>>> GetTurmasAluno(int alunoId)
-    {
-        var turmas = await _turmaService.GetTurmasAluno(alunoId);
-        return Ok(turmas);
-    }
-
-    [Authorize]
-    [HttpGet("{criterioId:int}", Name = "GetTurmasCriterio")]
-    [ActionName("GetTurmasCriterio")]
-    public async Task<ActionResult<IEnumerable<TurmaDTO>>> GetCriteriosTurma(int criterioId)
-    {
-        var criterios = await _turmaService.GetTurmasCriterio(criterioId);
-        return Ok(criterios);
-    }
-
-    [Authorize]
     [HttpPost]
-    [ActionName("Post")]
+    [ActionName("PostTurma")]
     public async Task<ActionResult<TurmaDTO>> Post(TurmaDTO model)
     {
         var Turma = await _turmaService.Add(model);
@@ -62,19 +44,8 @@ public class TurmaController(ITurmaService turmaService,
     }
 
     [Authorize]
-    [HttpPost("{turmaId:int}", Name = "AddAlunoTurma")]
-    [ActionName("PostAlunoTurma")]
-    public async Task<ActionResult<AlunoDTO>> PostAlunoTurma(int turmaId, int alunoId)
-    {
-        var aluno = await _turmaService.AddTurmaAluno(turmaId, alunoId);
-
-        await _turmaNotifier.TurmaAtualizadaAsync(turmaId);
-        return Ok(aluno);
-    }
-
-    [Authorize]
-    [HttpPost("", Name = "ImportAlunosTurma")]
-    [ActionName("ImportAlunosTurma")]
+    [HttpPost]
+    [ActionName("PostImportAlunosTurma")]
     public async Task<ActionResult<CsvImportResultDTO>> ImportAlunosTurma([FromForm] CsvImportRequestDTO dto)
     {
         var result = await _turmaService.ImportarAlunosAsync(dto.TurmaId, dto);
@@ -84,7 +55,7 @@ public class TurmaController(ITurmaService turmaService,
     }
 
     [Authorize]
-    [HttpPut("", Name = "PutCriterioTurma")]
+    [HttpPut]
     [ActionName("PutCriterioTurma")]
     public async Task<ActionResult<TurmaDTO>> PutCriterioTurma(TurmaCriterioDTO model)
     {
@@ -96,7 +67,7 @@ public class TurmaController(ITurmaService turmaService,
 
     [Authorize]
     [HttpPut("{id:int}")]
-    [ActionName("Put")]
+    [ActionName("PutTurma")]
     public async Task<ActionResult> Put(int id, TurmaDTO model)
     {
         var turma = await _turmaService.Update(id, model);

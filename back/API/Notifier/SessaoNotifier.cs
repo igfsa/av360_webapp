@@ -14,10 +14,10 @@ public class SessaoNotifier(IHubContext<SessaoHub> hub) : ISessaoNotifier
             .SendAsync("SessoesAtualizadas", sessaoId);
     }
 
-    public async Task NovaAvaliacao(int sessaoId)
+    public async Task SessaoAtualizada(int sessaoId)
     {
         await _hub.Clients.All
-            .SendAsync("NovaAvaliacao", sessaoId);
+            .SendAsync("SessaoAtualizada", sessaoId);
     }
 
 }

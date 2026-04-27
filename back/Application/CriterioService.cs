@@ -34,21 +34,6 @@ public class CriterioService(IGeralPersist geralPersist,
             throw;
         }
     }
-
-    public async Task<CriterioDTO> GetCriterioById(int Id)
-    {
-        try
-        {
-            var criterio = await _criterioPersist.GetCriterioIdAsync(Id)
-                ?? throw new NotFoundException("Critério não encontrado");
-
-            return _mapper.Map<CriterioDTO>(criterio);
-        }
-        catch
-        {
-            throw;
-        }
-    }
     public async Task<IEnumerable<CriterioDTO>> GetCriteriosTurma(int turmaId)
     {
         try

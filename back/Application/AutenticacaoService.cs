@@ -79,8 +79,6 @@ public class AutenticacaoService(IGeralPersist geralPersist,
     {
         try
         {
-            Console.WriteLine("refresh request", request);
-            Console.WriteLine("cookies", request.Cookies["refresh_token"]);
             var token = request.Cookies["refresh_token"]
                 ?? throw new UnauthorizedException("Cookie Refresh inválido");
 
@@ -114,8 +112,6 @@ public class AutenticacaoService(IGeralPersist geralPersist,
     {
         try
         {
-            Console.WriteLine("logout request", request);
-            Console.WriteLine("cookies", request.Cookies["refresh_token"]);
             var token = request.Cookies["refresh_token"] ??
                 throw new ValidationException("Cookie Inválido");
 

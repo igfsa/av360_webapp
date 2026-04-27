@@ -12,28 +12,20 @@ export class GrupoService {
 
   constructor(private http :HttpClient) { }
 
-  public getGrupos (): Observable<Grupo[]>{
-    return this.http.get<Grupo[]>(`/api/Grupo/GetAllGrupos`);
-  }
-
-  public getGrupoId(id: number): Observable<Grupo> {
-    return this.http.get<Grupo>(`/api/Grupo/GetId/${id}`);
-  }
-
   public getGruposTurma(id: number): Observable<Grupo[]> {
     return this.http.get<Grupo[]>(`/api/Grupo/GetGruposTurma/${id}`);
   }
 
-  public GetAlunoGruposCheckbox(grupoId: number, turmaId: number): Observable<AlunoGrupoCheckbox[]> {
+  public getAlunoGruposCheckbox(grupoId: number, turmaId: number): Observable<AlunoGrupoCheckbox[]> {
     return this.http.get<AlunoGrupoCheckbox[]>(`/api/Grupo/GetAlunoGruposCheckbox/${turmaId}`, {params: {turmaId, grupoId}});
   }
 
   public postGrupo (grupo: Grupo): Observable<Grupo>{
-    return this.http.post<Grupo>(`/api/Grupo/Post`, grupo);
+    return this.http.post<Grupo>(`/api/Grupo/PostGrupo`, grupo);
   }
 
   public putGrupo (grupo: Grupo): Observable<Grupo>{
-    return this.http.put<Grupo>(`/api/Grupo/Put/${grupo.id}`, grupo);
+    return this.http.put<Grupo>(`/api/Grupo/PutGrupo/${grupo.id}`, grupo);
   }
 
   public putAtualizarGrupo (alunosGrupo: AlunoGrupo){

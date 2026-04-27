@@ -1,5 +1,9 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import Swal from 'sweetalert2';
+
 import { AvaliacaoPublica } from '../../Models/AvaliacaoPublica';
 import { AvaliacaoService } from '../../Service/Avaliacao.service';
 import { Grupo } from '../../Models/Grupo';
@@ -8,11 +12,8 @@ import { AlunoService } from '../../Service/Aluno.service';
 import { Aluno } from '../../Models/Aluno';
 import { DeviceService } from '../../Helpers/hashGen';
 import { AvaliacaoItem } from '../../Models/AvaliacaoItem';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 import { AvaliacaoAgrupada } from '../../Models/AvaliacaoAgrupada';
 import { AvaliacaoEnvio } from '../../Models/AvaliacaoEnvio';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-avaliacao_publica',
@@ -61,7 +62,7 @@ export class AvaliacaoPublicaComponent implements OnInit {
   }
 
   public carregarSessao() {
-    this.avaliacaoService.GetValidaSessaoChavePub(this.token).subscribe({
+    this.avaliacaoService.getValidaSessaoChavePub(this.token).subscribe({
       next: (dto) => {
         this.dados = dto,
         this.grupos = [...dto.grupos].sort((a, b) => a.id - b.id);
@@ -104,7 +105,7 @@ export class AvaliacaoPublicaComponent implements OnInit {
   }
 
   public async carregarAvaliacao() {
-    this.avaliacaoService.GeraNovaAvaliacaoEnvio(
+    this.avaliacaoService.getNovaAvaliacaoEnvio(
       this.dados.sessaoId,
       this.grupoSelecionado.id,
       this.alunoLogado.id,
@@ -156,7 +157,7 @@ export class AvaliacaoPublicaComponent implements OnInit {
 
     this.avaliacaoEnvio.itens = itens;
 
-    this.avaliacaoService.PostAvaliacao(this.avaliacaoEnvio).subscribe({
+    this.avaliacaoService.postAvaliacao(this.avaliacaoEnvio).subscribe({
       next: (imported) =>{
       this.step = 5;
       this.cdr.detectChanges();

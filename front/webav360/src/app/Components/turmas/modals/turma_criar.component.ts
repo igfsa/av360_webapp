@@ -1,6 +1,6 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { form, FormField, min, max, required } from '@angular/forms/signals';
+import { form, FormField } from '@angular/forms/signals';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { Turma } from '../../../Models/Turma';
@@ -59,7 +59,7 @@ export class TurmaCriarModalComponent implements OnInit {
   turmaForm = form(this.turmaModel);
 
   get podeSalvar(): boolean {
-    if (this.turmaForm.notaMax().value() < 1 || this.turmaForm.notaMax().value() > 100 || this.turmaForm.cod().value() === '')
+    if (this.turmaForm.notaMax().value() < 1 || this.turmaForm.notaMax().value() > 100 || this.turmaForm.notaMax().invalid())
       return false;
     if (!this.turmaForm.cod || this.turmaForm.cod().value() === '')
       return false;
@@ -72,7 +72,7 @@ export class TurmaCriarModalComponent implements OnInit {
   }
 
   salvar(): void {
-    this.modal.close({Turma: this.turmaForm(), ImportAlunos: false});
+    this.modal.close({Turma: this.turmaModel(), ImportAlunos: false});
   }
 
   salvarImport(): void {

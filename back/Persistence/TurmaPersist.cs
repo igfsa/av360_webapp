@@ -25,11 +25,4 @@ public class TurmaPersist(APIContext context) : ITurmaPersist
             .Include(t => t.Grupos)
             .FirstOrDefaultAsync(t => t.Id == TurmaId);
     }
-    public async Task<Turma?> GetTurmaGrupoIdAsync(int grupoId)
-    {
-        var grupo = await _context.Grupos
-            .FirstOrDefaultAsync(g => g.Id == grupoId)
-                ?? null!;
-        return grupo.Turma;
-    }
 }

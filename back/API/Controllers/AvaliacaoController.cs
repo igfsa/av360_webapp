@@ -17,7 +17,7 @@ public class AvaliacaoController(
     private readonly ISessaoNotifier _sessaoNotifier = sessaoNotifier;
 
     [AllowAnonymous]
-    [HttpGet(Name = "GetValidaSessaoChavePub")]
+    [HttpGet]
     [ActionName("GetValidaSessaoChavePub")]
     public async Task<ActionResult<AvaliacaoPublicaDTO>> GetValidaSessaoChavePub(string token) {
         var avaliacao = await _avaliacaoService.GetValidaSessaoChavePub(token);
@@ -25,8 +25,8 @@ public class AvaliacaoController(
     }
 
     [AllowAnonymous]
-    [HttpGet(Name = "GeraNovaAvaliacaoEnvio")]
-    [ActionName("GeraNovaAvaliacaoEnvio")]
+    [HttpGet]
+    [ActionName("GetNovaAvaliacaoEnvio")]
     public async Task<ActionResult<AvaliacaoEnvioDTO>> GeraNovaAvaliacaoEnvio(int sessaoId, int grupoId, int avaliadorId, string deviceHash) {
         var avaliacao = new AvaliacaoEnvioDTO
         {
@@ -40,13 +40,13 @@ public class AvaliacaoController(
     }
 
     [AllowAnonymous]
-    [HttpPost("")]
-    [ActionName("Post")]
+    [HttpPost]
+    [ActionName("PostAvaliacao")]
     public async Task<ActionResult> Post(AvaliacaoEnvioDTO model)
     {
         var avaliacao = await _avaliacaoService.AddAvaliacao(model);
         
-        await _sessaoNotifier.NovaAvaliacao(model.SessaoId);
+        await _sessaoNotifier.SessaoAtualizada(model.SessaoId);
 
         return Ok(avaliacao);
     }
