@@ -8,7 +8,7 @@ public class TurmaNotifier(IHubContext<TurmaHub> hub) : ITurmaNotifier
 {
     private readonly IHubContext<TurmaHub> _hub = hub;
 
-    public async Task TurmaAtualizadaAsync(int turmaId)
+    public async Task TurmaAtualizada(int turmaId)
     {
         await _hub.Clients.All
             .SendAsync("TurmaAtualizada", turmaId);

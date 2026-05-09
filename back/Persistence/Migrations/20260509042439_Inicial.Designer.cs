@@ -12,8 +12,8 @@ using Persistence.Context;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(APIContext))]
-    [Migration("20260419024616_RefreshToken")]
-    partial class RefreshToken
+    [Migration("20260509042439_Inicial")]
+    partial class Inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -20,4 +20,10 @@ public class SessaoNotifier(IHubContext<SessaoHub> hub) : ISessaoNotifier
             .SendAsync("SessaoAtualizada", sessaoId);
     }
 
+    public async Task SessaoFinalizada(int sessaoId)
+    {
+        await _hub.Clients.All
+            .SendAsync("SessaoFinalizada", sessaoId);
+    }
+
 }

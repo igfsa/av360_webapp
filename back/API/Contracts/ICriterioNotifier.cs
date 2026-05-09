@@ -2,5 +2,5 @@ namespace Application.Contracts;
 
 public interface ICriterioNotifier
 {
-    Task CriterioAtualizadoAsync(int CriterioId);
+    Task CriterioAtualizado(int CriterioId);
 }

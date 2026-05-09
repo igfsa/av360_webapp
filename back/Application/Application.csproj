@@ -26,7 +26,8 @@
     <PackageReference Include="Ude.NetStandard"  />
     <PackageReference Include="StackExchange.Redis" />
     <PackageReference Include="BCrypt.Net-Next"/>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer"/>
+    <PackageReference Include="ClosedXML"/>
 
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>

@@ -10,6 +10,7 @@ export class SessaoRealTime {
   private hub!: HubConnection;
 
   sessaoAtualizada$ = new Subject<number>();
+  sessaoFinalizada$ = new Subject<number>();
 
 constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
@@ -33,6 +34,10 @@ constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
     this.hub.on('NovaAvaliacao', (sessaoId: number) => {
       this.sessaoAtualizada$.next(sessaoId);
+    });
+
+    this.hub.on('SessaoFinalizada', (sessaoId: number) => {
+      this.sessaoFinalizada$.next(sessaoId);
     });
 
     return this.hub.start()

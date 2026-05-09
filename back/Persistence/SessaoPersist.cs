@@ -32,4 +32,13 @@ public class SessaoPersist(APIContext context) : ISessaoPersist
                 && s.DataFim == null
             );
     }
+    public async Task<Sessao[]> GetSessoesTurmaIdAsync(int turmaId)
+    {
+        return await _context.Sessoes
+            .AsNoTracking()
+            .Include(s => s.Notasfinais)
+            .Include(s => s.Turma)
+            .Where(s => s.TurmaId == turmaId)
+            .ToArrayAsync();
+    }
 }

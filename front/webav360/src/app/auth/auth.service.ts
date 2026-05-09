@@ -17,7 +17,6 @@ export class AuthService {
   private checkAuth$?: Observable<boolean>;
 
   public checkAuth() {
-    console.log('checkAuth chamado');
     if (this.checkAuth$) return this.checkAuth$;
 
     this.checkAuth$ = this.http.get('/api/Autenticacao/Me', {

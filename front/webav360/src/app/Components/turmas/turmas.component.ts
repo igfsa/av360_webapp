@@ -91,7 +91,6 @@ export class TurmasComponent implements OnInit {
 
   public adicionarTurma(): void{
     const ref = this.modalService.open(TurmaCriarModalComponent, {
-      size: 'lg',
       backdrop: 'static',
       centered: true,
       fullscreen: true,
@@ -102,17 +101,7 @@ export class TurmasComponent implements OnInit {
       this.turmaService.postTurma(Turma)
         .subscribe({
           next: turma => {
-            Swal.mixin({
-              toast: true,
-              position: "top-end",
-              showConfirmButton: false,
-              timer: 3000,
-              timerProgressBar: true,
-              didOpen: (toast) => {
-                toast.onmouseenter = Swal.stopTimer;
-                toast.onmouseleave = Swal.resumeTimer;
-              }
-            }).fire({
+            Swal.fire({
               icon: 'success',
               title: 'Sucesso',
               text: `Turma ${turma.cod} criada com sucesso!`

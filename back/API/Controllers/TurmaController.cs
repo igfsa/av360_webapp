@@ -39,7 +39,7 @@ public class TurmaController(ITurmaService turmaService,
     {
         var Turma = await _turmaService.Add(model);
 
-        await _turmaNotifier.TurmaAtualizadaAsync(Turma.Id);
+        await _turmaNotifier.TurmaAtualizada(Turma.Id);
         return Ok(Turma);
     }
 
@@ -50,7 +50,7 @@ public class TurmaController(ITurmaService turmaService,
     {
         var result = await _turmaService.ImportarAlunosAsync(dto.TurmaId, dto);
         
-        await _turmaNotifier.TurmaAtualizadaAsync(dto.TurmaId);
+        await _turmaNotifier.TurmaAtualizada(dto.TurmaId);
         return Ok(result);
     }
 
@@ -61,7 +61,7 @@ public class TurmaController(ITurmaService turmaService,
     {
         var turma = await _turmaService.AddTurmaCriterio(model);
 
-        await _turmaNotifier.TurmaAtualizadaAsync(model.TurmaId);
+        await _turmaNotifier.TurmaAtualizada(model.TurmaId);
         return Ok(turma);
     }
 
@@ -72,7 +72,7 @@ public class TurmaController(ITurmaService turmaService,
     {
         var turma = await _turmaService.Update(id, model);
 
-        await _turmaNotifier.TurmaAtualizadaAsync(model.Id);
+        await _turmaNotifier.TurmaAtualizada(model.Id);
         return Ok(turma);
     }
 

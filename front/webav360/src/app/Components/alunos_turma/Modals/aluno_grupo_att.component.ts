@@ -14,7 +14,7 @@ import { AlunoGrupo } from '../../../Models/AlunoGrupo';
   imports: [CommonModule, FormsModule],
   template: `
     <div class="modal-header">
-      <h4 class="modal-title" style = "font-size: 2.4rem;">Grupo {{ grupo.nome }}</h4>
+      <h4 class="modal-title" style = "font-size: 2.4rem;">Equipe {{ grupo.nome }}</h4>
     </div>
     <div class="modal-body">
       <table id="main-table" class="table text-center table-hover">
@@ -25,7 +25,7 @@ import { AlunoGrupo } from '../../../Models/AlunoGrupo';
               Aluno
             </th>
             <th>
-              Grupo Atual
+              Equipe Atual
             </th>
           </tr>
         </thead>

@@ -1,32 +1,33 @@
 <div class="container">
-  <div class="mx-5 mt-5">
-    <h4 class="" style = "font-size: 2.4rem;">Login</h4>
-  </div>
+  <form (ngSubmit)="login()" method="post" class="mx-auto">
+    <h1>Login</h1>
 
-  <div class="mx-5" >
-    <form novalidate>
-      <div class="input-group mb-3 row">
-        <span class="input-group-text col-2" style = "font-size: 1.6rem;">Usuário: </span>
-        <input type="text" class="form-control" [formField]="loginForm.userName" aria-label="User" style = "font-size: 1.6rem;">
-        @if (loginForm.userName().touched() && (loginForm.userName().invalid() || loginForm.userName().value() === '')) {
-          <div class="alert alert-danger">
-            <span class="text-danger fw-bold" ></span>
-          </div>
+    <label>
+      Usuário:
+      <input type="text" class="form-control" [formField]="loginForm.userName" aria-label="User">
+    </label>
+    @if (loginForm.userName().touched() && loginForm.userName().invalid()) {
+      <ul class="error-list">
+        @for (error of loginForm.userName().errors(); track error) {
+          <li>{{ error.message }}</li>
         }
-      </div>
-      <div class="input-group mb-3 row" >
-        <span class="input-group-text col-2" style = "font-size: 1.6rem;">Senha: </span>
-        <input type="password" class="form-control" [formField]="loginForm.senha" aria-label="Senha" style = "font-size: 1.6rem;">
-        @if (loginForm.senha().touched() && (loginForm.senha().invalid() || loginForm.senha().value() === '')) {
-          <div class="alert alert-danger">
-            <span class="text-danger fw-bold" ></span>
-          </div>
-        }
-      </div>
-    </form>
-  </div>
+      </ul>
+    }
 
-  <div class="modal-footer align-bottom mx-5 mb-5" >
-    <button class="btn btn-secondary btn-success" (click)="login()" [disabled]="loginForm.userName().invalid() || loginForm.senha().invalid()">Entrar</button>
-  </div>
+    <label>
+      Senha:
+      <input type="password" class="form-control" [formField]="loginForm.senha" aria-label="Senha">
+    </label>
+    @if (loginForm.senha().touched() && loginForm.senha().invalid()) {
+      <ul class="error-list">
+        @for (error of loginForm.senha().errors(); track error) {
+          <li>{{ error.message }}</li>
+        }
+      </ul>
+    }
+
+    <div class="align-bottom" >
+      <button type="submit" class="btn btn-secondary btn-success">Entrar</button>
+    </div>
+  </form>
 </div>

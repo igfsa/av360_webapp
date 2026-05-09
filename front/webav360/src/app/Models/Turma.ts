@@ -8,11 +8,3 @@ export interface Turma {
     // alunos: Aluno[];
     // criterios: Criterio[];
 }
-
-export function createEmptyTurma(): Turma {
-  return {
-    id: 0,
-    cod: '',
-    notaMax: 0
-  }
-}

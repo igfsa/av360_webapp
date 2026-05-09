@@ -1,46 +1,101 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { form, FormField, required } from '@angular/forms/signals';
+import Swal from 'sweetalert2';
+
 import { Criterio } from '../../../Models/Criterio';
+import { FormsHelper } from '../../../Helpers/formsHelper';
 
 
 @Component({
   selector: 'app-criterio-editar-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    FormField,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="modal-header">
-      <h4 class="modal-title" style = "font-size: 2.4rem;">Critério: {{ criterio.nome }}</h4>
+      <h1 class="modal-title" >Critério: {{ criterio.nome }}</h1>
     </div>
 
-    <div class="modal-body">
+  <form (ngSubmit)="salvar()" class="d-flex flex-column vh-100">
+    <div class="modal-body flex-grow-1 overflow-auto" >
       <span class="text-bg-warning fw-bold rounded-4 py-1 px-3"  > Atenção! Este critério será alterado para todas turmas vinculadas! </span>
-      <div class="input-group m-1 mt-3 row">
-        <span class="input-group-text col-2" id="basic-addon1" style = "font-size: 1.6rem;">Nome: </span>
-        <input type="text" class="form-control" [(ngModel)]="criterioEdit.nome" aria-label="Nome" aria-describedby="basic-addon1" style = "font-size: 1.6rem;">
-      </div>
+      <label>Nome: </label>
+      <input type="text" class="form-control" [formField]="criterioForm.nome" aria-label="Nome" >
+      @if (criterioForm.nome().touched() && criterioForm.nome().invalid()){
+        <ul class="error-list">
+          @for (error of criterioForm.nome().errors(); track error) {
+            <li>{{ error.message }}</li>
+          }
+        </ul>
+      }
     </div>
 
-    <div class="modal-footer">
-      <button class="btn btn-secondary btn-danger" (click)="modal.dismiss()">Cancelar</button>
-      <button class="btn btn-secondary btn-success" (click)="salvar()">Salvar</button>
+    <div class="modal-footer mt-auto" >
+      <button class="btn btn-secondary btn-danger" type="button" (click)="cancelar($event)">Cancelar</button>
+      <button class="btn btn-secondary btn-success" type="submit" >Salvar</button>
     </div>
+  </form>
   `
 })
 export class CriterioEditarModalComponent implements OnInit {
 
   @Input() criterio!: Criterio;
 
-  criterioEdit!: Criterio;
+  criterioModel = signal<Criterio>({
+    id: 0,
+    nome: ''
+  })
 
-  constructor(public modal: NgbActiveModal) {}
+  criterioForm = form(this.criterioModel, (schemaPath) => {
+    required(schemaPath.nome, {message: `Critério deve ser preenchido.`});
+  });
+
+  constructor(public modal: NgbActiveModal,
+    private formHelper: FormsHelper) {}
 
   ngOnInit(): void {
-    this.criterioEdit = { ...this.criterio };
+    this.criterioModel.set({
+      ...this.criterio
+    });
   }
 
-  salvar(): void {
-    this.modal.close(this.criterioEdit);
+  public cancelar(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.modal.dismiss('cancelar')
+  }
+
+  public salvar(): void {
+    this.formHelper.markAllTouched(this.criterioForm);
+
+    if (this.criterioForm().invalid())
+    {
+      Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        }
+      }).fire({
+        icon: 'error',
+        title: 'Erro',
+        text: `Verifique os dados do Critério`
+      });
+      return
+    }
+
+    this.modal.close(this.criterioModel())
   }
 }

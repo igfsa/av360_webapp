@@ -37,12 +37,12 @@ builder.Services.AddControllers()
 
 builder.Services.AddSignalR();
 
-string npgConnection = (
-    "Host=" + Environment.GetEnvironmentVariable("DB_AV360_SERVER") +
-    ";DataBase=" + Environment.GetEnvironmentVariable("DB_AV360_NAME") +
-    ";Uid=" + Environment.GetEnvironmentVariable("DB_AV360_USER") +
-    ";Pwd=" + Environment.GetEnvironmentVariable("DB_AV360_PASSWORD")
-);
+string npgConnection =
+    $"Host={Environment.GetEnvironmentVariable("DB_AV360_SERVER")};" +
+    $"Port=5432;" +
+    $"Database={Environment.GetEnvironmentVariable("DB_AV360_NAME")};" +
+    $"Username={Environment.GetEnvironmentVariable("DB_AV360_USER")};" +
+    $"Password={Environment.GetEnvironmentVariable("DB_AV360_PASSWORD")}";
 
 builder.Services.AddDbContext<APIContext>(options =>
     options.UseNpgsql(npgConnection)
@@ -107,6 +107,8 @@ builder.Services.AddScoped<IRefreshTokenPersist, RefreshTokenPersist>();
 
 builder.Services.AddScoped<IAutenticacaoService, AutenticacaoService>();
 
+builder.Services.AddScoped<IExportService, ExportService>();
+
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", jwtOptions =>
     {
@@ -148,6 +150,13 @@ builder.Services.AddReverseProxy()
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 var app = builder.Build();
+
+if (args.Contains("--seed"))
+{
+    using var scope = app.Services.CreateScope();
+    await DbInitializer.Seed(scope.ServiceProvider);
+    return;
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

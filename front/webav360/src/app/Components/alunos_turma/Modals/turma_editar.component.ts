@@ -1,49 +1,114 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import Swal from 'sweetalert2';
+import { form, FormField, max, min, required } from '@angular/forms/signals';
+
 import { Turma } from '../../../Models/Turma';
+import { FormsHelper } from '../../../Helpers/formsHelper';
 
 
 @Component({
   selector: 'app-turma-editar-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    FormField,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="modal-header">
-      <h4 class="modal-title" style = "font-size: 2.4rem;">Turma {{ turma.cod }}</h4>
+      <h1>Turma {{ turma.cod }}</h1>
     </div>
 
-    <div class="modal-body">
-      <div class="input-group mb-3 row">
-        <span class="input-group-text col-2" id="basic-addon1" style = "font-size: 1.6rem;">Código: </span>
-        <input type="text" class="form-control" [(ngModel)]="turmaEdit.cod" aria-label="Cod" aria-describedby="basic-addon1" style = "font-size: 1.6rem;">
-      </div>
-      <div class="input-group mb-3 row" >
-        <span class="input-group-text col-2" id="basic-addon1" style = "font-size: 1.6rem;">Nota Máxima: </span>
-        <input type="decimal" class="form-control" [(ngModel)]="turmaEdit.notaMax" aria-label="Cod" aria-describedby="basic-addon1" style = "font-size: 1.6rem;">
-      </div>
+  <form (ngSubmit)="salvar()" class="d-flex flex-column vh-100">
+    <div class="modal-body flex-grow-1 overflow-auto" >
+      <label>Código: </label>
+      <input type="text" class="form-control w-50" [formField]="turmaForm.cod" aria-label="Cod" >
+      @if (turmaForm.cod().touched() && turmaForm.cod().invalid()) {
+        <ul class="error-list">
+          @for (error of turmaForm.cod().errors(); track error) {
+            <li>{{ error.message }}</li>
+          }
+        </ul>
+      }
+      <label>Nota Máxima: </label>
+      <input type="number" class="form-control w-25" [formField]="turmaForm.notaMax" aria-label="Nota Máxima" >
+      @if (turmaForm.notaMax().touched() && turmaForm.notaMax().invalid()){
+        <ul class="error-list">
+          @for (error of turmaForm.notaMax().errors(); track error) {
+            <li>{{ error.message }}</li>
+          }
+        </ul>
+      }
     </div>
 
-    <div class="modal-footer">
-      <button class="btn btn-secondary btn-danger" (click)="modal.dismiss()">Cancelar</button>
-      <button class="btn btn-secondary btn-success" (click)="salvar()">Salvar</button>
+    <div class="modal-footer mt-auto" >
+      <button class="btn btn-secondary btn-danger" type="button" (click)="cancelar($event)">Cancelar</button>
+      <button class="btn btn-secondary btn-success" type="submit" >Salvar</button>
     </div>
+  </form>
   `
 })
 export class TurmaEditarModalComponent implements OnInit {
 
   @Input() turma!: Turma;
 
-  turmaEdit!: Turma;
+  turmaModel = signal<Turma>({
+    id: 0,
+    cod: '',
+    notaMax: 0
+  });
 
-  constructor(public modal: NgbActiveModal) {}
+  turmaForm = form(this.turmaModel, schemaPath => {
+    required(schemaPath.cod, {message: `Código da turma deve ser inserido`})
+
+    required(schemaPath.notaMax, {message: `Nota Máxima da turma deve ser inserida`});
+    min(schemaPath.notaMax, 1, {message: `Nota Máxima não pode ser menor que 1`});
+    max(schemaPath.notaMax, 100, {message: `Nota Máxima não pode ser maior que 100`});
+  });
+
+  constructor(public modal: NgbActiveModal,
+    private formHelper: FormsHelper) {}
 
   ngOnInit(): void {
-    this.turmaEdit = { ...this.turma };
+    this.turmaModel.set({
+      ...this.turma
+    });
   }
 
-  salvar(): void {
-    this.modal.close(this.turmaEdit);
+  public cancelar(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.modal.dismiss('cancelar')
+  }
+
+  public salvar(): void {
+    this.formHelper.markAllTouched(this.turmaForm);
+
+    if (this.turmaForm().invalid())
+    {
+      Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        }
+      }).fire({
+        icon: 'error',
+        title: 'Erro',
+        text: `Verifique os dados da Turma`
+      });
+      return
+    }
+
+    this.modal.close(this.turmaModel())
   }
 }

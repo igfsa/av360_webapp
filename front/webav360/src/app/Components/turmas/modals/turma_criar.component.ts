@@ -1,9 +1,12 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { form, FormField } from '@angular/forms/signals';
+import { form, FormField, min, max, required } from '@angular/forms/signals';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { Turma } from '../../../Models/Turma';
+import { FormsModule } from '@angular/forms';
+import { FormsHelper } from '../../../Helpers/formsHelper';
+import Swal from 'sweetalert2';
 
 
 @Component({
@@ -11,71 +14,106 @@ import { Turma } from '../../../Models/Turma';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     FormField,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-  <div class="modal-header mx-5 mt-5">
-    <h4 class="modal-title" style = "font-size: 2.4rem;">Nova Turma</h4>
+  <div class="modal-header">
+    <h1 class="modal-title" >Nova Turma</h1>
   </div>
 
-  <div class="modal-body vh-100 mx-5" >
-    <form novalidate>
-      <div class="input-group mb-3 row">
-        <span class="input-group-text col-2" style = "font-size: 1.6rem;">Código: </span>
-        <input type="text" class="form-control" [formField]="turmaForm.cod" aria-label="Cod" style = "font-size: 1.6rem;">
-        @if (turmaForm.cod().touched() && (turmaForm.cod().invalid() || turmaForm.cod().value() === '')) {
-          <div class="alert alert-danger">
-            <span class="text-danger fw-bold" >Cod inválido...</span>
-          </div>
-        }
-      </div>
-      <div class="input-group mb-3 row" >
-        <span class="input-group-text col-2" style = "font-size: 1.6rem;">Nota Máxima: </span>
-        <input type="number" class="form-control" [formField]="turmaForm.notaMax" aria-label="Nota Máxima" style = "font-size: 1.6rem;">
-        @if (turmaForm.notaMax().touched() && (turmaForm.notaMax().value() < 1 || turmaForm.notaMax().value() > 100 || turmaForm.notaMax().invalid())){
-          <div class="alert alert-danger">
-            <span class="text-danger fw-bold" >Nota deve ser entre 1 e 100...</span>
-          </div>
-        }
-      </div>
-    </form>
-  </div>
+  <form (ngSubmit)="salvar()" class="d-flex flex-column vh-100">
+    <div class="modal-body flex-grow-1 overflow-auto" >
+      <label>Código: </label>
+      <input type="text" class="form-control" [formField]="turmaForm.cod" aria-label="Cod" >
+      @if (turmaForm.cod().touched() && turmaForm.cod().invalid()) {
+        <ul class="error-list">
+          @for (error of turmaForm.cod().errors(); track error) {
+            <li>{{ error.message }}</li>
+          }
+        </ul>
+      }
+      <label>Nota Máxima: </label>
+      <input type="number" class="form-control" [formField]="turmaForm.notaMax" aria-label="Nota Máxima" >
+      @if (turmaForm.notaMax().touched() && turmaForm.notaMax().invalid()){
+        <ul class="error-list">
+          @for (error of turmaForm.notaMax().errors(); track error) {
+            <li>{{ error.message }}</li>
+          }
+        </ul>
+      }
+      <label style="display: inline-block">
+        <input type="checkbox" class="form-check-input" [formField]="turmaForm.importarAlunos" aria-label="Importar Alunos">
+        Importar alunos após salvar
+      </label>
+    </div>
 
-  <div class="modal-footer align-bottom mx-5 mb-5" >
-    <button class="btn btn-secondary btn-danger" (click)="modal.dismiss()">Cancelar</button>
-    <button class="btn btn-secondary btn-success" (click)="salvarImport()" [disabled]="!podeSalvar">Salvar e Importar</button>
-    <button class="btn btn-secondary btn-success" (click)="salvar()" [disabled]="!podeSalvar">Salvar</button>
-  </div>
+    <div class="modal-footer mt-auto" >
+      <button class="btn btn-secondary btn-danger" type="button" (click)="cancelar($event)">Cancelar</button>
+      <button class="btn btn-secondary btn-success" type="submit" >Salvar</button>
+    </div>
+  </form>
   `
 })
 export class TurmaCriarModalComponent implements OnInit {
 
-  turmaModel = signal<Turma>({
+  turmaModel = signal<Turma & {importarAlunos: boolean}>({
     id: 0,
     cod: '',
-    notaMax: 0
+    notaMax: 0,
+    importarAlunos: true
   })
 
-  turmaForm = form(this.turmaModel);
+  turmaForm = form(this.turmaModel, schemaPath => {
+    required(schemaPath.cod, {message: `Código da turma deve ser inserido`})
 
-  get podeSalvar(): boolean {
-    if (this.turmaForm.notaMax().value() < 1 || this.turmaForm.notaMax().value() > 100 || this.turmaForm.notaMax().invalid())
-      return false;
-    if (!this.turmaForm.cod || this.turmaForm.cod().value() === '')
-      return false;
-    return true;
-  }
+    required(schemaPath.notaMax, {message: `Nota Máxima da turma deve ser inserida`});
+    min(schemaPath.notaMax, 1, {message: `Nota Máxima não pode ser menor que 1`});
+    max(schemaPath.notaMax, 100, {message: `Nota Máxima não pode ser maior que 100`});
+  });
 
-  constructor(public modal: NgbActiveModal) {}
+  constructor(public modal: NgbActiveModal,
+    private formHelper: FormsHelper) {}
 
   ngOnInit(): void {
   }
 
-  salvar(): void {
-    this.modal.close({Turma: this.turmaModel(), ImportAlunos: false});
+  public cancelar(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.modal.dismiss('cancelar')
   }
 
-  salvarImport(): void {
-    this.modal.close({Turma: this.turmaModel(), ImportAlunos:  true});
+  public salvar(): void {
+    this.formHelper.markAllTouched(this.turmaForm);
+
+    if (this.turmaForm().invalid())
+    {
+      Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        }
+      }).fire({
+        icon: 'error',
+        title: 'Erro',
+        text: `Verifique os dados da Turma`
+      });
+      return
+    }
+
+    const model = this.turmaModel();
+
+    this.modal.close({
+      Turma: model,
+      ImportAlunos: model.importarAlunos
+    });
   }
 }

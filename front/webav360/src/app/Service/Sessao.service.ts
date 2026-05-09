@@ -11,8 +11,36 @@ export class SessaoService {
 
   constructor(private http :HttpClient) { }
 
+  public getSessaoId(id: number): Observable<Sessao> {
+    return this.http.get<Sessao>(`/api/Sessao/GetSessaoId/${id}`);
+  }
+
   public getSessaoAtivaTurma(turmaId: number): Observable<Sessao> {
     return this.http.get<Sessao>(`/api/Sessao/GetSessaoAtivaTurma/${turmaId}`);
+  }
+
+  public getSessoesTurmaId(turmaId: number): Observable<Sessao> {
+    return this.http.get<Sessao>(`/api/Sessao/GetSessoesTurmaId/${turmaId}`);
+  }
+
+  public getExportConsolidado(sessaoId: number): void {
+    this.http.get(`/api/Sessao/GetExportConsolidado/${sessaoId}`,{responseType: 'blob'})
+      .subscribe(blob => {
+
+        const url =
+          window.URL.createObjectURL(blob);
+
+        const a =
+          document.createElement('a');
+
+        a.href = url;
+
+        a.download = 'avaliacoes.xlsx';
+
+        a.click();
+
+        window.URL.revokeObjectURL(url);
+      });
   }
 
   public postSessao (sessao: Sessao): Observable<Sessao>{

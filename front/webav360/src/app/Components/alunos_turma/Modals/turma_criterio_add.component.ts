@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -10,49 +10,55 @@ import { CriterioCheckbox } from '../../../Models/CriterioCheckbox';
 @Component({
   selector: 'app-turma-criterio-add-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="modal-header">
-      <h4 class="modal-title" style = "font-size: 2.4rem;">Turma {{ turma.cod }}</h4>
+      <h1 class="modal-title">Turma {{ turma.cod }}</h1>
     </div>
-    <div class="modal-body">
-      <table class="table table-hover">
-        <thead>
-          <tr (click)="toggleTodos()"
-                style="cursor: pointer">
-            <td width="4rem">
-              <input type="checkbox" class="form-check-input"
-                [checked]="todosSelecionados"
-                [indeterminate]="algunsSelecionados"
-                (click)="onToggleTodosCheckbox($event)" />
-            </td>
-            <td>
-              {{ todosSelecionados
-              ? 'Desmarcar todos'
-              : 'Marcar todos' }}
-            </td>
-          </tr>
-        </thead>
-        <tbody>
-          @for (criterio of criteriosCheck; track criterio.id){
-            <tr (click)="toggleCriterio(criterio)"
-                 style="cursor: pointer">
+    <div class="d-flex flex-column vh-100">
+      <div class="modal-body flex-grow-1 overflow-auto" >
+        <table class="table table-hover">
+          <thead>
+            <tr (click)="toggleTodos()"
+                  style="cursor: pointer">
               <td width="4rem">
                 <input type="checkbox" class="form-check-input"
-                      [(ngModel)]="criterio.selecionado"
-                      (click)="$event.stopPropagation()" />
+                  [checked]="todosSelecionados"
+                  [indeterminate]="algunsSelecionados"
+                  (click)="onToggleTodosCheckbox($event)" />
               </td>
               <td>
-                {{ criterio.nome }}
+                {{ todosSelecionados
+                ? 'Desmarcar todos'
+                : 'Marcar todos' }}
               </td>
             </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary btn-danger" (click)="modal.dismiss()">Cancelar</button>
-      <button class="btn btn-secondary btn-success" (click)="salvar()">Salvar</button>
+          </thead>
+          <tbody>
+            @for (criterio of criteriosCheck; track criterio.id){
+              <tr (click)="toggleCriterio(criterio)"
+                  style="cursor: pointer">
+                <td width="4rem">
+                  <input type="checkbox" class="form-check-input"
+                        [(ngModel)]="criterio.selecionado"
+                        (click)="$event.stopPropagation()" />
+                </td>
+                <td>
+                  {{ criterio.nome }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer mt-auto">
+        <button class="btn btn-secondary btn-danger" (click)="modal.dismiss()">Cancelar</button>
+        <button class="btn btn-secondary btn-success" (click)="salvar()">Salvar</button>
+      </div>
     </div>
   `
 })

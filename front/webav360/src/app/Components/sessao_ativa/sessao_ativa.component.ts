@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, DestroyRef, Inject, Input, OnInit, PLATFORM_ID } from '@angular/core';
 import { DecimalPipe, isPlatformBrowser } from '@angular/common'
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';import {
 	NgbAccordionButton,
 	NgbAccordionDirective,
@@ -12,7 +12,7 @@ import { forkJoin } from 'rxjs';import {
 } from '@ng-bootstrap/ng-bootstrap/accordion';
 import Swal from 'sweetalert2';
 
-import { createEmptyTurma, Turma } from '../../Models/Turma';
+import { Turma } from '../../Models/Turma';
 import { Aluno } from '../../Models/Aluno';
 import { Criterio } from '../../Models/Criterio';
 import { Grupo } from '../../Models/Grupo';
@@ -29,7 +29,7 @@ import { AuthService } from '../../auth/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
-  selector: 'app-sessao',
+  selector: 'app-sessao-ativa',
   imports: [
 		NgbAccordionButton,
 		NgbAccordionDirective,
@@ -40,20 +40,27 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 	  NgbAccordionCollapse,
     DecimalPipe
   ],
-  templateUrl: './sessao.component.html',
-  styleUrls: ['./sessao.component.scss', '../../app.scss']
+  templateUrl: './sessao_ativa.component.html',
+  styleUrls: ['./sessao_ativa.component.scss','../../app.scss']
 })
-export class SessaoComponent implements OnInit {
-
-  @Input() turmaEditar!: Turma;
+export class SessaoAtivaComponent implements OnInit {
 
   public alunos: Aluno[]  = [];
   public criterios: Criterio[]  = [];
   public grupos: Grupo[]  = [];
-  public turma: Turma = createEmptyTurma();
+  public turma: Turma = ({id: 0, cod: '', notaMax: 0});
   public sessaoAtiva?: Sessao;
   public qrCode: string = '';
-  public dashboard?: DashboardSessao;
+  public dashboard: DashboardSessao = ({
+     sessaoId: 0
+    , totalAlunos: 0
+    , avaliaram: 0
+    , pendentes: 0
+    , mediaGeral: 0
+    , totalNotas: 0
+    , criterios: []
+    , grupos: []
+  });
 
   constructor(
     private alunoService: AlunoService,
@@ -62,6 +69,7 @@ export class SessaoComponent implements OnInit {
     private grupoService: GrupoService,
     private sessaoService: SessaoService,
     private route: ActivatedRoute,
+    private router: Router,
     private cdr: ChangeDetectorRef,
     private sessaoRealTime: SessaoRealTime,
     private authService: AuthService,
@@ -106,9 +114,11 @@ export class SessaoComponent implements OnInit {
       this.sessaoAtiva = sessaoAtiva;
 
       if (sessaoAtiva){
-        this.qrCode = `/api/Sessao/GetQrCode/${sessaoAtiva.id}`
+        const urlTree = this.router.createUrlTree([`/sessao-qrcode/${sessaoAtiva.id}`]);
 
         this.loadSessao(sessaoAtiva.id);
+
+        window.open(this.router.serializeUrl(urlTree), '_blank')
 
         this.sessaoRealTime.connect()?.then(() => {
           this.sessaoRealTime.acessarSessao(sessaoAtiva.id);
@@ -189,6 +199,7 @@ export class SessaoComponent implements OnInit {
       });
     }
   }
+
   public dashboardReset(sessaoId: number){
     this.sessaoService.dashboardResetSessao(sessaoId).subscribe({
       next: (res) => {
@@ -203,5 +214,9 @@ export class SessaoComponent implements OnInit {
         });
       }
     });
+  }
+
+  exportar(): void {
+    this.sessaoService.getExportConsolidado(this.sessaoAtiva?.id ?? 0);
   }
 }

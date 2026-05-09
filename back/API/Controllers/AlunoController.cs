@@ -48,7 +48,7 @@ public class AlunoController(IAlunoService alunoService,
     {
         var aluno = await _alunoService.AddAlunoTurma(turmaId, alunoModel);
 
-        await _turmaNotifier.TurmaAtualizadaAsync(turmaId);
+        await _turmaNotifier.TurmaAtualizada(turmaId);
         return Ok(aluno);
     }
 }

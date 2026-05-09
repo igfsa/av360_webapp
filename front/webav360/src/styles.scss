@@ -58,6 +58,14 @@ td {
   text-align: left;
 }
 
+thead {
+  border-style: none;
+}
+
+.swal2-popup{
+  font-size: 1.6rem;
+}
+
 .container {
   margin: 10vh auto 15vh;
   padding:  5%;
@@ -67,11 +75,17 @@ td {
 }
 
 .table th {
-  background-color: var(--dark);
+  background-color: var(--secondary);
+}
+
+.tabela-wrapper{
+  overflow: auto;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
 }
 
 .btn{
-  font-size: 1.6rem !important;
+  font-size: 1.4rem !important;
   // background-color: var(--primary);
   // color: var(--text);
 }
@@ -80,7 +94,55 @@ td {
 //   background-color: var(--secondary);
 // }
 
-.tooltip .tooltip-inner {
-  font-size: 200%;
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  // font-family:
+  //   Inter,
+  //   system-ui,
+  //   -apple-system,
+  //   sans-serif;
 }
 
+.input-group {
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-weight: 500;
+}
+
+input {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1.6rem;
+  font-family: inherit;
+}
+
+input:focus {
+  outline: none;
+  border-color: #4285f4;
+}
+
+.form-control{
+  font-size: 1.6rem;
+}
+
+.error-list {
+  color: red;
+  font-size: 1.6rem;
+  margin: 0.25rem 0 0 0;
+  padding-left: 0;
+  list-style-position: inside;
+}
+
+.error-list p {
+  margin: 0;
+}

@@ -10,14 +10,8 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<APIContext
 
         var server = Environment.GetEnvironmentVariable("DB_AV360_SERVER");
         var database = Environment.GetEnvironmentVariable("DB_AV360_NAME");
-
-        var user =
-            Environment.GetEnvironmentVariable("DB_PSQLUSER") ??
-            Environment.GetEnvironmentVariable("DB_AV360_USER");
-
-        var password =
-            Environment.GetEnvironmentVariable("DB_PSQLPWD") ??
-            Environment.GetEnvironmentVariable("DB_AV360_PASSWORD");
+        var user = Environment.GetEnvironmentVariable("DB_PSQLUSER");
+        var password = Environment.GetEnvironmentVariable("DB_PSQLPWD");
 
         if (string.IsNullOrEmpty(server) ||
             string.IsNullOrEmpty(database) ||
@@ -28,8 +22,7 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<APIContext
         }
 
         var connectionString =
-            $"Server={server};Database={database};Username={user};Password={password}";
-
+            $"Host={server};Port=5432;Database={database};Username={user};Password={password}";
         var optionsBuilder = new DbContextOptionsBuilder<APIContext>();
 
         optionsBuilder.UseNpgsql(connectionString)

@@ -2,5 +2,5 @@ namespace Application.Contracts;
 
 public interface IGrupoNotifier
 {
-    Task GrupoAtualizadoAsync(int GrupoId);
+    Task GrupoAtualizado(int GrupoId);
 }

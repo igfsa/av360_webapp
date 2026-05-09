@@ -21,7 +21,7 @@ import Swal from 'sweetalert2';
 import { AlunoService } from '../../Service/Aluno.service';
 import { Aluno } from '../../Models/Aluno';
 import { TurmaService } from '../../Service/Turma.service';
-import { createEmptyTurma, Turma } from '../../Models/Turma';
+import { Turma } from '../../Models/Turma';
 import { CriterioService } from '../../Service/Criterio.service';
 import { Criterio } from '../../Models/Criterio';
 import { TurmaEditarModalComponent } from './Modals/turma_editar.component';
@@ -73,7 +73,7 @@ export class AlunoTurmaComponent implements OnInit {
   private _filtroCriterios: string = '';
   private _filtroGrupos: string = '';
   public criterioIds: number[] = [];
-  public turma: Turma = createEmptyTurma();
+  public turma: Turma = ({id: 0, cod: '', notaMax: 0});
   public sessaoAtiva?: Sessao;
   public alunoGrupo: AlunoGrupoNomes[] = [];
 
@@ -196,7 +196,9 @@ export class AlunoTurmaComponent implements OnInit {
     const ref = this.modalService.open(TurmaEditarModalComponent, {
       size: 'lg',
       backdrop: 'static',
-      centered: true
+      centered: true,
+      fullscreen: true,
+      scrollable: true
     });
     ref.componentInstance.turma = this.turma;
 
@@ -230,7 +232,9 @@ export class AlunoTurmaComponent implements OnInit {
       const ref = this.modalService.open(TurmaCriterioModalComponent, {
         size: 'lg',
         backdrop: 'static',
-        centered: true
+        centered: true,
+        fullscreen: true,
+        scrollable: true
       });
 
       ref.componentInstance.turma = this.turma;
@@ -267,7 +271,9 @@ export class AlunoTurmaComponent implements OnInit {
     const ref = this.modalService.open(TurmaGrupoModalComponent, {
       size: 'lg',
       backdrop: 'static',
-      centered: true
+      centered: true,
+      fullscreen: true,
+      scrollable: true
     });
 
     ref.componentInstance.turma = this.turma;
@@ -348,7 +354,9 @@ export class AlunoTurmaComponent implements OnInit {
       const ref = this.modalService.open(AlunoGrupoModalComponent, {
         size: 'lg',
         backdrop: 'static',
-        centered: true
+        centered: true,
+        fullscreen: true,
+        scrollable: true
       });
       ref.componentInstance.turma = this.turma;
       ref.componentInstance.grupo = grupo;
@@ -384,7 +392,9 @@ export class AlunoTurmaComponent implements OnInit {
     const ref = this.modalService.open(TurmaImportModalComponent, {
       size: 'lg',
       backdrop: 'static',
-      centered: true
+      centered: true,
+      fullscreen: true,
+      scrollable: true
     });
 
     ref.componentInstance.turma = this.turma;
@@ -418,7 +428,9 @@ export class AlunoTurmaComponent implements OnInit {
     const ref = this.modalService.open(CriterioEditarModalComponent, {
       size: 'lg',
       backdrop: 'static',
-      centered: true
+      centered: true,
+      fullscreen: true,
+      scrollable: true
     });
 
     ref.componentInstance.criterio = criterio;
@@ -463,17 +475,17 @@ export class AlunoTurmaComponent implements OnInit {
     const ref = this.modalService.open(AlunoTurmaAddModalComponent, {
       size: 'lg',
       backdrop: 'static',
-      centered: true
+      centered: true,
+      fullscreen: true,
+      scrollable: true
     });
 
     ref.result.then((aluno: Aluno) => {
       if (!aluno)
         return
-      console.log('aluno', aluno);
 
       this.alunoService.postAlunoTurma( this.turma.id, aluno).subscribe({
         next: (a) => {
-          console.log('aluno', a);
           Swal.mixin({
             toast: true,
             position: "top-end",

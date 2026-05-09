@@ -42,8 +42,8 @@ public class GrupoController(
     {
         var grupo = await _grupoService.Add(model);
 
-        await _grupoNotifier.GrupoAtualizadoAsync(grupo.Id);
-        await _turmaNotifier.TurmaAtualizadaAsync(grupo.TurmaId);
+        await _grupoNotifier.GrupoAtualizado(grupo.Id);
+        await _turmaNotifier.TurmaAtualizada(grupo.TurmaId);
         return Ok(grupo);
     }
 
@@ -54,8 +54,8 @@ public class GrupoController(
     {
         var grupo = await _grupoService.Update(id, model);
 
-        await _grupoNotifier.GrupoAtualizadoAsync(grupo.Id);
-        await _turmaNotifier.TurmaAtualizadaAsync(grupo.TurmaId);
+        await _grupoNotifier.GrupoAtualizado(grupo.Id);
+        await _turmaNotifier.TurmaAtualizada(grupo.TurmaId);
         return Ok(grupo);
     }
 
@@ -66,8 +66,8 @@ public class GrupoController(
     {
             await _grupoService.AtualizarGrupo(model.TurmaId, model.GrupoId, model.AlunoIds);
 
-            await _grupoNotifier.GrupoAtualizadoAsync(model.GrupoId);
-            await _turmaNotifier.TurmaAtualizadaAsync(model.TurmaId);
+            await _grupoNotifier.GrupoAtualizado(model.GrupoId);
+            await _turmaNotifier.TurmaAtualizada(model.TurmaId);
             var grupo = await _grupoService.GetGrupoById(model.GrupoId);
             return Ok(grupo);
     }

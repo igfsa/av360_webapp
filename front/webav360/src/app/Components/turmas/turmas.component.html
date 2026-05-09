@@ -13,43 +13,45 @@
 
   <input type="text" class="form-control w-100 h-100 m-2" style = "font-size: 1.6rem;" placeholder="Filtrar" [(ngModel)]="filtroLista">
 
-  <table id="main-table" class="table table-striped text-center table-hover">
-    <thead class="table-dark">
-      <tr>
-        <th style = 'width: 10%; text-align: center;'>#</th>
-        <th>Cod</th>
-        <th>Nota Máxima</th>
-        <th style = 'width: 20%; text-align: center;'>Ações</th>
-      </tr>
-    </thead>
-    <tbody>
-      @if (turmasFiltradas && turmasFiltradas.length){
-        @for (turma of turmasFiltradas; track turma.id){
+  <div class="tabela-wrapper">
+    <table id="main-table" class="table table-striped text-center table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th style = 'width: 10%; text-align: center;'>#</th>
+          <th>Cod</th>
+          <th>Nota Máxima</th>
+          <th style = 'width: 20%; text-align: center;'>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (turmasFiltradas && turmasFiltradas.length){
+          @for (turma of turmasFiltradas; track turma.id){
+            <tr>
+              <td style= 'text-align: center'>{{turma.id}}</td>
+              <td>{{turma.cod}}</td>
+              <td>{{turma.notaMax}}</td>
+              <td style= 'text-align: center'>
+                <button type="button" class="btn-editar btn btn-primary btn-sm mr-2 " [routerLink]="['/alunos-turma', turma.id]" routerLinkActive="active">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                    <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+                    <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+                  </svg>
+                  Acessar
+                </button>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+      <tfoot >
+        @if (!turmasFiltradas.length){
           <tr>
-            <td style= 'text-align: center'>{{turma.id}}</td>
-            <td>{{turma.cod}}</td>
-            <td>{{turma.notaMax}}</td>
-            <td style= 'text-align: center'>
-              <button type="button" class="btn-editar btn btn-primary btn-sm mr-2 " [routerLink]="['/alunos-turma', turma.id]" routerLinkActive="active">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
-                  <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
-                  <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
-                </svg>
-                Acessar
-              </button>
+            <td colspan="8" class="text-center">
+              <h4>Nenhuma turma encontrada!</h4>
             </td>
           </tr>
         }
-      }
-    </tbody>
-    <tfoot >
-      @if (!turmasFiltradas.length){
-        <tr>
-          <td colspan="8" class="text-center">
-            <h4>Nenhuma turma encontrada!</h4>
-          </td>
-        </tr>
-      }
-    </tfoot>
-  </table>
+      </tfoot>
+    </table>
+  </div>
 </div>

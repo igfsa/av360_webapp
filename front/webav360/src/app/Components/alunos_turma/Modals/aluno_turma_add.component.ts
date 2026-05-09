@@ -1,42 +1,45 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { form, FormField } from '@angular/forms/signals';
+import { form, FormField, max, min, required } from '@angular/forms/signals';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { Aluno } from '../../../Models/Aluno';
+import { FormsModule } from '@angular/forms';
+import Swal from 'sweetalert2';
+import { FormsHelper } from '../../../Helpers/formsHelper';
 
 @Component({
   selector: 'app-aluno-turma-add-modal',
   standalone: true,
-  imports: [CommonModule, FormField],
+  imports: [
+    CommonModule,
+    FormsModule,
+    FormField,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-  <div class="modal-header mx-5 mt-5">
-    <h4 class="modal-title" style = "font-size: 2.4rem;">Adicionar Aluno</h4>
+  <div class="modal-header">
+    <h1 class="modal-title">Adicionar Aluno</h1>
   </div>
 
-  <div class="modal-body vh-100 mx-5" >
-    <form novalidate>
-      <div class="input-group mb-3 row">
-        <span class="input-group-text col-2" style = "font-size: 1.6rem;">Nome: </span>
-        <input type="text" class="form-control" [formField]="alunoForm.nome" aria-label="Nome" style = "font-size: 1.6rem;">
-        @if (alunoForm.nome().touched() && (alunoForm.nome().invalid() || alunoForm.nome().value() === '')) {
-          <div class="alert alert-danger">
-            <span class="text-danger fw-bold" >Nome inválido...</span>
-          </div>
-        }
-      </div>
-    </form>
-  </div>
+  <form (ngSubmit)="salvar()" class="d-flex flex-column vh-100">
+    <div class="modal-body flex-grow-1 overflow-auto" >
+      <label>Nome: </label>
+      <input type="text" class="form-control" [formField]="alunoForm.nome" aria-label="Nome">
+      @if (alunoForm.nome().touched() && alunoForm.nome().invalid()) {
+        <ul class="error-list">
+          @for (error of alunoForm.nome().errors(); track error) {
+            <li>{{ error.message }}</li>
+          }
+        </ul>
+      }
+    </div>
 
-  <div class="modal-footer align-bottom mx-5 mb-5" >
-    <button class="btn btn-secondary btn-danger" (click)="modal.dismiss()">Cancelar</button>
-    <button class="btn btn-secondary btn-success"
-      (click)="salvar()"
-      [disabled]="!this.alunoForm.nome || this.alunoForm.nome().value() === '' || this.alunoForm.nome().invalid()"
-    >
-      Salvar
-    </button>
-  </div>
+    <div class="modal-footer mt-auto" >
+      <button class="btn btn-secondary btn-danger" type="button" (click)="cancelar($event)">Cancelar</button>
+      <button class="btn btn-secondary btn-success" type="submit" >Salvar</button>
+    </div>
+  </form>
   `
 })
 export class AlunoTurmaAddModalComponent implements OnInit {
@@ -46,20 +49,47 @@ export class AlunoTurmaAddModalComponent implements OnInit {
     nome: ''
   })
 
-  alunoForm = form(this.alunoModel);
+  alunoForm = form(this.alunoModel, schemaPath => {
+    required(schemaPath.nome, {message: `Nome do Aluno deve ser inserido`})
+  });
 
-  get podeSalvar(): boolean {
-    if (!this.alunoForm.nome || this.alunoForm.nome().value() === '' || this.alunoForm.nome().invalid())
-      return false;
-    return true;
-  }
-
-  constructor(public modal: NgbActiveModal) {}
+  constructor(public modal: NgbActiveModal,
+    private formHelper: FormsHelper) {}
 
   ngOnInit(): void {
   }
 
-  salvar(): void {
+  public cancelar(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.modal.dismiss('cancelar')
+  }
+
+  public salvar(): void {
+    this.formHelper.markAllTouched(this.alunoForm);
+
+    if (this.alunoForm().invalid())
+    {
+      Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        }
+      }).fire({
+        icon: 'error',
+        title: 'Erro',
+        text: `Verifique as informações do Aluno`
+      });
+      return
+    }
+
     this.modal.close(this.alunoModel());
   }
 }
+

@@ -87,7 +87,9 @@ export class CriteriosComponent implements OnInit {
     const ref = this.modalService.open(CriterioCriarModalComponent, {
       size: 'lg',
       backdrop: 'static',
-      centered: true
+      centered: true,
+      fullscreen: true,
+      scrollable: true
     });
 
     ref.result.then((criterioEditado: Criterio) => {
@@ -117,7 +119,9 @@ export class CriteriosComponent implements OnInit {
     const ref = this.modalService.open(CriterioEditarModalComponent, {
       size: 'lg',
       backdrop: 'static',
-      centered: true
+      centered: true,
+      fullscreen: true,
+      scrollable: true
     });
 
     ref.componentInstance.criterio = criterio;

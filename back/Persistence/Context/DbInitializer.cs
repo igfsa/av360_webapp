@@ -11,13 +11,25 @@ public static class DbInitializer
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<APIContext>();
 
-        if (await context.Professores.FirstOrDefaultAsync(p => p.UserName == "admin01") != null)
-            return;
+        Console.WriteLine("[SEED] Iniciando...");
 
-        var senhaHash = BCrypt.Net.BCrypt.HashPassword(Environment.GetEnvironmentVariable("AV360_ADMINPWD"));
+        var senha = Environment.GetEnvironmentVariable("AV360_ADMINPWD");
+
+        if (string.IsNullOrEmpty(senha))
+            throw new InvalidOperationException("AV360_ADMINPWD não configurada");
+
+        if(await context.Professores.AnyAsync(p => p.UserName == "admin01"))
+        {
+            Console.WriteLine("[SEED] Admin já existe.");
+            return;
+        }
+
+        var senhaHash = BCrypt.Net.BCrypt.HashPassword(senha);
         var professor = new Professor("admin01", senhaHash, "Administrador");
 
         context.Professores.Add(professor);
         await context.SaveChangesAsync();
+
+        Console.WriteLine("[SEED] Admin criado com sucesso!");
     }
 }

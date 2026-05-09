@@ -8,7 +8,7 @@ public class CriterioNotifier(IHubContext<CriterioHub> hub) : ICriterioNotifier
 {
     private readonly IHubContext<CriterioHub> _hub = hub;
 
-    public async Task CriterioAtualizadoAsync(int criterioId)
+    public async Task CriterioAtualizado(int criterioId)
     {
         await _hub.Clients.All
             .SendAsync("CriterioAtualizado", criterioId);

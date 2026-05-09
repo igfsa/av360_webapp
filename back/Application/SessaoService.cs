@@ -10,11 +10,15 @@ using Domain.Exceptions;
 namespace Application.Services;
 
 public class SessaoService(IGeralPersist geralPersist,
+                    IAlunoService alunoService,
+                    INotaParcialPersist notaParcialPersist,
                     ISessaoPersist SessaoPersist,
                     ITurmaPersist turmaPersist,
                     IMapper mapper) : ISessaoService
 {
     private readonly IGeralPersist _geralPersist = geralPersist;
+    private readonly IAlunoService _alunoService = alunoService;
+    private readonly INotaParcialPersist _notaParcialPersist = notaParcialPersist;
     private readonly ISessaoPersist _sessaoPersist = SessaoPersist;
     private readonly ITurmaPersist _turmaPersist = turmaPersist;
     private readonly IMapper _mapper = mapper;
@@ -40,6 +44,50 @@ public class SessaoService(IGeralPersist geralPersist,
             var sessao = await _sessaoPersist.GetSessaoAtivaTurmaIdAsync(TurmaId)
                 ?? null!;
             return _mapper.Map<SessaoDTO>(sessao);
+        }
+        catch
+        {
+            throw;
+        }
+    }
+    public async Task<IEnumerable<SessaoDTO>> GetSessoesTurmaIdAsync(int turmaId)
+    {
+        try
+        {
+            var sessoes = await _sessaoPersist.GetSessoesTurmaIdAsync(turmaId)
+                ?? null!;
+            return _mapper.Map<IEnumerable<SessaoDTO>>(sessoes);
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+    public async Task<List<AvaliacaoConsolidadaExportDTO>> GetAvaliacaoConsolidada(int sessaoId)
+    {
+        try
+        {
+            var sessao = await _sessaoPersist.GetSessaoIdAsync(sessaoId) 
+                ?? throw new NotFoundException("Sessão inválida");
+            var notasParciais = await _notaParcialPersist.GetNotaParcialSessaoIdAsync(sessaoId);
+            var alunos = await _alunoService.GetAlunosTurma(sessao.TurmaId);
+            var alunosDict = alunos.ToDictionary(a => a.Id, a => a.Nome);
+
+            var alunoNota = notasParciais
+                .GroupBy(n => n.AvaliadoId)
+                .Select(np => new AvaliacaoConsolidadaExportDTO
+                {
+                    Aluno = alunosDict.GetValueOrDefault(
+                        np.Key,
+                        "Não identificado"
+                    ),
+                    Nota = np.Average(c => c.Nota)
+                })
+                .OrderBy(an => an.Aluno)
+                .ToList();
+
+            return alunoNota; 
         }
         catch
         {

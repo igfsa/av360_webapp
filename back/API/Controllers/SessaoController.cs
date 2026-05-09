@@ -10,19 +10,43 @@ namespace API.Controllers;
 [ApiController]
 [Route("api/[controller]/[action]")]
 public class SessaoController(ISessaoService sessoesService,
-                    ITurmaNotifier turmaNotifier) : ControllerBase
+                    IExportService exportService,
+                    ITurmaNotifier turmaNotifier,
+                    ISessaoNotifier sessaoNotifier) : ControllerBase
 {
     private readonly ISessaoService _sessoesService = sessoesService;
+    private readonly IExportService _exportService = exportService;
     private readonly ITurmaNotifier _turmaNotifier = turmaNotifier;
+    private readonly ISessaoNotifier _sessaoNotifier = sessaoNotifier;
+
+
 
 
     [Authorize]
-    [HttpGet("{turmaId:int}", Name = "GetSessaoAtivaTurma")]
+    [HttpGet("{id:int}")]
+    [ActionName("GetSessaoId")]
+    public async Task<ActionResult<SessaoDTO>> Get(int id)
+    {
+        var Sessao = await _sessoesService.GetSessaoById(id);
+        return Ok(Sessao);
+    }
+
+    [Authorize]
+    [HttpGet("{turmaId:int}")]
     [ActionName("GetSessaoAtivaTurma")]
     public async Task<ActionResult<SessaoDTO>> GetSessaoAtivaTurmaIdAsync(int turmaId)
     {
         var sessao = await _sessoesService.GetSessaoAtivaTurmaIdAsync(turmaId);
         return Ok(sessao);
+    }
+
+    [Authorize]
+    [HttpGet("{turmaId:int}")]
+    [ActionName("GetSessoesTurmaId")]
+    public async Task<ActionResult<IEnumerable<SessaoDTO>>> GetSessoesTurmaIdAsync(int turmaId)
+    {
+        var sessoes = await _sessoesService.GetSessoesTurmaIdAsync(turmaId);
+        return Ok(sessoes);
     }
 
     [AllowAnonymous]
@@ -38,13 +62,29 @@ public class SessaoController(ISessaoService sessoesService,
     }
 
     [Authorize]
+    [HttpGet("{sessaoId:int}")]
+    [ActionName("GetExportConsolidado")]
+    public async Task<IActionResult> GetExportConsolidado(int sessaoId)
+    {
+        var dados = await _sessoesService.GetAvaliacaoConsolidada(sessaoId);
+
+        var arquivo = await _exportService.ExportAvaliacaoConsolidada(dados);
+
+        return File(
+            arquivo,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "avaliacoes.xlsx"
+        );
+    }
+
+    [Authorize]
     [HttpPost]
     [ActionName("PostSessao")]
     public async Task<ActionResult<SessaoDTO>> Post(SessaoDTO model)
     {
         var Sessao = await _sessoesService.Add(model);
 
-        await _turmaNotifier.TurmaAtualizadaAsync(Sessao.TurmaId);
+        await _turmaNotifier.TurmaAtualizada(Sessao.TurmaId);
         return Ok(Sessao);
     }
 
@@ -55,7 +95,8 @@ public class SessaoController(ISessaoService sessoesService,
     {
         var Sessao = await _sessoesService.EncerrarSessao(sessaoId, model);
 
-        await _turmaNotifier.TurmaAtualizadaAsync(Sessao.TurmaId);
+        await _turmaNotifier.TurmaAtualizada(Sessao.TurmaId);
+        await _sessaoNotifier.SessaoFinalizada(sessaoId);
         return Ok(Sessao);
     }
 }

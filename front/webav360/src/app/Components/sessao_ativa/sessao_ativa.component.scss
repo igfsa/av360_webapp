@@ -3,10 +3,16 @@ th {
   text-align: center;
 }
 
+.tittle-box{
+  border-right: 0.2rem solid var(--secondary);
+}
+
 .dashboard-section{
   display: flex;
   width: 100%;
   flex-wrap: wrap;
+  border-radius: 0.5rem;
+  background: var(--light);
 }
 
 .dashboard-item{
@@ -16,14 +22,13 @@ th {
   display: flex;
   align-items: center;
   flex-direction: column;
-  background: var(--light);
 }
 
 .item-titulo{
   text-align: center;
   height: 5rem;
   width: 100%;
-  background: var(--secondary);
+  background: var(--bs-purple);
   color: var(--light);
   font-weight: bolder;
   margin-bottom: 0;

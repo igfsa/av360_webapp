@@ -35,7 +35,10 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
 
       const isRefresh = req.url.includes('/Autenticacao/Refresh');
 
-      if (err.status === 401 && !isPublic && !isRefresh) {
+      const isLogin = req.url.includes('/Autenticacao/Login');
+
+
+      if (err.status === 401 && !isPublic && !isRefresh && !isLogin) {
         return http
           .post('/api/Autenticacao/Refresh', {}, { withCredentials: true })
           .pipe(

@@ -8,7 +8,7 @@ public class GrupoNotifier(IHubContext<GrupoHub> hub) : IGrupoNotifier
 {
     private readonly IHubContext<GrupoHub> _hub = hub;
 
-    public async Task GrupoAtualizadoAsync(int grupoId)
+    public async Task GrupoAtualizado(int grupoId)
     {
         await _hub.Clients.All
             .SendAsync("GrupoAtualizado", grupoId);

@@ -5,11 +5,3 @@ export interface ImportAlunos {
   colunaNome: string;
   file: File | null;
 }
-
-export function createEmptyImport(): ImportAlunos {
-  return {
-    turmaId: 0,
-    colunaNome: '',
-    file: null
-  }
-}

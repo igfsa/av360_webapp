@@ -40,7 +40,7 @@ public class CriterioController(
     {
         var criterio = await _criterioService.Add(model);
 
-        await _criterioNotifier.CriterioAtualizadoAsync(criterio.Id);
+        await _criterioNotifier.CriterioAtualizado(criterio.Id);
         return Ok(criterio);
     }
 
@@ -51,7 +51,7 @@ public class CriterioController(
     {
         var criterio = await _criterioService.Update(id, model);
 
-        await _criterioNotifier.CriterioAtualizadoAsync(model.Id);
+        await _criterioNotifier.CriterioAtualizado(model.Id);
         return Ok(criterio);
     }
 

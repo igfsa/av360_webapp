@@ -7,4 +7,5 @@ public interface ISessaoPersist
     Task<Sessao?> GetSessaoIdAsync(int SessaoId);
     Task<Sessao?> GetSessaoAtivaTurmaIdAsync(int TurmaId);
     Task<Sessao?> GetValidaSessaoChavePubAsync(string token);
+    Task<Sessao[]> GetSessoesTurmaIdAsync(int turmaId);
 }

@@ -54,6 +54,21 @@ namespace Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "professores",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    user_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    nome = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    senha_hash = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_professores", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "turmas",
                 columns: table => new
                 {
@@ -65,6 +80,28 @@ namespace Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_turmas", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "refresh_tokens",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    token = table.Column<string>(type: "text", nullable: false),
+                    expira_em = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    revogado = table.Column<bool>(type: "boolean", nullable: false),
+                    professor_id = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_refresh_tokens", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_refresh_tokens_professores_professor_id",
+                        column: x => x.professor_id,
+                        principalTable: "professores",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -167,7 +204,7 @@ namespace Persistence.Migrations
                     sessao_id = table.Column<int>(type: "integer", nullable: false),
                     avaliador_id = table.Column<int>(type: "integer", nullable: false),
                     grupo_id = table.Column<int>(type: "integer", nullable: false),
-                    device_hash = table.Column<string>(type: "character(65)", fixedLength: true, maxLength: 65, nullable: false),
+                    device_hash = table.Column<string>(type: "character varying(65)", maxLength: 65, nullable: false),
                     data_envio = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -308,6 +345,23 @@ namespace Persistence.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "ix_professores_user_name",
+                table: "professores",
+                column: "user_name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_refresh_tokens_professor_id",
+                table: "refresh_tokens",
+                column: "professor_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_refresh_tokens_token",
+                table: "refresh_tokens",
+                column: "token",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "ix_sessoes_turma_id",
                 table: "sessoes",
                 column: "turma_id");
@@ -329,10 +383,16 @@ namespace Persistence.Migrations
                 name: "notas_parciais");
 
             migrationBuilder.DropTable(
+                name: "refresh_tokens");
+
+            migrationBuilder.DropTable(
                 name: "criterios");
 
             migrationBuilder.DropTable(
                 name: "notas_finais");
+
+            migrationBuilder.DropTable(
+                name: "professores");
 
             migrationBuilder.DropTable(
                 name: "alunos");

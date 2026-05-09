@@ -9,4 +9,5 @@ public class SessaoDTO
     public DateTime? DataFim { get; set; }
     public string TokenPublico { get; set; } = null!;
     public bool Ativo { get; set; } = false;
+    public IEnumerable<NotaFinalDTO>? NotasFinais { get; set; }
 }

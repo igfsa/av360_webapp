@@ -2,6 +2,7 @@ import { Component, Input, OnInit, ChangeDetectionStrategy, Inject, } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import Swal from 'sweetalert2';
 
 import { Turma } from '../../../Models/Turma';
 import { Grupo } from '../../../Models/Grupo';
@@ -16,53 +17,49 @@ import { Grupo } from '../../../Models/Grupo';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="modal-header">
-      <h4 class="modal-title" style = "font-size: 2.4rem;">Equipes Turma {{ turma.cod }}</h4>
+      <h1 class="modal-title" style = "font-size: 2.4rem;">Equipes Turma {{ turma.cod }}</h1>
     </div>
-    <div class="modal-body">
-      <form [formGroup]="form">
-        <table class="table table-hover">
-          <tbody>
-            <div formArrayName="grupos">
-              @for (grupo of grupos.controls; track grupo.get('id')?.value; let i = $index)
-              {
-                <div class="input-group mb-3 row" [formGroupName]="i">
-                  <span class="input-group-text col-2" id="basic-addon1" style = "font-size: 1.6rem;">Equipe: </span>
-                  <input
-                    type="text"
-                    class="form-control"
-                    style="font-size: 1.6rem;"
-                    formControlName="nome"
-                    placeholder="Nome da equipe"
-                  />
-                  @if (grupo.get('nome')?.touched && grupo.get('nome')?.invalid) {
-                    <div class="alert alert-danger">
-                      <span class="text-danger fw-bold" >Nome inválido...</span>
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-          </tbody>
-          <tfoot>
-            <button class="btn btn-secondary btn-success"
-                type="button"
-                (click)="addGrupo()"
-                [disabled]="form.invalid">
-              Nova Equipe
-            </button>
-          </tfoot>
-        </table>
-      </form>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary btn-danger" (click)="modal.dismiss()">Cancelar</button>
-      <button class="btn btn-secondary btn-success" (click)="salvar()" [disabled]="!podeSalvar">Salvar</button>
-    </div>
+    <form (ngSubmit)="salvar()" [formGroup]="form" class="d-flex flex-column vh-100">
+      <div class="modal-body flex-grow-1 overflow-auto" formArrayName="grupos">
+        @for (grupo of grupos.controls; track grupo.get('id')?.value; let i = $index)
+        {
+          <div [formGroupName]="i">
+            @if(grupo.get('id')?.value === 0){
+              <label class="text-success fw-bold">Nova Equipe: </label>
+            } @else {
+              <label>Equipe: </label>
+            }
+            <input
+              type="text"
+              class="form-control"
+              formControlName="nome"
+              placeholder="Nome da equipe"
+            />
+            @if (grupo.get('nome')?.touched && grupo.get('nome')?.invalid) {
+              <ul class="error-list">
+                  <li class="text-danger fw-bold">Nome da equipe deve ser inserido</li>
+              </ul>
+            }
+          </div>
+        }
+
+        <button class="btn btn-secondary btn-success"
+            type="button"
+            (click)="addGrupo()">
+          Nova Equipe
+        </button>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-danger" (click)="cancelar($event)">Cancelar</button>
+        <button type="submit" class="btn btn-secondary btn-success">Salvar</button>
+      </div>
+  </form>
   `
 })
 export class TurmaGrupoModalComponent implements OnInit {
 
-  @Input() turma!: Turma;
+  @Input() turma: Turma = ({id: 0, cod: '', notaMax: 0});
   @Input() gruposOrig: Grupo[] = [];
   @Inject(FormBuilder) private fb: FormBuilder = new FormBuilder;
 
@@ -115,7 +112,33 @@ export class TurmaGrupoModalComponent implements OnInit {
     )
   }
 
+  public cancelar(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.modal.dismiss('cancelar')
+  }
+
   public addGrupo() {
+    if (this.form.invalid){
+      Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        }
+      }).fire({
+        icon: 'error',
+        title: 'Erro',
+        text: `Todas equipes anteriores devem estar com nome para criar uma nova. Verifique novamente.`
+      });
+      return
+    }
+
     this.grupos.push(this.criaGrupo());
   }
 
@@ -145,6 +168,27 @@ export class TurmaGrupoModalComponent implements OnInit {
   }
 
   public salvar(): void {
+    this.form.markAllAsTouched();
+
+    if (!this.podeSalvar){
+      Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        }
+      }).fire({
+        icon: 'error',
+        title: 'Erro',
+        text: `Apenas a última nova equipe pode estar em branco.`
+      });
+      return
+    }
+
     this.removerUltimoVazio();
 
     const differences = this.getDiff(this.gruposOrig, this.grupos.value as Grupo[]);

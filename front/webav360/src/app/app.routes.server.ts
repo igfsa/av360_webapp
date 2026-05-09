@@ -10,7 +10,7 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Server
   },
   {
-    path: 'sessao/:id',
+    path: 'sessao-ativa/:id',
     renderMode: RenderMode.Server
   },
   {
