@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, Inject, Input, OnInit, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, Inject, Input, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
 import { DecimalPipe, isPlatformBrowser } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';import {
@@ -18,15 +18,13 @@ import { Criterio } from '../../Models/Criterio';
 import { Grupo } from '../../Models/Grupo';
 import { Sessao } from '../../Models/Sessao';
 
-import { AlunoService } from '../../Service/Aluno.service';
 import { TurmaService } from '../../Service/Turma.service';
-import { CriterioService } from '../../Service/Criterio.service';
-import { GrupoService } from '../../Service/Grupo.service';
 import { SessaoService } from '../../Service/Sessao.service';
 import { SessaoRealTime } from '../../Service/SessaoRealTime.service';
 import { DashboardSessao } from '../../Models/Dashboard/DashboardSessao';
 import { AuthService } from '../../auth/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
 
 @Component({
   selector: 'app-sessao-ativa',
@@ -43,11 +41,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   templateUrl: './sessao_ativa.component.html',
   styleUrls: ['./sessao_ativa.component.scss','../../app.scss']
 })
-export class SessaoAtivaComponent implements OnInit {
+export class SessaoAtivaComponent implements OnInit, OnDestroy {
 
-  public alunos: Aluno[]  = [];
-  public criterios: Criterio[]  = [];
-  public grupos: Grupo[]  = [];
   public turma: Turma = ({id: 0, cod: '', notaMax: 0});
   public sessaoAtiva?: Sessao;
   public qrCode: string = '';
@@ -61,17 +56,16 @@ export class SessaoAtivaComponent implements OnInit {
     , criterios: []
     , grupos: []
   });
+  private sessaoinicializada?: number;
 
   constructor(
-    private alunoService: AlunoService,
     private turmaService: TurmaService,
-    private criterioService: CriterioService,
-    private grupoService: GrupoService,
     private sessaoService: SessaoService,
     private route: ActivatedRoute,
     private router: Router,
     private cdr: ChangeDetectorRef,
     private sessaoRealTime: SessaoRealTime,
+    private turmaRealTime: TurmaRealTime,
     private authService: AuthService,
     @Inject(PLATFORM_ID) private platformId: Object,
     @Inject(DestroyRef) private destroyRef: DestroyRef
@@ -81,15 +75,14 @@ export class SessaoAtivaComponent implements OnInit {
     if (this.authService.isLogged()){
       const turmaId = Number(this.route.snapshot.paramMap.get('id'));
 
-      this.loadData(turmaId);
+      if (isPlatformBrowser(this.platformId)) {
+        this.loadData(turmaId);
 
-      if (isPlatformBrowser(this.platformId) && this.sessaoAtiva) {
-        const sessaoId = this.sessaoAtiva.id;
-        this.sessaoRealTime.connect()?.then(() => {
-          this.sessaoRealTime.acessarSessao(sessaoId);
+        this.turmaRealTime.connect()?.then(() => {
+          this.turmaRealTime.acessarTurma(turmaId);
         });
 
-        this.sessaoRealTime.sessaoAtualizada$
+        this.turmaRealTime.sessaoTurmaCriada$
           .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe(id => {
             if (id === turmaId) {
@@ -99,37 +92,28 @@ export class SessaoAtivaComponent implements OnInit {
     }}
   }
 
+  ngOnDestroy(): void {
+    this.turmaRealTime.disconnect();
+    this.sessaoRealTime.disconnect();
+  }
+
   public loadData(turmaId: number) {
     forkJoin({
-      alunos: this.alunoService.getAlunosTurma(turmaId),
-      criterios: this.criterioService.getCriteriosTurma(turmaId),
-      grupos: this.grupoService.getGruposTurma(turmaId),
       turma: this.turmaService.getTurmaId(turmaId),
       sessaoAtiva: this.sessaoService.getSessaoAtivaTurma(turmaId),
-    }).subscribe(({ alunos, criterios, grupos, turma, sessaoAtiva }) => {
+    }).subscribe(({turma, sessaoAtiva }) => {
       this.turma = turma;
-      this.alunos = alunos;
-      this.criterios = criterios;
-      this.grupos = grupos;
       this.sessaoAtiva = sessaoAtiva;
 
-      if (sessaoAtiva){
-        const urlTree = this.router.createUrlTree([`/sessao-qrcode/${sessaoAtiva.id}`]);
+      if (sessaoAtiva && this.sessaoinicializada !== sessaoAtiva.id){
 
+        this.conectarSessao(sessaoAtiva.id);
         this.loadSessao(sessaoAtiva.id);
 
+        const urlTree = this.router.createUrlTree([`/sessao-qrcode/${sessaoAtiva.id}`]);
         window.open(this.router.serializeUrl(urlTree), '_blank')
 
-        this.sessaoRealTime.connect()?.then(() => {
-          this.sessaoRealTime.acessarSessao(sessaoAtiva.id);
-        });
-
-        this.sessaoRealTime.sessaoAtualizada$
-          .subscribe(id => {
-            if (id === sessaoAtiva.id) {
-              this.loadSessao(sessaoAtiva.id);
-            }
-        });
+        this.sessaoinicializada = sessaoAtiva.id;
       }
 
       this.cdr.detectChanges();
@@ -143,7 +127,17 @@ export class SessaoAtivaComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        Swal.fire({
+        Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        }).fire({
           icon: 'error',
           title: 'Erro',
           text: err.error?.message ?? `Erro ao buscar dashboard`
@@ -152,7 +146,84 @@ export class SessaoAtivaComponent implements OnInit {
     });
   }
 
-  public criaSessao() {
+  private conectarSessao(sessaoId: number): void {
+
+    this.sessaoRealTime.connect()?.then(() => {
+      this.sessaoRealTime.acessarSessao(sessaoId);
+    });
+
+    this.sessaoRealTime.sessaoAtualizada$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(id => {
+        if (id === sessaoId) {
+          this.loadData(this.turma.id);
+        }
+      });
+
+    this.sessaoRealTime.sessaoFinalizada$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(id => {
+        if (id === sessaoId) {
+          this.sessaoRealTime.disconnect();
+          this.loadData(this.turma.id);
+          this.sessaoinicializada = undefined;
+        }
+      });
+  }
+
+  public validaInicioSessao () {
+    let podeIniciar: boolean = false;
+    this.sessaoService.getValidaInicioSessao(this.turma.id)
+      .subscribe({
+        next: (res) => {
+          podeIniciar = res.podeIniciar;
+          if (!podeIniciar) {
+            let texto: string = '<ul class="error-list">';
+            res.mensagens.forEach(m => {
+              texto += `<li>${m.tipo}: ${m.mensagem}. </li>`;
+            })
+            texto += `</ul>`;
+            Swal.fire({
+              icon: 'error',
+              title: 'Erro',
+              html: texto
+            });
+          }
+          else if (podeIniciar && res.mensagens.length > 0) {
+            let texto: string = '<ul class="warning-list">';
+            res.mensagens.forEach(m => {
+              texto += `<li>${m.tipo}: ${m.mensagem}. </li>`;
+            })
+            texto += `</ul>`;
+            Swal.fire({
+              icon: 'warning',
+              title: 'Aviso',
+              showDenyButton: true,
+              confirmButtonText: "Iniciar Sessão",
+              denyButtonText: `Cancelar`,
+              html: `${texto}
+                      <br> Deseja seguir com o início da sessão?`
+            }).then((res) => {
+              if (res.isConfirmed)
+                this.criaSessao();
+              if (res.isDenied)
+                return
+            });
+          } else if (podeIniciar && res.mensagens.length == 0) {
+            this.criaSessao();
+          }
+        },
+        error: (err) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: err.error?.message ?? `Erro ao criar Período de Avaliação`
+          });
+        }
+      })
+  }
+
+  private criaSessao() {
     this.sessaoService.postSessao({
       id: 0,
       turmaId: this.turma.id,
@@ -163,7 +234,17 @@ export class SessaoAtivaComponent implements OnInit {
       ativo: true
     }).subscribe({
       next: () => {
-        Swal.fire({
+        Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        }).fire({
           icon: 'success',
           title: 'Sucesso',
           text: `Período de Avaliação criado com sucesso!`
@@ -179,15 +260,35 @@ export class SessaoAtivaComponent implements OnInit {
     });
   }
 
-  public encerrarSessao() {
+  public validarEncerrarSessao(){
     if (this.sessaoAtiva){
-      this.sessaoService.putEncerraSessao(this.sessaoAtiva).subscribe({
-        next: () => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Sucesso',
-            text: `Período de Avaliação Encerrado!`
-          });
+      this.sessaoService.getFaltamAvaliarSessao(this.sessaoAtiva.id).subscribe({
+        next: (res) => {
+          if (res.length != 0){
+            let texto: string = '<ul class="warning-list">';
+            res.forEach(a => {
+              texto += `<li>${a.nome}. </li>`;
+            })
+            texto += `</ul>`;
+            Swal.fire({
+              icon: 'warning',
+              title: 'Aviso',
+              showDenyButton: true,
+              confirmButtonText: "Encerrar Sessão",
+              denyButtonText: `Cancelar`,
+              html: `${res.length } alunos sem avaliar.
+                      <br> ${texto}
+                      <br> Deseja seguir com o fim da sessão?`
+            }).then((res) => {
+              if (res.isConfirmed)
+                this.encerrarSessao();
+              if (res.isDenied)
+                return
+            });
+          } else {
+            this.encerrarSessao();
+          }
+
         },
         error: (err) => {
           Swal.fire({
@@ -196,8 +297,37 @@ export class SessaoAtivaComponent implements OnInit {
             text: err.error?.message ?? `Erro ao encerrar Período de Avaliação`
           });
         }
-      });
+      })
     }
+  }
+
+  private encerrarSessao() {
+    this.sessaoService.putEncerraSessao(this.sessaoAtiva!).subscribe({
+      next: () => {
+        Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        }).fire({
+          icon: 'success',
+          title: 'Sucesso',
+          text: `Período de Avaliação Encerrado!`
+        });
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: err.error?.message ?? `Erro ao encerrar Período de Avaliação`
+        });
+      }
+    });
   }
 
   public dashboardReset(sessaoId: number){
@@ -207,7 +337,17 @@ export class SessaoAtivaComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        Swal.fire({
+        Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        }).fire({
           icon: 'error',
           title: 'Erro',
           text: err.error?.message ?? `Erro ao buscar dashboard`

@@ -15,7 +15,6 @@ public class AvaliacaoService(IGeralPersist geralPersist,
                     ICriterioPersist criterioPersist,
                     IGrupoService grupoService,
                     IGrupoPersist grupoPersist,
-                    INotaParcialPersist notaParcialPersist,
                     ITurmaService turmaService,
                     IDashboardCacheService dashboardCache
                     ) : IAvaliacaoService
@@ -29,7 +28,6 @@ public class AvaliacaoService(IGeralPersist geralPersist,
     private readonly ICriterioPersist _criterioPersist = criterioPersist;
     private readonly IGrupoService _grupoService = grupoService;
     private readonly IGrupoPersist _grupoPersist = grupoPersist;
-    private readonly INotaParcialPersist _notaParcialPersist = notaParcialPersist;
     private readonly ITurmaService _turmaService = turmaService;
     private readonly IDashboardCacheService _dashboardCache = dashboardCache;
 

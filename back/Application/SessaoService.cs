@@ -11,6 +11,8 @@ namespace Application.Services;
 
 public class SessaoService(IGeralPersist geralPersist,
                     IAlunoService alunoService,
+                    IAlunoGrupoPersist alunoGrupoPersist,
+                    IAlunoTurmaPersist alunoTurmaPersist,
                     INotaParcialPersist notaParcialPersist,
                     ISessaoPersist SessaoPersist,
                     ITurmaPersist turmaPersist,
@@ -18,6 +20,8 @@ public class SessaoService(IGeralPersist geralPersist,
 {
     private readonly IGeralPersist _geralPersist = geralPersist;
     private readonly IAlunoService _alunoService = alunoService;
+    private readonly IAlunoGrupoPersist _alunoGrupoPersist = alunoGrupoPersist;
+    private readonly IAlunoTurmaPersist _alunoTurmaPersist = alunoTurmaPersist;
     private readonly INotaParcialPersist _notaParcialPersist = notaParcialPersist;
     private readonly ISessaoPersist _sessaoPersist = SessaoPersist;
     private readonly ITurmaPersist _turmaPersist = turmaPersist;
@@ -72,17 +76,18 @@ public class SessaoService(IGeralPersist geralPersist,
                 ?? throw new NotFoundException("Sessão inválida");
             var notasParciais = await _notaParcialPersist.GetNotaParcialSessaoIdAsync(sessaoId);
             var alunos = await _alunoService.GetAlunosTurma(sessao.TurmaId);
-            var alunosDict = alunos.ToDictionary(a => a.Id, a => a.Nome);
 
-            var alunoNota = notasParciais
-                .GroupBy(n => n.AvaliadoId)
-                .Select(np => new AvaliacaoConsolidadaExportDTO
-                {
-                    Aluno = alunosDict.GetValueOrDefault(
-                        np.Key,
-                        "Não identificado"
-                    ),
-                    Nota = np.Average(c => c.Nota)
+            var alunoNota = alunos
+                .Select(a => {
+                    var notas = notasParciais.Where(np => np.AvaliadoId == a.Id);
+                    return new AvaliacaoConsolidadaExportDTO
+                    {
+                        Aluno = a.Nome ??
+                            "Não identificado",
+                        Nota = notas.Any()
+                            ? notas.Average(c => c.Nota)
+                            : 0
+                    };
                 })
                 .OrderBy(an => an.Aluno)
                 .ToList();
@@ -94,6 +99,87 @@ public class SessaoService(IGeralPersist geralPersist,
             throw;
         }
     }
+    public async Task<SessaoValidacaoDTO> GetValidaInicioSessao(int turmaId)
+    {
+        try
+        {
+            var turma = await _turmaPersist.GetTurmaIdAsync(turmaId)
+                ?? throw new NotFoundException("Turma não encontrada");
+
+            var retorno = new SessaoValidacaoDTO();
+
+            var alunos = turma.Alunos;
+            var alunoGrupos = await _alunoGrupoPersist.GetAlunosGrupoTurmaId(turmaId);
+            var alunoComGrupoIds = alunoGrupos.Select(ag => ag.AlunoId).ToHashSet();
+            var alunosSemGrupo = alunos.Where(a => !alunoComGrupoIds.Contains(a.Id));
+
+            if(alunos.Count == 0)
+            {
+                retorno.Mensagens.Add(new SessaoValidacaoMensagemDTO
+                {
+                   Tipo = "Erro",
+                   Mensagem = "Nenhum aluno vinculado à turma."
+                });
+
+                retorno.PodeIniciar = false;
+            }
+
+            if(alunoGrupos.Length == 0)
+            {                
+                retorno.Mensagens.Add(new SessaoValidacaoMensagemDTO
+                {
+                   Tipo = "Erro",
+                   Mensagem = "Sem vínculos de alunos à equipe na turma."
+                });
+
+                retorno.PodeIniciar = false;
+            }
+
+            if(turma.Criterios.Count == 0)
+            {                
+                retorno.Mensagens.Add(new SessaoValidacaoMensagemDTO
+                {
+                   Tipo = "Erro",
+                   Mensagem = "Nenhum critério vinculado à turma."
+                });
+
+                retorno.PodeIniciar = false;
+            }
+
+            if(alunosSemGrupo.Any())
+            {                
+                retorno.Mensagens.Add(new SessaoValidacaoMensagemDTO
+                {
+                   Tipo = "Aviso",
+                   Mensagem = "Existem alunos sem equipe."
+                });
+            }
+
+            return retorno;
+        } catch {
+            throw;
+        }
+    }
+    public async Task<IEnumerable<AlunoDTO>> GetFaltamAvaliarSessao(int sessaoId)
+    {
+        try
+        {
+            var sessao = await _sessaoPersist.GetSessaoIdAsync(sessaoId)
+                ?? throw new NotFoundException("Sessão não encontrada");
+
+            var turma = await _turmaPersist.GetTurmaIdAsync(sessao.TurmaId);
+            var alunos = turma!.Alunos;
+            var notasFinais = sessao.Notasfinais;
+
+            var alunosAvaliaram = notasFinais.Select(n => n.AvaliadorId).ToHashSet();
+
+            var alunosSemAvaliar = alunos.Where(a => !alunosAvaliaram.Contains(a.Id));
+
+            return _mapper.Map<IEnumerable<AlunoDTO>>(alunosSemAvaliar);
+        } catch {
+            throw;
+        }
+    }
     #endregion
     #region add
     public async Task<SessaoDTO> Add(SessaoDTO model)
@@ -102,6 +188,8 @@ public class SessaoService(IGeralPersist geralPersist,
         {
             var turma = await _turmaPersist.GetTurmaIdAsync(model.TurmaId)
                 ?? throw new NotFoundException("Turma não encontrada");
+            if(await _sessaoPersist.GetSessaoAtivaTurmaIdAsync(model.TurmaId) != null)
+                throw new BusinessException("Já existe Avaliação ativa para esta turma.");
             var sessao = new Sessao
             (
                 turma: turma,

@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Sessao } from '../Models/Sessao';
 import { DashboardSessao } from '../Models/Dashboard/DashboardSessao';
+import { SessaoValidacao } from '../Models/SessaoValidacao';
+import { Aluno } from '../Models/Aluno';
 
 @Injectable({
   providedIn: 'root'
@@ -41,6 +43,14 @@ export class SessaoService {
 
         window.URL.revokeObjectURL(url);
       });
+  }
+
+  public getValidaInicioSessao(turmaId: number): Observable<SessaoValidacao> {
+    return this.http.get<SessaoValidacao>(`/api/Sessao/GetValidaInicioSessao/${turmaId}`);
+  }
+
+  public getFaltamAvaliarSessao(sessaoId: number): Observable<Aluno[]> {
+    return this.http.get<Aluno[]>(`/api/Sessao/GetFaltamAvaliarSessao/${sessaoId}`);
   }
 
   public postSessao (sessao: Sessao): Observable<Sessao>{

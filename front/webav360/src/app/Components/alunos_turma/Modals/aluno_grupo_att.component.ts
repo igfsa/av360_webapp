@@ -17,7 +17,7 @@ import { AlunoGrupo } from '../../../Models/AlunoGrupo';
       <h4 class="modal-title" style = "font-size: 2.4rem;">Equipe {{ grupo.nome }}</h4>
     </div>
     <div class="modal-body">
-      <table id="main-table" class="table text-center table-hover">
+      <table id="main-table" class="table table-striped text-center table-hover">
         <thead class="table-dark">
           <tr>
             <th></th>

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { form, FormField, max, min, required } from '@angular/forms/signals';
+import { form, FormField, max, maxLength, min, required } from '@angular/forms/signals';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { Aluno } from '../../../Models/Aluno';
@@ -16,7 +16,6 @@ import { FormsHelper } from '../../../Helpers/formsHelper';
     FormsModule,
     FormField,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
   <div class="modal-header">
     <h1 class="modal-title">Adicionar Aluno</h1>
@@ -26,6 +25,9 @@ import { FormsHelper } from '../../../Helpers/formsHelper';
     <div class="modal-body flex-grow-1 overflow-auto" >
       <label>Nome: </label>
       <input type="text" class="form-control" [formField]="alunoForm.nome" aria-label="Nome">
+      <small [class.text-danger]="alunoForm.nome().value().length >= 100">
+        {{ alunoForm.nome().value().length }}/100
+      </small>
       @if (alunoForm.nome().touched() && alunoForm.nome().invalid()) {
         <ul class="error-list">
           @for (error of alunoForm.nome().errors(); track error) {
@@ -50,7 +52,8 @@ export class AlunoTurmaAddModalComponent implements OnInit {
   })
 
   alunoForm = form(this.alunoModel, schemaPath => {
-    required(schemaPath.nome, {message: `Nome do Aluno deve ser inserido`})
+    required(schemaPath.nome, {message: `Nome do Aluno deve ser inserido`});
+    maxLength(schemaPath.nome, 100, {message: 'Nome do Aluno não pode ter mais de 100 caracteres.'});
   });
 
   constructor(public modal: NgbActiveModal,

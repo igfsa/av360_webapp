@@ -12,9 +12,9 @@ export class SessaoRealTime {
   sessaoAtualizada$ = new Subject<number>();
   sessaoFinalizada$ = new Subject<number>();
 
-constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
-  connect() {
+  public connect() {
 
     if (!isPlatformBrowser(this.platformId)) {
       return;
@@ -42,6 +42,19 @@ constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
     return this.hub.start()
         .catch(err => console.error('SignalR error:', err));
+  }
+
+  public disconnect() {
+
+    if (this.hub) {
+
+      this.hub.stop()
+        .catch(err =>
+          console.error('Erro ao desconectar SignalR:', err)
+        );
+
+      this.hub = undefined!;
+    }
   }
 
   public acessarSessao(sessaoId: number) {

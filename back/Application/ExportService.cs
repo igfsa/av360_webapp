@@ -31,7 +31,7 @@ public class ExportService() :IExportService
             ws.Column(2)
                 .Style
                 .NumberFormat
-                .Format = "0.00";
+                .Format = "0.0";
 
             ws.Columns().AdjustToContents();
 

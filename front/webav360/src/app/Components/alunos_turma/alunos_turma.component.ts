@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Inject, Input, OnInit, PLATFORM_ID, DestroyRef } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, Input, OnInit, PLATFORM_ID, DestroyRef, OnDestroy } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -59,7 +59,7 @@ import { AlunoTurmaAddModalComponent } from './Modals/aluno_turma_add.component'
   templateUrl: './alunos_turma.component.html',
   styleUrls: ['./alunos_turma.component.scss', '../../app.scss'],
 })
-export class AlunoTurmaComponent implements OnInit {
+export class AlunoTurmaComponent implements OnInit, OnDestroy {
 
   @Input() turmaEditar!: Turma;
 
@@ -125,6 +125,10 @@ export class AlunoTurmaComponent implements OnInit {
     )
   }
 
+  public quantidadeAlunosGrupo(grupo : number): number{
+    return this.alunoGrupo.filter(q => q.grupoId == grupo).length;
+  }
+
   Id: string = '';
   Nome: string = '';
 
@@ -163,6 +167,10 @@ export class AlunoTurmaComponent implements OnInit {
           });
     }}
   };
+
+  ngOnDestroy(): void {
+    this.turmaRealTime.disconnect();
+  }
 
   public loadData(turmaId: number) {
     forkJoin({

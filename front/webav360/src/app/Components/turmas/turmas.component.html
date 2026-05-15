@@ -7,7 +7,7 @@
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
         <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
       </svg>
-      Adicionar
+      Adicionar Turma
     </button>
   </div>
 
@@ -18,7 +18,7 @@
       <thead class="table-dark">
         <tr>
           <th style = 'width: 10%; text-align: center;'>#</th>
-          <th>Cod</th>
+          <th>Nome</th>
           <th>Nota Máxima</th>
           <th style = 'width: 20%; text-align: center;'>Ações</th>
         </tr>
@@ -31,7 +31,7 @@
               <td>{{turma.cod}}</td>
               <td>{{turma.notaMax}}</td>
               <td style= 'text-align: center'>
-                <button type="button" class="btn-editar btn btn-primary btn-sm mr-2 " [routerLink]="['/alunos-turma', turma.id]" routerLinkActive="active">
+                <button type="button" class="btn btn-primary btn-sm mr-2 " [routerLink]="['/alunos-turma', turma.id]" routerLinkActive="active">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
                     <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
                     <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>

@@ -4,6 +4,8 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { form, FormField, required } from '@angular/forms/signals';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
+import * as jschardet from 'jschardet';
+import Papa from 'papaparse';
 
 import { Turma } from '../../../Models/Turma';
 import { ImportAlunos } from '../../../Models/TurmaImport';
@@ -17,6 +19,7 @@ import { FormsHelper } from '../../../Helpers/formsHelper';
     FormsModule,
     FormField,
   ],
+  styleUrls: ['../turmas.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
   <div class="modal-header">
@@ -25,16 +28,6 @@ import { FormsHelper } from '../../../Helpers/formsHelper';
 
   <form (ngSubmit)="salvar()" class="d-flex flex-column vh-100">
     <div class="modal-body flex-grow-1 overflow-auto" >
-      <label>Nome do Aluno: </label>
-      <input type="text" class="form-control" [formField]="importForm.colunaNome" aria-label="colunaNome">
-      @if (importForm.colunaNome().touched() && importForm.colunaNome().invalid()) {
-        <ul class="error-list">
-          @for (error of importForm.colunaNome().errors(); track error) {
-            <li>{{ error.message }}</li>
-          }
-        </ul>
-      }
-
       <label>Arquivo .csv: </label>
       <input type="file" accept=".csv" class="form-control" (change)="onFile($event)">
       @if (importForm.colunaNome().touched() && importForm.file().invalid()) {
@@ -44,7 +37,50 @@ import { FormsHelper } from '../../../Helpers/formsHelper';
           }
         </ul>
       }
+
+      <label>Selecione a coluna com nome do aluno: </label>
+      <select
+        class="form-control"
+        [formField]="importForm.colunaNome">
+
+        <option value="">
+          Selecione a coluna
+        </option>
+
+        @for (header of headers(); track header) {
+
+          <option [value]="header">
+            {{ header }}
+          </option>
+        }
+      </select>
+
+      @if (previewRows().length > 0) {
+        <div class="tabela-wrapper">
+          <table class="tabela-csv table text-center table-hover">
+            <thead>
+              <tr>
+                @for (header of headers(); track header) {
+                  <th>{{ header }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of previewRows(); track $index) {
+                <tr>
+                  @for (header of headers(); track header) {
+                    <td>
+                      {{ row[header] }}
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
     </div>
+
     <div class="modal-footer mt-auto">
       <button type="button" class="btn btn-secondary btn-danger" (click)="cancelar($event)">Cancelar</button>
       <button type="submit" class="btn btn-secondary btn-success">Salvar</button>
@@ -66,6 +102,10 @@ export class TurmaImportModalComponent implements OnInit {
       required(schemaPath.file, {message: `Arquivo deve ser inserido.`});
   });
 
+  headers = signal<string[]>([]);
+
+  previewRows = signal<any[]>([]);
+
   constructor(public modal: NgbActiveModal,
     private formHelper: FormsHelper) {}
 
@@ -79,13 +119,95 @@ export class TurmaImportModalComponent implements OnInit {
     this.modal.dismiss('cancelar')
   }
 
-  public onFile(event: any) {
+  public onFile(event: any): void {
+
     const file = event.target.files[0];
+
+    if (!file)
+      return;
 
     this.importModel.update(model => ({
       ...model,
       file
     }));
+
+    const reader = new FileReader();
+
+    reader.onload = (e: any) => {
+
+      const buffer = e.target.result;
+
+      const uint8Array = new Uint8Array(buffer);
+
+      // texto temporário para detecção
+      const sample = new TextDecoder('latin1')
+        .decode(uint8Array.slice(0, 10000));
+
+      const detected = jschardet.detect(sample);
+
+      let encoding = detected.encoding?.toLowerCase() ?? 'utf-8';
+
+      // normalização
+      if (
+        encoding.includes('1252') ||
+        encoding.includes('8859') ||
+        encoding.includes('latin')
+      ) {
+        encoding = 'windows-1252';
+      }
+      else {
+        encoding = 'utf-8';
+      }
+
+      const csv = new TextDecoder(encoding)
+        .decode(uint8Array);
+
+      Papa.parse(csv, {
+        header: true,
+        skipEmptyLines: true,
+        delimiter: ';',
+
+        complete: (result) => {
+
+          const data = result.data as any[];
+
+          if (!data.length)
+            return;
+
+          this.headers.set(
+            Object.keys(data[0])
+          );
+
+          this.previewRows.set(
+            data.slice(0, 5)
+          );
+
+          // auto detectar coluna nome
+          const nomeColumn = this.headers()
+            .find(h =>
+              h.toLowerCase().includes('nome')
+            );
+
+          if (nomeColumn) {
+
+            this.importModel.update(model => ({
+              ...model,
+              colunaNome: nomeColumn
+            }));
+          }
+        },
+        error: () => {
+
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: 'Erro ao ler arquivo CSV'
+          });
+        }
+      });
+    };
+
+    reader.readAsArrayBuffer(file);
 
     this.importForm.file().markAsTouched();
   }

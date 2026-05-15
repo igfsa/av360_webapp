@@ -50,7 +50,7 @@ public class SessaoController(ISessaoService sessoesService,
     }
 
     [AllowAnonymous]
-    [HttpGet("{sessaoId}")]
+    [HttpGet("{sessaoId:int}")]
     [ActionName("GetQrCode")]
     public async Task<IActionResult> GetQrCode(int sessaoId)
     {
@@ -78,13 +78,33 @@ public class SessaoController(ISessaoService sessoesService,
     }
 
     [Authorize]
+    [HttpGet("{turmaId:int}")]
+    [ActionName("GetValidaInicioSessao")]
+    public async Task<ActionResult<SessaoValidacaoDTO>> GetValidaInicioSessao(int turmaId)
+    {
+        var validacao = await _sessoesService.GetValidaInicioSessao(turmaId);
+
+        return Ok(validacao);
+    }
+
+    [Authorize]
+    [HttpGet("{sessaoId:int}")]
+    [ActionName("GetFaltamAvaliarSessao")]
+    public async Task<ActionResult<IEnumerable<AlunoDTO>>> GetFaltamAvaliarSessao(int sessaoId)
+    {
+        var validacao = await _sessoesService.GetFaltamAvaliarSessao(sessaoId);
+
+        return Ok(validacao);
+    }
+
+    [Authorize]
     [HttpPost]
     [ActionName("PostSessao")]
     public async Task<ActionResult<SessaoDTO>> Post(SessaoDTO model)
     {
         var Sessao = await _sessoesService.Add(model);
 
-        await _turmaNotifier.TurmaAtualizada(Sessao.TurmaId);
+        await _turmaNotifier.SessaoTurmaCriada(Sessao.TurmaId);
         return Ok(Sessao);
     }
 
@@ -95,7 +115,6 @@ public class SessaoController(ISessaoService sessoesService,
     {
         var Sessao = await _sessoesService.EncerrarSessao(sessaoId, model);
 
-        await _turmaNotifier.TurmaAtualizada(Sessao.TurmaId);
         await _sessaoNotifier.SessaoFinalizada(sessaoId);
         return Ok(Sessao);
     }

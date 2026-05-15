@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CriterioService } from '../../Service/Criterio.service';
@@ -21,7 +21,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   templateUrl: './criterios.component.html',
   styleUrls: ['./criterios.component.scss', '../../app.scss'],
 })
-export class CriteriosComponent implements OnInit {
+export class CriteriosComponent implements OnInit, OnDestroy {
 
   public criterios: Criterio[]  = [];
   public criteriosFiltrados : Criterio[] = [];
@@ -74,6 +74,10 @@ export class CriteriosComponent implements OnInit {
     }};
   }
 
+  ngOnDestroy(): void {
+    this.criterioRealTime.disconnect();
+  }
+
   public getCriterios (): void{
     this.criterioService.getCriterios().subscribe((criterios) => {
         this.criterios = criterios;
@@ -98,7 +102,17 @@ export class CriteriosComponent implements OnInit {
     this.criterioService.postCriterio(criterioEditado)
       .subscribe({
         next: criterio => {
-          Swal.fire({
+          Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            }
+          }).fire({
             icon: 'success',
             title: 'Sucesso',
             text: `Critério ${criterio.nome} criado com sucesso!`
@@ -132,7 +146,17 @@ export class CriteriosComponent implements OnInit {
       this.criterioService.putCriterio(criterioEditado).subscribe({
         next: (c) => {
           criterio = c;
-          Swal.fire({
+          Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            }
+          }).fire({
             icon: 'success',
             title: 'Sucesso',
             text: `Critério ${c.nome} editado com sucesso!`

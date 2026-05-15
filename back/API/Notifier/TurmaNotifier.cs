@@ -27,4 +27,10 @@ public class TurmaNotifier(IHubContext<TurmaHub> hub) : ITurmaNotifier
             .Group($"turma-{turmaId}")
             .SendAsync("CriterioTurmaAtualizada", turmaId);
     }
+
+    public async Task SessaoTurmaCriada(int turmaId)
+    {
+        await _hub.Clients.All
+            .SendAsync("SessaoTurmaCriada", turmaId);
+    }
 }

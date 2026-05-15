@@ -14,7 +14,6 @@ import { CriterioCheckbox } from '../../../Models/CriterioCheckbox';
     CommonModule,
     FormsModule,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="modal-header">
       <h1 class="modal-title">Turma {{ turma.cod }}</h1>

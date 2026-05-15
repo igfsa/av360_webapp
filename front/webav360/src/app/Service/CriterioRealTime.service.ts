@@ -36,6 +36,19 @@ export class CriterioRealTime {
         .catch(err => console.error('SignalR error:', err));
   }
 
+  public disconnect() {
+
+    if (this.hub) {
+
+      this.hub.stop()
+        .catch(err =>
+          console.error('Erro ao desconectar SignalR:', err)
+        );
+
+      this.hub = undefined!;
+    }
+  }
+
   public acessarCriterio(criterioId: number) {
     return this.hub.invoke('AcessarCriterio', criterioId);
   }

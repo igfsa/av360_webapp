@@ -21,4 +21,8 @@ public class CriterioPersist(APIContext context) : ICriterioPersist
         return await _context.Criterios
             .FirstOrDefaultAsync(c => c.Id == criterioId);
     }
+    public async Task<Criterio[]> GetCriteriosPadrao()
+    {
+        return await _context.Criterios.Where(c => c.Id >= 1 && c.Id <= 9).ToArrayAsync();
+    }
 }

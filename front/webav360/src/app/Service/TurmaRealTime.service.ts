@@ -12,10 +12,11 @@ export class TurmaRealTime {
   turmaAtualizada$ = new Subject<number>();
   alunoTurmaAtualizada$ = new Subject<number>();
   criterioTurmaAtualizada$ = new Subject<number>();
+  sessaoTurmaCriada$ = new Subject<number>();
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
-  connect() {
+  public connect() {
 
     if (!isPlatformBrowser(this.platformId)) {
       return;
@@ -41,8 +42,25 @@ export class TurmaRealTime {
       this.criterioTurmaAtualizada$.next(turmaId);
     });
 
+    this.hub.on('SessaoTurmaCriada', (turmaId: number) => {
+      this.sessaoTurmaCriada$.next(turmaId);
+    });
+
     return this.hub.start()
         .catch(err => console.error('SignalR error:', err));
+  }
+
+  public disconnect() {
+
+    if (this.hub) {
+
+      this.hub.stop()
+        .catch(err =>
+          console.error('Erro ao desconectar SignalR:', err)
+        );
+
+      this.hub = undefined!;
+    }
   }
 
   public acessarTurma(turmaId: number) {

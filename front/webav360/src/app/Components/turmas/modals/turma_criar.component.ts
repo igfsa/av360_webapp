@@ -1,6 +1,6 @@
 import { Component, signal, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { form, FormField, min, max, required } from '@angular/forms/signals';
+import { form, FormField, min, max, required, maxLength } from '@angular/forms/signals';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { Turma } from '../../../Models/Turma';
@@ -17,7 +17,6 @@ import Swal from 'sweetalert2';
     FormsModule,
     FormField,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
   <div class="modal-header">
     <h1 class="modal-title" >Nova Turma</h1>
@@ -25,8 +24,11 @@ import Swal from 'sweetalert2';
 
   <form (ngSubmit)="salvar()" class="d-flex flex-column vh-100">
     <div class="modal-body flex-grow-1 overflow-auto" >
-      <label>Código: </label>
+      <label>Nome da Turma: </label>
       <input type="text" class="form-control" [formField]="turmaForm.cod" aria-label="Cod" >
+      <small [class.text-danger]="turmaForm.cod().value().length >= 100">
+        {{ turmaForm.cod().value().length }}/100
+      </small>
       @if (turmaForm.cod().touched() && turmaForm.cod().invalid()) {
         <ul class="error-list">
           @for (error of turmaForm.cod().errors(); track error) {
@@ -66,7 +68,8 @@ export class TurmaCriarModalComponent implements OnInit {
   })
 
   turmaForm = form(this.turmaModel, schemaPath => {
-    required(schemaPath.cod, {message: `Código da turma deve ser inserido`})
+    required(schemaPath.cod, {message: `Nome da Turma deve ser inserido`})
+    maxLength(schemaPath.cod, 100, {message: 'Nome da Turma não pode ter mais de 100 caracteres.'});
 
     required(schemaPath.notaMax, {message: `Nota Máxima da turma deve ser inserida`});
     min(schemaPath.notaMax, 1, {message: `Nota Máxima não pode ser menor que 1`});

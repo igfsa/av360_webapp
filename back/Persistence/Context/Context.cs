@@ -84,7 +84,7 @@ public class APIContext(DbContextOptions<APIContext> options) : DbContext(option
 
         _ = modelBuilder.Entity<Turma>()
             .Property(t => t.Cod)
-            .HasMaxLength(30);
+            .HasMaxLength(100);
 
         _ = modelBuilder.Entity<Turma>()
             .Property(t => t.NotaMax)

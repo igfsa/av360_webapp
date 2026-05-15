@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input, OnInit, signal } from '@angu
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { form, FormField, required } from '@angular/forms/signals';
+import { form, FormField, maxLength, required } from '@angular/forms/signals';
 import Swal from 'sweetalert2';
 
 import { Criterio } from '../../../Models/Criterio';
@@ -17,7 +17,6 @@ import { FormsHelper } from '../../../Helpers/formsHelper';
     FormsModule,
     FormField,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="modal-header">
       <h1 class="modal-title" >Critério: {{ criterio.nome }}</h1>
@@ -28,6 +27,10 @@ import { FormsHelper } from '../../../Helpers/formsHelper';
       <span class="text-bg-warning fw-bold rounded-4 py-1 px-3"  > Atenção! Este critério será alterado para todas turmas vinculadas! </span>
       <label>Nome: </label>
       <input type="text" class="form-control" [formField]="criterioForm.nome" aria-label="Nome" >
+      <small [class.text-danger]="criterioForm.nome().value().length >= 100">
+        {{ criterioForm.nome().value().length }}/100
+      </small>
+
       @if (criterioForm.nome().touched() && criterioForm.nome().invalid()){
         <ul class="error-list">
           @for (error of criterioForm.nome().errors(); track error) {
@@ -55,6 +58,7 @@ export class CriterioEditarModalComponent implements OnInit {
 
   criterioForm = form(this.criterioModel, (schemaPath) => {
     required(schemaPath.nome, {message: `Critério deve ser preenchido.`});
+    maxLength(schemaPath.nome, 100, {message: 'Critério não pode ter mais de 100 caracteres.'});
   });
 
   constructor(public modal: NgbActiveModal,

@@ -63,7 +63,7 @@ thead {
 }
 
 .swal2-popup{
-  font-size: 1.6rem;
+  font-size: 1.4rem;
 }
 
 .container {
@@ -143,6 +143,16 @@ input:focus {
   list-style-position: inside;
 }
 
-.error-list p {
+
+.warning-list {
+  color: goldenrod;
+  font-size: 1.6rem;
+  margin: 0.25rem 0 0 0;
+  padding-left: 0;
+  list-style-position: inside;
+}
+
+.error-list p,
+.warning-list {
   margin: 0;
 }

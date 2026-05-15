@@ -21,7 +21,6 @@
         <input
           type="text"
           class="form-control"
-          style="font-size: 1.6rem;"
           [(ngModel)]="nomeAluno"
         />
       </div>
@@ -30,29 +29,26 @@
     @else if(step === 3){
       <div class="d-flex justify-content-between">
         <h2>Equipe: {{grupoSelecionado.nome}}</h2>
-        <h2>Nota Máxima {{ dados.turma.notaMax }}</h2>
+        <h2>Nota Máxima: {{ dados.turma.notaMax }}</h2>
       </div>
       <div>
       @if (!carregandoAvaliacao) {
-        <h3>Avaliando {{ atual.avaliado.nome }}
-          Estudante {{indiceAtual + 1}} de {{avaliacoes.length}} </h3>
-          <table>
-            @for (criterio of atual.criterios; track criterio.criterioId) {
-              <tr>
-                <label class="input-group-text" style="font-size: 1.6rem;">{{ criterio.criterioNome }}</label>
-                <input type="number"
-                  class="form-control"
-                  style="font-size: 1.6rem;"
-                  [(ngModel)]="criterio.nota"
-                  placeholder="Nota" />
-                  @if (criterio.nota < 1 || criterio.nota > dados.turma.notaMax) {
-                    <div class="alert alert-danger">
-                      <span class="text-danger fw-bold" >Critério deve estar entre 1 e {{dados.turma.notaMax}}...</span>
-                    </div>
-                  }
-              </tr>
+        <h3>Olá {{alunoLogado.nome}}! </h3>
+        <h3>Você está avaliando {{ atual.avaliado.nome }}
+          <br> Estudante {{indiceAtual + 1}} de {{avaliacoes.length}} </h3>
+          @for (criterio of atual.criterios; track criterio.criterioId) {
+            <label>{{ criterio.criterioNome }}</label>
+            <input type="number"
+              class="form-control"
+              [(ngModel)]="criterio.nota"
+              #notaModel="ngModel"
+              placeholder="Nota" />
+            @if (notaModel.touched && (criterio.nota < 1 || criterio.nota > dados.turma.notaMax)) {
+              <ul class="error-list">
+                  <li class="text-danger">Nota do critério deve estar entre 1 e {{dados.turma.notaMax}}</li>
+              </ul>
             }
-          </table>
+          }
 
           <button class="btn btn-primary" (click)="proximo()">Próximo</button>
       }@else {
@@ -62,6 +58,7 @@
     }
     @else if(step === 4){
       <h2>Equipe: {{grupoSelecionado.nome}}</h2>
+      <h3>Olá {{alunoLogado.nome}}! </h3>
       <div>
         <h2>Resumo</h2>
         <div class="avaliacao-container">

@@ -58,6 +58,11 @@ public class TurmaService(IGeralPersist geralPersist,
             var turma = new Turma(cod: model.Cod, notaMax: model.NotaMax);
             _geralPersist.Add(turma);
             await _geralPersist.SaveChangesAsync();
+
+            var criteriosPadrao = await _criterioPersist.GetCriteriosPadrao();
+            turma.AtualizarCriterios(criteriosPadrao);
+            await _geralPersist.SaveChangesAsync();
+
             return _mapper.Map<TurmaDTO>(turma);
         }
         catch

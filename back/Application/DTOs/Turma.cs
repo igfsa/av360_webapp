@@ -6,7 +6,7 @@ namespace Application.DTOs;
 public class TurmaDTO
 {
     public int Id { get; set; }
-    [StringLength(30)]
+    [StringLength(100)]
     public required string Cod { get; set; }
     [Column(TypeName = "decimal(5,2)")]
     public decimal NotaMax { get; set; } = 0;

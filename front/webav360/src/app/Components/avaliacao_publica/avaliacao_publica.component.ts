@@ -138,7 +138,25 @@ export class AvaliacaoPublicaComponent implements OnInit {
 
 
   public proximo() {
-    if (!this.avaliacaoValida(this.atual)) return;
+    if (!this.avaliacaoValida(this.atual)) {
+
+      Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        }
+      }).fire({
+        icon: 'error',
+        title: 'Erro',
+        text: `Verifique as notas inseridas`
+      });
+      return
+    }
 
     if(this.editarNotas) {
       this.step = 4;

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -25,7 +25,7 @@ import { AuthService } from '../../auth/auth.service';
   templateUrl: './turmas.component.html',
   styleUrls: ['./turmas.component.scss', '../../app.scss'],
 })
-export class TurmasComponent implements OnInit {
+export class TurmasComponent implements OnInit, OnDestroy {
 
   public turmas: Turma[] = [];
   public turmasFiltradas : Turma[] = [];
@@ -78,6 +78,10 @@ export class TurmasComponent implements OnInit {
           });
 
     }};
+  }
+
+  ngOnDestroy(): void {
+    this.turmaRealTime.disconnect();
   }
 
   public getTurmas (): void{

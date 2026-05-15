@@ -35,6 +35,19 @@ export class GrupoRealTime {
         .catch(err => console.error('SignalR error:', err));
   }
 
+  public disconnect() {
+
+    if (this.hub) {
+
+      this.hub.stop()
+        .catch(err =>
+          console.error('Erro ao desconectar SignalR:', err)
+        );
+
+      this.hub = undefined!;
+    }
+  }
+
   public acessarGrupo(grupoId: number) {
     return this.hub.invoke('AcessarGrupo', grupoId);
   }

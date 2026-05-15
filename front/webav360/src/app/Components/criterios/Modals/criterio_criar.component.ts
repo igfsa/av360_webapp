@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import Swal from 'sweetalert2';
-import { form, FormField, required } from '@angular/forms/signals';
+import { form, FormField, maxLength, required } from '@angular/forms/signals';
 
 import { Criterio } from '../../../Models/Criterio';
 import { FormsHelper } from '../../../Helpers/formsHelper';
@@ -17,30 +17,33 @@ import { FormsHelper } from '../../../Helpers/formsHelper';
     FormsModule,
     FormField,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-  <div class="modal-header">
-    <h1 class="modal-title">Novo Critério</h1>
-  </div>
-
-  <form (ngSubmit)="salvar()" class="d-flex flex-column vh-100">
-    <div class="modal-body flex-grow-1 overflow-auto" >
-      <label>Nome: </label>
-      <input type="text" class="form-control" [formField]="criterioForm.nome" aria-label="Cod">
-      @if (criterioForm.nome().touched() && criterioForm.nome().invalid()){
-        <ul class="error-list">
-          @for (error of criterioForm.nome().errors(); track error) {
-            <li>{{ error.message }}</li>
-          }
-        </ul>
-      }
+    <div class="modal-header">
+      <h1 class="modal-title">Novo Critério</h1>
     </div>
 
-    <div class="modal-footer mt-auto">
-      <button type="button" class="btn btn-secondary btn-danger" (click)="cancelar($event)">Cancelar</button>
-      <button type="submit" class="btn btn-secondary btn-success">Salvar</button>
-    </div>
-  </form>
+    <form (ngSubmit)="salvar()" class="d-flex flex-column vh-100">
+      <div class="modal-body flex-grow-1 overflow-auto" >
+        <label>Nome: </label>
+        <input type="text" class="form-control" [formField]="criterioForm.nome" aria-label="Nome" >
+        <small [class.text-danger]="criterioForm.nome().value().length >= 100">
+          {{ criterioForm.nome().value().length }}/100
+        </small>
+
+        @if (criterioForm.nome().touched() && criterioForm.nome().invalid()){
+          <ul class="error-list">
+            @for (error of criterioForm.nome().errors(); track error) {
+              <li>{{ error.message }}</li>
+            }
+          </ul>
+        }
+      </div>
+
+      <div class="modal-footer mt-auto">
+        <button type="button" class="btn btn-secondary btn-danger" (click)="cancelar($event)">Cancelar</button>
+        <button type="submit" class="btn btn-secondary btn-success">Salvar</button>
+      </div>
+    </form>
   `
 })
 export class CriterioCriarModalComponent implements OnInit {
@@ -51,7 +54,8 @@ export class CriterioCriarModalComponent implements OnInit {
   })
 
   criterioForm = form(this.criterioModel, schemaPath => {
-    required(schemaPath.nome, {message: `Nome do Critério deve ser inserido`})
+    required(schemaPath.nome, {message: `Nome do Critério deve ser inserido`});
+    maxLength(schemaPath.nome, 100, {message: 'Critério não pode ter mais de 100 caracteres.'});
   })
 
   constructor(public modal: NgbActiveModal,

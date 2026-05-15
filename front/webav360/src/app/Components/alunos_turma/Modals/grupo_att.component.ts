@@ -14,7 +14,6 @@ import { Grupo } from '../../../Models/Grupo';
     CommonModule,
     ReactiveFormsModule
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="modal-header">
       <h1 class="modal-title" style = "font-size: 2.4rem;">Equipes Turma {{ turma.cod }}</h1>
@@ -35,6 +34,9 @@ import { Grupo } from '../../../Models/Grupo';
               formControlName="nome"
               placeholder="Nome da equipe"
             />
+            <small [class.text-danger]="grupo.get('nome')?.value.length >= 100">
+              {{ grupo.get('nome')?.value.length }}/100
+            </small>
             @if (grupo.get('nome')?.touched && grupo.get('nome')?.invalid) {
               <ul class="error-list">
                   <li class="text-danger fw-bold">Nome da equipe deve ser inserido</li>
@@ -59,7 +61,7 @@ import { Grupo } from '../../../Models/Grupo';
 })
 export class TurmaGrupoModalComponent implements OnInit {
 
-  @Input() turma: Turma = ({id: 0, cod: '', notaMax: 0});
+  @Input() turma!: Turma;
   @Input() gruposOrig: Grupo[] = [];
   @Inject(FormBuilder) private fb: FormBuilder = new FormBuilder;
 

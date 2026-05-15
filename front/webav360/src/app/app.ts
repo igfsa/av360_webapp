@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, HostListener, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -21,6 +21,7 @@ export class App {
   protected readonly title = signal('webav360');
 
   hydrated = signal(false);
+  mostrarScrollTop = false;
 
   constructor(protected authService: AuthService) {
       queueMicrotask(() => {
@@ -30,4 +31,19 @@ export class App {
 
   ngOnInit() {
   }
+
+  @HostListener('window:scroll')
+  onScroll(): void {
+
+    this.mostrarScrollTop =
+      window.scrollY > 300;
+  }
+
+  public scrollTop(): void {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+
 }
