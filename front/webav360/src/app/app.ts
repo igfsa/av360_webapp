@@ -23,7 +23,9 @@ export class App {
   hydrated = signal(false);
   mostrarScrollTop = false;
 
-  constructor(protected authService: AuthService) {
+  constructor(
+    protected authService: AuthService
+  ) {
       queueMicrotask(() => {
         this.hydrated.set(true);
       });
@@ -45,5 +47,4 @@ export class App {
       behavior: 'smooth'
     });
   }
-
 }

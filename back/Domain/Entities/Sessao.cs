@@ -25,6 +25,17 @@ public class Sessao
     private readonly List<NotaFinal> _notasFinais = [];
     public IReadOnlyCollection<NotaFinal> Notasfinais => _notasFinais;
 
+    public NotaFinal AdicionarNotaFinal(Aluno avaliador, Grupo grupo, string deviceHash, DateTime dataEnvio)
+    {
+        if (_notasFinais.Any(nf => nf.AvaliadorId == avaliador.Id || nf.DeviceHash == deviceHash))
+            throw new BusinessException($"Avaliador ou dispositivo já registrados nessa sessão.");
+        var nf = new NotaFinal(this, avaliador, grupo, deviceHash, dataEnvio);
+            Console.WriteLine(nf);
+        _notasFinais.Add(nf);
+        
+        return nf;
+    }
+
     public bool ValidaAvaliacao(Aluno avaliador, string deviceHash)
     {
         if (_notasFinais.Any(nf => nf.Avaliador == avaliador))
@@ -44,6 +55,8 @@ public class Sessao
 
     public void EncerrarSessao(DateTime dataFim)
     {
+        if (DataFim != null || !Ativo)
+            throw new BusinessException("Sessão encerrada");
         DataFim = dataFim;
         Ativo = false;
         TokenPublico = "";

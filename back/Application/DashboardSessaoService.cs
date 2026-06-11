@@ -4,6 +4,7 @@ using Application.Contracts;
 using Application.DTOs;
 using Persistence.Contracts;
 using Domain.Exceptions;
+using Domain.Entities;
 
 namespace Application.Services;
 public class DashboardSessaoService(
@@ -12,6 +13,8 @@ public class DashboardSessaoService(
                                         INotaParcialPersist notaParcialPersist,
                                         ICriterioTurmaPersist criterioturmaPersist,
                                         IGrupoPersist grupoPersist,
+                                        ITurmaPersist turmaPersist,
+                                        IResultadoPersist resultadoPersist,
                                         IAlunoGrupoPersist alunoGrupoPersist,
                                         ISessaoPersist sessaoPersist, 
                                         IDashboardCacheService cache
@@ -21,8 +24,10 @@ public class DashboardSessaoService(
     private readonly IAlunoTurmaPersist _alunoTurmaPersist = alunoTurmaPersist;
     private readonly INotaFinalPersist _notaFinalPersist = notaFinalPersist;
     private readonly INotaParcialPersist _notaParcialPersist = notaParcialPersist;
-    private readonly ICriterioTurmaPersist _criterioturmaPersist = criterioturmaPersist;
+    private readonly ICriterioTurmaPersist _criterioTurmaPersist = criterioturmaPersist;
     private readonly IGrupoPersist _grupoPersist = grupoPersist;
+    private readonly ITurmaPersist _turmaPersist = turmaPersist;
+    private readonly IResultadoPersist _resultadoPersist = resultadoPersist;
     private readonly IAlunoGrupoPersist _alunoGrupoPersist = alunoGrupoPersist;
     private readonly ISessaoPersist _sessaoPersist = sessaoPersist;
 
@@ -31,13 +36,16 @@ public class DashboardSessaoService(
         var sessao = await _sessaoPersist.GetSessaoIdAsync(sessaoId)
                 ?? throw new NotFoundException("Sessão não encontrada");
 
+        var turma = await _turmaPersist.GetTurmaIdAsync(sessao.TurmaId)
+                ?? throw new NotFoundException("Sessão não encontrada");
+
         var notasFinais = await _notaFinalPersist.GetNotasFinalSessaoIdAsync(sessaoId);
 
         var notasSessao = await _notaParcialPersist.GetNotaParcialSessaoIdAsync(sessaoId);
 
         var alunos = await _alunoTurmaPersist.GetAlunosTurmaIdAsync(sessao.TurmaId);
 
-        var criteriosTurma = await _criterioturmaPersist.GetCriteriosTurmaIdAsync(sessao.TurmaId);
+        var criteriosTurma = await _criterioTurmaPersist.GetCriteriosTurmaIdAsync(sessao.TurmaId);
 
         var gruposTurma = await _grupoPersist.GetGruposTurmaIdAsync(sessao.TurmaId);
 
@@ -54,6 +62,9 @@ public class DashboardSessaoService(
         var alunosPorGrupo = alunosGrupo
             .GroupBy(ag => ag.GrupoId)
             .ToDictionary(g => g.Key, g => g.Select(x => x.AlunoId).ToHashSet());
+
+        Console.WriteLine($"========================================>{notasSessao.Length}");
+        Console.WriteLine("notasSessao");
 
         var alunosDto = alunos.Select(a => 
         {
@@ -97,14 +108,14 @@ public class DashboardSessaoService(
             {
                 CriterioId = c.Id,
                 Nome = c.Nome,
-                MediaGlobal = totalNotasCriterio != 0 ? notasCriterio.Average(n => n.Nota) : 0,
+                MediaGlobal = totalNotasCriterio > 0 ? notasCriterio.Average(n => n.Nota) : 0,
                 TotalNotas = totalNotasCriterio
             };
         }).ToList();
 
         var gruposDto = gruposTurma.Select(g =>
         {
-            var notasAluno  = alunosPorGrupo.GetValueOrDefault(g.Id, []);
+            var notasAluno = alunosPorGrupo.GetValueOrDefault(g.Id, []);
             var notasGrupo = notasSessao
                 .Where(ng => notasAluno
                     .Contains(ng.AvaliadoId)).ToList();
@@ -115,7 +126,7 @@ public class DashboardSessaoService(
             {
                 GrupoId = g.Id,
                 Nome = g.Nome,
-                Media = totalnotasGrupo != 0 ? notasGrupo.Average(n => n.Nota) : 0,
+                Media = totalnotasGrupo > 0 ? notasGrupo.Average(n => n.Nota) : 0,
                 TotalNotas = totalnotasGrupo,
                 Avaliaram = alunosGrupo.Count(a => a.Avaliou),
                 Pendentes = alunosGrupo.Count - alunosGrupo.Count(a => a.Avaliou),
@@ -125,7 +136,7 @@ public class DashboardSessaoService(
 
         var avaliaram = alunosDto.Count(a => a.Avaliou);
 
-        var mediaGeral = notasSessao.Length != 0 ? notasSessao.Average(n => n.Nota) : 0;
+        var mediaGeral = notasSessao.Length > 0 ? notasSessao.Average(n => n.Nota) : 0;
         var totalNotas = notasSessao.Length;
 
         return new DashboardSessaoDTO
@@ -136,6 +147,8 @@ public class DashboardSessaoService(
             Pendentes = alunos.Length - avaliaram,
             MediaGeral = mediaGeral,
             TotalNotas = totalNotas,
+            NotaMax = turma.NotaMax,
+            TurmaCod = turma.Cod,
             Criterios = criteriosDto,
             Grupos = gruposDto
         };
@@ -162,4 +175,124 @@ public class DashboardSessaoService(
 
         return dto;
     }
+
+    public async Task<DashboardSessaoDTO> GetResultadoDashboard(int sessaoId)
+    {
+        var sessaoResultado = await _resultadoPersist.GetResultadoSessaoIdAsync(sessaoId)
+                ?? throw new NotFoundException("Sessão não encontrada");
+
+        var notasFinais = await _resultadoPersist.GetNotasFinalResultadoSessaoIdAsync(sessaoResultado.Id);
+
+        var notasSessao = await _resultadoPersist.GetNotaParcialResultadoSessaoIdAsync(sessaoResultado.Id);
+
+        var alunos = await _resultadoPersist.GetAlunosResultadoSessaoIdAsync(sessaoResultado.Id);
+
+        var criterios =  await _resultadoPersist.GetCriteriosResultadoSessaoIdAsync(sessaoResultado.Id);
+
+        var grupos = await _resultadoPersist.GetGruposResultadoSessaoIdAsync(sessaoResultado.Id);
+
+        var notasPorAluno = notasSessao
+            .GroupBy(n => n.AvaliadoResId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+        
+        var notasPorCriterio = notasSessao
+            .GroupBy(n => n.CriterioResId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        var notasPorGrupo = notasFinais
+            .GroupBy(ag => ag.GrupoResId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        var alunosPorGrupo = alunos
+            .GroupBy(a => a.ResultadoGrupoId)
+            .ToDictionary(g => g.Key, g => g.Select(x => x.Id).ToHashSet());
+
+        var alunosDto = alunos.Select(a => 
+        {
+            var notasAluno = notasPorAluno.GetValueOrDefault(a.Id, []);
+            var totalNotas = notasAluno.Count;
+
+            var mediasCriterios = new List<CriterioAlunoDashboardDTO>();
+
+            foreach (var c in criterios)
+            {
+                var criterioNotas = notasAluno.Where(n => n.CriterioResId == c.Id).ToArray();
+                var totalCriterio = criterioNotas.Length;
+                
+                mediasCriterios.Add(new CriterioAlunoDashboardDTO
+                {
+                    CriterioId = c.Id,
+                    Nome = c.Nome,
+                    Media = totalCriterio > 0 ? criterioNotas.Average(n => n.Nota) : 0,
+                    TotalNotas = totalCriterio
+                });
+            }
+
+            return new AlunoDashboardDTO
+            {
+                AlunoId = a.Id,
+                Nome = a.Nome,
+                TotalNotas = totalNotas,
+                Media = totalNotas > 0 ? notasAluno.Average(n => n.Nota) : 0,
+                GrupoId = a.ResultadoGrupoId,
+                Avaliou = notasFinais.Any(nf => nf.AvaliadorResId == a.Id),
+                CriterioAluno = mediasCriterios
+            };
+        }).ToList();
+
+        var criteriosDto = criterios.Select(c =>
+        {
+            var notasCriterio = notasPorCriterio.GetValueOrDefault(c.Id, []);
+            var totalNotasCriterio = notasCriterio.Count; 
+
+            return new CriterioDashboardDTO
+            {
+                CriterioId = c.Id,
+                Nome = c.Nome,
+                MediaGlobal = totalNotasCriterio > 0 ? notasCriterio.Average(n => n.Nota) : 0,
+                TotalNotas = totalNotasCriterio
+            };
+        }).ToList();
+
+        var gruposDto = grupos.Select(g =>
+        {
+            var notasAluno = alunosPorGrupo.GetValueOrDefault(g.Id, []);
+            var notasGrupo = notasSessao
+                .Where(ng => notasAluno
+                    .Contains(ng.AvaliadoResId)).ToList();
+            var totalnotasGrupo = notasGrupo.Count;
+            var alunosGrupo = alunosDto.Where(a => a.GrupoId == g.Id).ToList();
+
+            return new GrupoDashboardDTO
+            {
+                GrupoId = g.Id,
+                Nome = g.Nome,
+                Media = totalnotasGrupo > 0 ? notasGrupo.Average(n => n.Nota) : 0,
+                TotalNotas = totalnotasGrupo,
+                Avaliaram = alunosGrupo.Count(a => a.Avaliou),
+                Pendentes = alunosGrupo.Count - alunosGrupo.Count(a => a.Avaliou),
+                Alunos = alunosGrupo
+            };
+        }).ToList();
+
+        var avaliaram = alunosDto.Count(a => a.Avaliou);
+
+        var mediaGeral = notasSessao.Length > 0 ? notasSessao.Average(n => n.Nota) : 0;
+        var totalNotas = notasSessao.Length;
+
+        return new DashboardSessaoDTO
+        {
+            SessaoId = sessaoId,
+            TotalAlunos = alunos.Length,
+            Avaliaram = avaliaram,
+            Pendentes = alunos.Length - avaliaram,
+            MediaGeral = mediaGeral,
+            TotalNotas = totalNotas,
+            NotaMax = sessaoResultado.NotaMaxima,
+            TurmaCod = sessaoResultado.TurmaCod,
+            Criterios = criteriosDto,
+            Grupos = gruposDto
+        };
+    }
+
 }

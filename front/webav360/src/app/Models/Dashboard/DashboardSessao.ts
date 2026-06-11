@@ -9,6 +9,8 @@ export interface DashboardSessao {
   pendentes: number;
   mediaGeral: number,
   totalNotas: number,
+  notaMax: number
+  turmaCod: string,
 
   criterios: CriterioDashboard[];
   grupos: GrupoDashboard[];

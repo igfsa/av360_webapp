@@ -16,6 +16,13 @@ public class APIContext(DbContextOptions<APIContext> options) : DbContext(option
     public DbSet<Turma> Turmas { get; set; }
     public DbSet<Professor> Professores { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<ResultadoSessao> SessoesResultados { get; set; }
+    public DbSet<ResultadoNotaFinal> NotaFinaisResultados { get; set; }
+    public DbSet<ResultadoNotaParcial> NotasParciaisResultados { get; set; }
+    public DbSet<ResultadoGrupo> GruposResultados { get; set; }
+    public DbSet<ResultadoAluno> AlunosResultados { get; set; }
+    public DbSet<ResultadoCriterio> CriteriosResultados { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -120,10 +127,10 @@ public class APIContext(DbContextOptions<APIContext> options) : DbContext(option
             .HasMaxLength(65);
         
         _ = modelBuilder.Entity<NotaParcial>()
-                .HasIndex(x => x.AvaliadoId);
+            .HasIndex(x => x.AvaliadoId);
 
         _ = modelBuilder.Entity<NotaParcial>()
-                .HasIndex(x => x.CriterioId);
+            .HasIndex(x => x.CriterioId);
         
         _ = modelBuilder.Entity<NotaParcial>()
             .HasIndex(a => new { a.NotaFinalId, a.AvaliadoId, a.CriterioId })
@@ -144,6 +151,76 @@ public class APIContext(DbContextOptions<APIContext> options) : DbContext(option
             .HasOne(np => np.NotaFinal)
             .WithMany(nf => nf.NotasParcial)
             .HasForeignKey(np => np.NotaFinalId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        _ = modelBuilder.Entity<ResultadoSessao>()
+            .HasIndex(x => x.SessaoId);
+
+        _ = modelBuilder.Entity<ResultadoNotaFinal>()
+            .HasIndex(x => x.ResultadoSessaoId);
+
+        _ = modelBuilder.Entity<ResultadoNotaFinal>()
+            .HasIndex(a => new { a.ResultadoSessaoId, a.AvaliadorResId })
+            .IsUnique();
+        
+        _ = modelBuilder.Entity<ResultadoNotaParcial>()
+            .HasIndex(x => x.AvaliadoResId);
+
+        _ = modelBuilder.Entity<ResultadoNotaParcial>()
+            .HasIndex(x => x.CriterioResId);
+        
+        _ = modelBuilder.Entity<ResultadoNotaParcial>()
+            .HasIndex(a => new { a.ResultadoNotaFinalId, a.AvaliadoResId, a.CriterioResId })
+            .IsUnique();
+
+        _ = modelBuilder.Entity<ResultadoNotaParcial>()
+            .HasIndex(x => new { x.AvaliadoResId, x.CriterioResId });
+
+        _ = modelBuilder.Entity<ResultadoNotaParcial>()
+            .HasIndex(x => x.AvaliadoResId)
+            .IncludeProperties(x => new { x.Nota, x.CriterioResId });
+
+        _ = modelBuilder.Entity<ResultadoNotaParcial>()
+            .Property(n => n.Nota)
+            .HasPrecision(5, 2);
+
+        _ = modelBuilder.Entity<ResultadoNotaParcial>()
+            .HasOne(np => np.ResultadoNotaFinal)
+            .WithMany(nf => nf.NotasParciais)
+            .HasForeignKey(np => np.ResultadoNotaFinalId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        _ = modelBuilder.Entity<ResultadoGrupo>()
+            .HasIndex(x => x.ResultadoSessaoId);
+
+        _ = modelBuilder.Entity<ResultadoGrupo>()
+            .HasOne(x => x.ResultadoSessao)
+            .WithMany(g => g.Grupos)
+            .HasForeignKey(x => x.ResultadoSessaoId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        _ = modelBuilder.Entity<ResultadoAluno>()
+            .HasIndex(x => x.ResultadoGrupoId);
+
+        _ = modelBuilder.Entity<ResultadoAluno>()
+            .HasOne(x => x.ResultadoGrupo)
+            .WithMany(g => g.Alunos)
+            .HasForeignKey(x => x.ResultadoGrupoId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        _ = modelBuilder.Entity<ResultadoAluno>()
+            .HasOne(x => x.ResultadoSessao)
+            .WithMany(s => s.Alunos)
+            .HasForeignKey(x => x.ResultadoSessaoId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        _ = modelBuilder.Entity<ResultadoCriterio>()
+            .HasIndex(x => x.ResultadoSessaoId);
+
+        _ = modelBuilder.Entity<ResultadoCriterio>()
+            .HasOne(x => x.ResultadoSessao)
+            .WithMany(s => s.Criterios)
+            .HasForeignKey(x => x.ResultadoSessaoId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

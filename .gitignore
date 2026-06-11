@@ -1,6 +1,6 @@
 *.sh
 /front/teste/
-
+*.lscache
 
 ## Gerado com https://github.com/github/gitignore/tree/main
 

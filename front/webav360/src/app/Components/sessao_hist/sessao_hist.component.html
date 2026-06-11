@@ -1,0 +1,190 @@
+<div class="container ">
+  <div class="m-2 w-100 d-flex flex-wrap">
+    <div class="w-50 p-2 tittle-box">
+      <h1 class="">Turma: {{dashboard.turmaCod}}</h1 >
+      <h2 class="">Nota Máxima: {{dashboard.notaMax}}</h2 >
+    </div>
+    <div class="w-50 p-2 d-flex flex-column justify-content-around">
+      <button id="btn-export" class="btn btn-success w-100 m-1" (click)="exportar();">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-arrow-down-fill" viewBox="0 0 16 16">
+          <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1m-1 4v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 11.293V7.5a.5.5 0 0 1 1 0"/>
+        </svg>
+        Exportar XLSX
+      </button>
+    </div>
+    <p class="text-primary m-2 w-100">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+      </svg>
+        As informações nessa página são relativas ao momento de encerramento da sessão.
+    </p>
+  </div>
+
+  <div class="dashboard-section">
+    <div class="dashboard-item">
+      <h3 class="item-titulo">
+        Média Geral
+      </h3>
+      <div class="item-conteudo">
+        {{ dashboard.mediaGeral | number:'1.0-1' }}
+      </div>
+    </div>
+    <div class="dashboard-item">
+      <h3 class="item-titulo">
+        Total de Alunos
+      </h3>
+      <div class="item-conteudo">
+        {{ dashboard.totalAlunos }}
+      </div>
+    </div>
+    <div class="dashboard-item">
+      <h3 class="item-titulo">
+        Avaliaram
+      </h3>
+      <div class="item-conteudo">
+        {{ dashboard.avaliaram }}
+      </div>
+    </div>
+    <div class="dashboard-item">
+      <h3 class="item-titulo">
+        Faltantes
+      </h3>
+      <div class="item-conteudo">
+        {{ dashboard.pendentes }}
+      </div>
+    </div>
+  </div>
+
+  <div class="tabela-wrapper">
+    <table class="table table-striped text-center table-hover">
+
+      <thead class="table-dark">
+        <tr class="first-row">
+
+          <th>
+            Critério
+          </th>
+          <th>
+            Média Global
+          </th>
+          <th>
+            Total de notas
+          </th>
+
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (criterio of dashboard.criterios; track criterio.criterioId) {
+          <tr>
+
+            <td style="width: 70%;">
+              {{criterio.nome}}
+            </td>
+
+            <td style="width: 15%;">
+              {{criterio.mediaGlobal | number:'1.0-1'}}
+            </td>
+
+            <td style="width: 15%;">
+              {{criterio.totalNotas}}
+            </td>
+          </tr>
+        }
+      </tbody>
+
+    </table>
+  </div>
+
+  @for(grupo of dashboard.grupos; track grupo.grupoId){
+    <div ngbAccordion>
+      <div ngbAccordionItem>
+        <h2 ngbAccordionHeader>
+          <button ngbAccordionButton>
+            <h2>{{ grupo?.nome }}</h2>
+          </button>
+        </h2>
+        <div ngbAccordionCollapse>
+          <div ngbAccordionBody>
+            <ng-template>
+              <div class="dashboard-section">
+                <div class="dashboard-item">
+                  <h3 class="item-titulo">
+                    Média Geral
+                  </h3>
+                  <div class="item-conteudo">
+                    {{ grupo?.media | number:'1.0-1' }}
+                  </div>
+                </div>
+                <div class="dashboard-item">
+                  <h3 class="item-titulo">
+                    Total de Alunos
+                  </h3>
+                  <div class="item-conteudo">
+                    {{ grupo?.alunos?.length }}
+                  </div>
+                </div>
+                <div class="dashboard-item">
+                  <h3 class="item-titulo">
+                    Avaliaram
+                  </h3>
+                  <div class="item-conteudo">
+                    {{ grupo?.avaliaram }}
+                  </div>
+                </div>
+                <div class="dashboard-item">
+                  <h3 class="item-titulo">
+                    Faltantes
+                  </h3>
+                  <div class="item-conteudo">
+                    {{ grupo?.pendentes }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="tabela-wrapper">
+                <table class="table table-striped text-center table-hover">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>Nome</th>
+                      <th>Avaliou</th>
+                      <th>Média</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (aluno of grupo.alunos; track aluno.alunoId){
+                        <tr>
+                          <td style="width: 70%;">{{aluno.nome}}</td>
+                          <td style="width: 15%;">
+                            @if (aluno.avaliou) {
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-circle" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>
+                              </svg>
+                            } @else {
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#dc3545" class="bi bi-x-circle" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                              </svg>
+                            }
+                          </td>
+                          <td style="width: 15%;">{{aluno.media | number:'1.0-1'}}</td>
+                        </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <button class="back-button" [routerLink]="['/alunos-turma', sessao.turmaId]" routerLinkActive="active">
+    <svg xmlns="http://www.w3.org/2000/svg" width="2rem" height="2rem" fill="#EDE9FE" stroke="#EDE9FE" class="bi bi-arrow-return-left" viewBox="0 0 16 16">
+      <path fill-rule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5"/>
+    </svg>
+  </button>
+</div>

@@ -156,3 +156,16 @@ input:focus {
 .warning-list {
   margin: 0;
 }
+
+.back-button {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 4rem;
+  height: 4rem;
+  background-color: var(--secondary);
+  border-color: transparent;
+  border-radius: 50%;
+
+  z-index: 1000;
+}

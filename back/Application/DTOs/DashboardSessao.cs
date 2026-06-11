@@ -8,6 +8,8 @@ public class DashboardSessaoDTO
     public int Pendentes { get; set; }
     public decimal MediaGeral { get; set; }
     public int TotalNotas { get; set; }
+    public decimal NotaMax { get; set; }
+    public string TurmaCod { get; set; } = "";
     
     public List<CriterioDashboardDTO> Criterios { get; set; } = [];
     public List<GrupoDashboardDTO> Grupos { get; set; } = [];

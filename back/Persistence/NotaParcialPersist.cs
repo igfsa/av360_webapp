@@ -17,5 +17,5 @@ public class NotaParcialPersist(APIContext context) : INotaParcialPersist
             .OrderByDescending(np => np.Id)
             .ToArrayAsync();
     }
-    
+   
 }

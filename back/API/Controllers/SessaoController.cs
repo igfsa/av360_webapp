@@ -111,11 +111,26 @@ public class SessaoController(ISessaoService sessoesService,
     [Authorize]
     [HttpPut("{sessaoId:int}")]
     [ActionName("PutEncerraSessao")]
-    public async Task<ActionResult> PutEncerra(int sessaoId, SessaoDTO model)
+    public async Task<ActionResult> PutEncerra(int sessaoId)
     {
-        var Sessao = await _sessoesService.EncerrarSessao(sessaoId, model);
+        var dados = await _sessoesService.EncerrarSessao(sessaoId);
 
+        var sessao = await _sessoesService.GetSessaoById(sessaoId);
         await _sessaoNotifier.SessaoFinalizada(sessaoId);
-        return Ok(Sessao);
+        await _turmaNotifier.TurmaAtualizada(sessao.TurmaId);
+
+        if (dados.TotalGeralErros > 0)
+        {
+            var arquivo = await _exportService.ExportResultadoSessao(dados);
+
+            return File(
+                arquivo,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "resultado.xlsx"
+            );
+        } else {
+            return NoContent();
+        }
+
     }
 }

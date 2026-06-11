@@ -65,7 +65,6 @@ public class DashboardCacheService(IConnectionMultiplexer connection) : IDashboa
             criterioAluno.Media,
             criterioAluno.TotalNotas,
             nota);
-
         criterioAluno.TotalNotas++;
 
         var criterioGlobal = dto.Criterios
@@ -75,21 +74,20 @@ public class DashboardCacheService(IConnectionMultiplexer connection) : IDashboa
             criterioGlobal.MediaGlobal,
             criterioGlobal.TotalNotas,
             nota);
-
         criterioGlobal.TotalNotas++;
 
         grupo.Media = AtualizarMedia(
             grupo.Media,
             grupo.TotalNotas,
             nota);
-
         grupo.TotalNotas++;
 
         dto.MediaGeral = AtualizarMedia(
             dto.MediaGeral,
             dto.TotalNotas,
-            aluno.Media
+            nota
         );
+        dto.TotalNotas++;
 
         await SetAsync(sessaoId, dto);
     }

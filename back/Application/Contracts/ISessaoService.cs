@@ -10,6 +10,6 @@ public interface ISessaoService
     Task<SessaoValidacaoDTO> GetValidaInicioSessao(int turmaId);
     Task<IEnumerable<AlunoDTO>> GetFaltamAvaliarSessao(int sessaoId);
     Task<SessaoDTO> Add(SessaoDTO model);
-    Task<SessaoDTO> EncerrarSessao(int SessaoId, SessaoDTO model);
+    Task<ResultadoSessaoReportDTO> EncerrarSessao(int SessaoId);
     Task<List<AvaliacaoConsolidadaExportDTO>> GetAvaliacaoConsolidada(int sessaoId);
 }

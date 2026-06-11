@@ -1,5 +1,5 @@
 <div class="container ">
-  @if (!sessaoAtiva) {
+  @if (!sessaoAtiva || sessaoAtiva === null) {
     <div class="m-2 w-100 d-flex flex-wrap">
       <div class="w-50 tittle-box">
         <h1 class="">Turma: {{turma.cod}}</h1 >
@@ -17,8 +17,8 @@
     }@else {
     <div class="m-2 w-100 d-flex flex-wrap">
       <div class="w-50 tittle-box">
-        <h1 class="">Turma: {{turma.cod}}</h1 >
-        <h2 class="">Nota Máxima: {{turma.notaMax}}</h2 >
+        <h1 class="">Turma: {{dashboard.turmaCod}}</h1 >
+        <h2 class="">Nota Máxima: {{dashboard.notaMax}}</h2 >
         <a class="figure-caption">http://localhost:5074/avaliacao/publica/{{sessaoAtiva.tokenPublico}}</a>
       </div>
       <div class="w-50 p-2 d-flex flex-column justify-content-around">
@@ -77,6 +77,13 @@
           {{ dashboard.pendentes }}
         </div>
       </div>
+      <!-- <p-chart
+        type="bar"
+        [data]="dataCriterio"
+        [options]="optionsBar"
+        height="300"
+        width="100%">
+      </p-chart> -->
     </div>
 
     <div class="tabela-wrapper">
@@ -205,4 +212,10 @@
       </div>
     }
   }
+
+  <button class="back-button" [routerLink]="['/alunos-turma', turma.id]" routerLinkActive="active">
+    <svg xmlns="http://www.w3.org/2000/svg" width="2rem" height="2rem" fill="#EDE9FE" stroke="#EDE9FE" class="bi bi-arrow-return-left" viewBox="0 0 16 16">
+      <path fill-rule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5"/>
+    </svg>
+  </button>
 </div>

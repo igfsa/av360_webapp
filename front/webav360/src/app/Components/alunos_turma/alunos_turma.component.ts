@@ -69,6 +69,7 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
   public criteriosFiltrados : Criterio[] = [];
   public grupos: Grupo[]  = [];
   public gruposFiltrados: Grupo[]  = [];
+  public sessoes: Sessao[]  = [];
   private _filtroAlunos: string = '';
   private _filtroCriterios: string = '';
   private _filtroGrupos: string = '';
@@ -177,10 +178,11 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
       alunos: this.alunoService.getAlunosTurma(turmaId),
       criterios: this.criterioService.getCriteriosTurma(turmaId),
       grupos: this.grupoService.getGruposTurma(turmaId),
+      sessoes: this.sessaoService.getSessoesTurmaId(turmaId),
       turma: this.turmaService.getTurmaId(turmaId),
-      sessao: this.sessaoService.getSessaoAtivaTurma(turmaId),
+      sessaoAtiva: this.sessaoService.getSessaoAtivaTurma(turmaId),
       alunoGrupo: this.alunoService.getAlunoGrupoNome(turmaId)
-    }).subscribe(({ alunos, criterios, grupos, turma, sessao, alunoGrupo }) => {
+    }).subscribe(({ alunos, criterios, grupos, sessoes, turma, sessaoAtiva, alunoGrupo }) => {
       this.turma = turma;
 
       this.alunos = alunos;
@@ -192,9 +194,11 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
       this.grupos = grupos;
       this.gruposFiltrados = grupos;
 
+      this.sessoes = sessoes.sort((a, b) => b.id - a.id);
+
       this.alunoGrupo = alunoGrupo;
 
-      this.sessaoAtiva = sessao;
+      this.sessaoAtiva = sessaoAtiva;
 
       this.cdr.detectChanges();
     });

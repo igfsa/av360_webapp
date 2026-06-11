@@ -24,7 +24,12 @@ import { FormsHelper } from '../../../Helpers/formsHelper';
 
   <form (ngSubmit)="salvar()" class="d-flex flex-column vh-100">
     <div class="modal-body flex-grow-1 overflow-auto" >
-      <span class="text-bg-warning fw-bold rounded-4 py-1 px-3"  > Atenção! Este critério será alterado para todas turmas vinculadas! </span>
+      <p class="text-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle-fill" viewBox="0 0 16 16">
+          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4m.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2"/>
+        </svg>
+         O critério será alterado em todas turmas vinculadas.
+      </p>
       <label>Nome: </label>
       <input type="text" class="form-control" [formField]="criterioForm.nome" aria-label="Nome" >
       <small [class.text-danger]="criterioForm.nome().value().length >= 100">

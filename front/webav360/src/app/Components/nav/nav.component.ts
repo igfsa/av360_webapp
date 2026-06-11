@@ -1,6 +1,5 @@
-import { Component, Inject, TemplateRef  } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { Router } from '@angular/router';
+import { Component, HostListener, Inject, TemplateRef  } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../../auth/auth.service';
@@ -18,10 +17,12 @@ import { AuthService } from '../../auth/auth.service';
 })
 export class NavComponent {
 
+  mostrarScrollTop = false;
+
   constructor(
-    private router: Router,
-    public authService: AuthService,
-    @Inject(NgbOffcanvas) private offcanvasService: NgbOffcanvas
+    private router: Router
+    , public authService: AuthService
+    , @Inject(NgbOffcanvas) private offcanvasService: NgbOffcanvas
   ) {}
 
   open(content: TemplateRef<any>) {
@@ -31,5 +32,19 @@ export class NavComponent {
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  @HostListener('window:scroll')
+  onScroll(): void {
+
+    this.mostrarScrollTop =
+      window.scrollY > 300;
+  }
+
+  public scrollTop(): void {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   }
 }

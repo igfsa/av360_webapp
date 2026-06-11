@@ -21,8 +21,8 @@ export class SessaoService {
     return this.http.get<Sessao>(`/api/Sessao/GetSessaoAtivaTurma/${turmaId}`);
   }
 
-  public getSessoesTurmaId(turmaId: number): Observable<Sessao> {
-    return this.http.get<Sessao>(`/api/Sessao/GetSessoesTurmaId/${turmaId}`);
+  public getSessoesTurmaId(turmaId: number): Observable<Sessao[]> {
+    return this.http.get<Sessao[]>(`/api/Sessao/GetSessoesTurmaId/${turmaId}`);
   }
 
   public getExportConsolidado(sessaoId: number): void {
@@ -57,8 +57,8 @@ export class SessaoService {
     return this.http.post<Sessao>(`/api/Sessao/PostSessao`, sessao);
   }
 
-  public putEncerraSessao (sessao: Sessao): Observable<Sessao>{
-    return this.http.put<Sessao>(`/api/Sessao/PutEncerraSessao/${sessao.id}`, sessao);
+  public putEncerraSessao (sessaoId: number): Observable<Blob>{
+    return this.http.put<Blob>(`/api/Sessao/PutEncerraSessao/${sessaoId}`,{responseType: 'blob'});
   }
 
   public dashboardSessao (id: number): Observable<DashboardSessao>{
@@ -67,5 +67,9 @@ export class SessaoService {
 
   public dashboardResetSessao (id: number): Observable<DashboardSessao>{
     return this.http.post<DashboardSessao>(`/api/Dashboard/PostDashboardReset/${id}`, id);
+  }
+
+  public dashboardResultadoSessao (id: number): Observable<DashboardSessao>{
+    return this.http.get<DashboardSessao>(`/api/Dashboard/GetResultadoDashboard/${id}`);
   }
 }

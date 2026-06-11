@@ -2,8 +2,11 @@
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background-color: transparent;
+  width: 4rem;
+  height: 4rem;
+  background-color: var(--secondary);
   border-color: transparent;
+  border-radius: 50%;
 
   z-index: 1000;
 }

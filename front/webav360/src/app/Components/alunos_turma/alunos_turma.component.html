@@ -230,5 +230,82 @@
         </div>
       </div>
     </div>
+    <div ngbAccordionItem>
+      <h2 ngbAccordionHeader>
+        <button ngbAccordionButton>
+          <h2>Sessoes</h2>
+        </button>
+      </h2>
+      <div ngbAccordionCollapse>
+        <div ngbAccordionBody>
+          <ng-template>
+            <table id="main-table" class="table table-striped text-center table-hover">
+              <thead class="table-dark">
+                <tr>
+                  <th style = 'width: 10%; text-align: center;'>#</th>
+                  <th style = 'width: 25%;'>Inicio</th>
+                  <th style = 'width: 25%;'>Fim</th>
+                  <th style = 'width: 20%; text-align: center;'>Finalizada</th>
+                  <th style = 'width: 20%; text-align: center;'>Acessar Sessão</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if (sessoes){
+                  @for (sessao of sessoes; track sessao.id){
+                    <tr>
+                      <td style= 'text-align: center'>{{sessao.id}}</td>
+                      <td>{{sessao.dataInicio | date:'dd/MM/yyyy HH:mm' }}</td>
+                      <td>{{sessao.dataFim | date:'dd/MM/yyyy HH:mm' }}</td>
+                      @if (!sessao.ativo) {
+                        <td style="text-align: center;">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-circle" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                            <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>
+                          </svg>
+                        </td>
+                        <td style= 'text-align: center'>
+                          <button type="button" class="btn btn-primary btn-sm mr-2 "  [routerLink]="['/sessao-hist', sessao.id]">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                              <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+                              <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+                            </svg>
+                            Ver Sessão
+                          </button>
+                        </td>
+                      } @else {
+                        <td style="text-align: center;">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#dc3545" class="bi bi-x-circle" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                          </svg>
+                        </td>
+                        <td style= 'text-align: center'>
+                          <button type="button" class="btn btn-primary btn-sm mr-2 "  [routerLink]="['/sessao-ativa', turma.id]">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                              <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+                              <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+                            </svg>
+                            Ver Sessão
+                          </button>
+                        </td>
+                      }
+                    </tr>
+                  }
+                }
+              </tbody>
+              <tfoot >
+                @if (!sessoes.length){
+                  <tr>
+                    <td colspan="8" class="text-center">
+                      <h4>Nenhuma Sessão encontrada!</h4>
+                    </td>
+                  </tr>
+                }
+              </tfoot>
+            </table>
+          </ng-template>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

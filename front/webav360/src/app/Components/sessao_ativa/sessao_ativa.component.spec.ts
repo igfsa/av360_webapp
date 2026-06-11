@@ -3,7 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
-import { SessaoAtivaComponent } from './sessao.component';
+import { SessaoAtivaComponent } from './sessao_ativa.component';
 
 describe('SessaoAtivaComponent', () => {
   let component: SessaoAtivaComponent;

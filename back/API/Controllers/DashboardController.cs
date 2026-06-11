@@ -31,4 +31,13 @@ public class DashboardController(
         return Ok(result);
     }
 
+    [Authorize]
+    [HttpGet("{sessaoId:int}")]
+    [ActionName("GetResultadoDashboard")]
+    public async Task<ActionResult<DashboardSessaoDTO>> GetResultadoDashboard(int sessaoId)
+    {
+        var result = await _dashboardService.GetResultadoDashboard(sessaoId);
+        return Ok(result);
+    }
+
 }

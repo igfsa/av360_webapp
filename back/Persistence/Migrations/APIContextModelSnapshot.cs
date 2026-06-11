@@ -373,6 +373,262 @@ namespace Persistence.Migrations
                     b.ToTable("refresh_tokens", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.ResultadoAluno", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AlunoId")
+                        .HasColumnType("integer")
+                        .HasColumnName("aluno_id");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("nome");
+
+                    b.Property<int>("ResultadoGrupoId")
+                        .HasColumnType("integer")
+                        .HasColumnName("resultado_grupo_id");
+
+                    b.Property<int>("ResultadoSessaoId")
+                        .HasColumnType("integer")
+                        .HasColumnName("resultado_sessao_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_alunos_resultados");
+
+                    b.HasIndex("ResultadoGrupoId")
+                        .HasDatabaseName("ix_alunos_resultados_resultado_grupo_id");
+
+                    b.HasIndex("ResultadoSessaoId")
+                        .HasDatabaseName("ix_alunos_resultados_resultado_sessao_id");
+
+                    b.ToTable("alunos_resultados", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.ResultadoCriterio", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CriterioId")
+                        .HasColumnType("integer")
+                        .HasColumnName("criterio_id");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("nome");
+
+                    b.Property<int>("ResultadoSessaoId")
+                        .HasColumnType("integer")
+                        .HasColumnName("resultado_sessao_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_criterios_resultados");
+
+                    b.HasIndex("ResultadoSessaoId")
+                        .HasDatabaseName("ix_criterios_resultados_resultado_sessao_id");
+
+                    b.ToTable("criterios_resultados", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.ResultadoGrupo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("GrupoId")
+                        .HasColumnType("integer")
+                        .HasColumnName("grupo_id");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("nome");
+
+                    b.Property<int>("ResultadoSessaoId")
+                        .HasColumnType("integer")
+                        .HasColumnName("resultado_sessao_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_grupos_resultados");
+
+                    b.HasIndex("ResultadoSessaoId")
+                        .HasDatabaseName("ix_grupos_resultados_resultado_sessao_id");
+
+                    b.ToTable("grupos_resultados", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.ResultadoNotaFinal", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AvaliadorNome")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("avaliador_nome");
+
+                    b.Property<int>("AvaliadorResId")
+                        .HasColumnType("integer")
+                        .HasColumnName("avaliador_res_id");
+
+                    b.Property<DateTime>("DataEnvio")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("data_envio");
+
+                    b.Property<string>("GrupoNome")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("grupo_nome");
+
+                    b.Property<int>("GrupoResId")
+                        .HasColumnType("integer")
+                        .HasColumnName("grupo_res_id");
+
+                    b.Property<int>("NotaFinalId")
+                        .HasColumnType("integer")
+                        .HasColumnName("nota_final_id");
+
+                    b.Property<int>("ResultadoSessaoId")
+                        .HasColumnType("integer")
+                        .HasColumnName("resultado_sessao_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_nota_finais_resultados");
+
+                    b.HasIndex("ResultadoSessaoId")
+                        .HasDatabaseName("ix_nota_finais_resultados_resultado_sessao_id");
+
+                    b.HasIndex("ResultadoSessaoId", "AvaliadorResId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_nota_finais_resultados_resultado_sessao_id_avaliador_res_id");
+
+                    b.ToTable("nota_finais_resultados", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.ResultadoNotaParcial", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AvaliadoResId")
+                        .HasColumnType("integer")
+                        .HasColumnName("avaliado_res_id");
+
+                    b.Property<string>("AvaliadoResNome")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("avaliado_res_nome");
+
+                    b.Property<int>("CriterioResId")
+                        .HasColumnType("integer")
+                        .HasColumnName("criterio_res_id");
+
+                    b.Property<string>("CriterioResNome")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("criterio_res_nome");
+
+                    b.Property<decimal>("Nota")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("nota");
+
+                    b.Property<int>("NotaParcialId")
+                        .HasColumnType("integer")
+                        .HasColumnName("nota_parcial_id");
+
+                    b.Property<int>("ResultadoNotaFinalId")
+                        .HasColumnType("integer")
+                        .HasColumnName("resultado_nota_final_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_notas_parciais_resultados");
+
+                    b.HasIndex("AvaliadoResId")
+                        .HasDatabaseName("ix_notas_parciais_resultados_avaliado_res_id");
+
+                    NpgsqlIndexBuilderExtensions.IncludeProperties(b.HasIndex("AvaliadoResId"), new[] { "Nota", "CriterioResId" });
+
+                    b.HasIndex("CriterioResId")
+                        .HasDatabaseName("ix_notas_parciais_resultados_criterio_res_id");
+
+                    b.HasIndex("AvaliadoResId", "CriterioResId")
+                        .HasDatabaseName("ix_notas_parciais_resultados_avaliado_res_id_criterio_res_id");
+
+                    b.HasIndex("ResultadoNotaFinalId", "AvaliadoResId", "CriterioResId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_notas_parciais_resultados_resultado_nota_final_id_avaliado_");
+
+                    b.ToTable("notas_parciais_resultados", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.ResultadoSessao", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DataFim")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("data_fim");
+
+                    b.Property<DateTime>("DataInicio")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("data_inicio");
+
+                    b.Property<decimal>("NotaMaxima")
+                        .HasColumnType("numeric")
+                        .HasColumnName("nota_maxima");
+
+                    b.Property<int>("SessaoId")
+                        .HasColumnType("integer")
+                        .HasColumnName("sessao_id");
+
+                    b.Property<string>("TurmaCod")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("turma_cod");
+
+                    b.Property<int>("TurmaId")
+                        .HasColumnType("integer")
+                        .HasColumnName("turma_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_sessoes_resultados");
+
+                    b.HasIndex("SessaoId")
+                        .HasDatabaseName("ix_sessoes_resultados_sessao_id");
+
+                    b.ToTable("sessoes_resultados", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.Sessao", b =>
                 {
                     b.Property<int>("Id")
@@ -557,6 +813,87 @@ namespace Persistence.Migrations
                     b.Navigation("Professor");
                 });
 
+            modelBuilder.Entity("Domain.Entities.ResultadoAluno", b =>
+                {
+                    b.HasOne("Domain.Entities.ResultadoGrupo", "ResultadoGrupo")
+                        .WithMany("Alunos")
+                        .HasForeignKey("ResultadoGrupoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_alunos_resultados_grupos_resultados_resultado_grupo_id");
+
+                    b.HasOne("Domain.Entities.ResultadoSessao", "ResultadoSessao")
+                        .WithMany("Alunos")
+                        .HasForeignKey("ResultadoSessaoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_alunos_resultados_sessoes_resultados_resultado_sessao_id");
+
+                    b.Navigation("ResultadoGrupo");
+
+                    b.Navigation("ResultadoSessao");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ResultadoCriterio", b =>
+                {
+                    b.HasOne("Domain.Entities.ResultadoSessao", "ResultadoSessao")
+                        .WithMany("Criterios")
+                        .HasForeignKey("ResultadoSessaoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_criterios_resultados_sessoes_resultados_resultado_sessao_id");
+
+                    b.Navigation("ResultadoSessao");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ResultadoGrupo", b =>
+                {
+                    b.HasOne("Domain.Entities.ResultadoSessao", "ResultadoSessao")
+                        .WithMany("Grupos")
+                        .HasForeignKey("ResultadoSessaoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_grupos_resultados_sessoes_resultados_resultado_sessao_id");
+
+                    b.Navigation("ResultadoSessao");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ResultadoNotaFinal", b =>
+                {
+                    b.HasOne("Domain.Entities.ResultadoSessao", "ResultadoSessao")
+                        .WithMany("NotasFinais")
+                        .HasForeignKey("ResultadoSessaoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_nota_finais_resultados_sessoes_resultados_resultado_sessao_");
+
+                    b.Navigation("ResultadoSessao");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ResultadoNotaParcial", b =>
+                {
+                    b.HasOne("Domain.Entities.ResultadoNotaFinal", "ResultadoNotaFinal")
+                        .WithMany("NotasParciais")
+                        .HasForeignKey("ResultadoNotaFinalId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_notas_parciais_resultados_nota_finais_resultados_resultado_");
+
+                    b.Navigation("ResultadoNotaFinal");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ResultadoSessao", b =>
+                {
+                    b.HasOne("Domain.Entities.Sessao", "Sessao")
+                        .WithMany()
+                        .HasForeignKey("SessaoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_sessoes_resultados_sessoes_sessao_id");
+
+                    b.Navigation("Sessao");
+                });
+
             modelBuilder.Entity("Domain.Entities.Sessao", b =>
                 {
                     b.HasOne("Domain.Entities.Turma", "Turma")
@@ -577,6 +914,27 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Domain.Entities.Professor", b =>
                 {
                     b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ResultadoGrupo", b =>
+                {
+                    b.Navigation("Alunos");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ResultadoNotaFinal", b =>
+                {
+                    b.Navigation("NotasParciais");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ResultadoSessao", b =>
+                {
+                    b.Navigation("Alunos");
+
+                    b.Navigation("Criterios");
+
+                    b.Navigation("Grupos");
+
+                    b.Navigation("NotasFinais");
                 });
 
             modelBuilder.Entity("Domain.Entities.Sessao", b =>

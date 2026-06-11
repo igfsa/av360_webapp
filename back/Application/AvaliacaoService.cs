@@ -101,11 +101,11 @@ public class AvaliacaoService(IGeralPersist geralPersist,
         try
         {
             _ = model.Itens
-                ?? throw new NotFoundException("Sem avaliações");
+                ?? throw new NotFoundException("Sem avaliações.");
+            var sessao = await _sessaoPersist.GetSessaoIdAsync(model.SessaoId)
+                ?? throw new NotFoundException("Sessão não encontrada."); 
 
-            var final = new NotaFinal(
-                sessao: await _sessaoPersist.GetSessaoIdAsync(model.SessaoId)
-                    ?? throw new NotFoundException("Sessão inválida"),
+            var final = sessao.AdicionarNotaFinal(
                 avaliador: await _alunoPersist.GetAlunoIdAsync(model.AvaliadorId)
                     ?? throw new NotFoundException("Aluno Avaliador não encontrado"),
                 grupo: await _grupoPersist.GetGrupoIdAsync(model.GrupoId)
@@ -113,7 +113,7 @@ public class AvaliacaoService(IGeralPersist geralPersist,
                 deviceHash: model.DeviceHash,
                 dataEnvio: DateTime.UtcNow
             );
-            _geralPersist.Add(final);
+            
             _ = await _geralPersist.SaveChangesAsync();
             AvaliacaoPostResultDTO resultado = new();
             foreach (var np in model.Itens)

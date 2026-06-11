@@ -1,6 +1,6 @@
-import { ChangeDetectorRef, Component, DestroyRef, Inject, Input, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, inject, Inject, Input, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
 import { DecimalPipe, isPlatformBrowser } from '@angular/common'
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';import {
 	NgbAccordionButton,
 	NgbAccordionDirective,
@@ -11,11 +11,9 @@ import { forkJoin } from 'rxjs';import {
 	NgbAccordionCollapse,
 } from '@ng-bootstrap/ng-bootstrap/accordion';
 import Swal from 'sweetalert2';
+import { ChartModule } from 'primeng/chart';
 
 import { Turma } from '../../Models/Turma';
-import { Aluno } from '../../Models/Aluno';
-import { Criterio } from '../../Models/Criterio';
-import { Grupo } from '../../Models/Grupo';
 import { Sessao } from '../../Models/Sessao';
 
 import { TurmaService } from '../../Service/Turma.service';
@@ -36,7 +34,9 @@ import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
 		NgbAccordionToggle,
 		NgbAccordionBody,
 	  NgbAccordionCollapse,
-    DecimalPipe
+    DecimalPipe,
+    RouterLink,
+    ChartModule
   ],
   templateUrl: './sessao_ativa.component.html',
   styleUrls: ['./sessao_ativa.component.scss','../../app.scss']
@@ -53,10 +53,15 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
     , pendentes: 0
     , mediaGeral: 0
     , totalNotas: 0
+    , notaMax: 0
+    , turmaCod: ``
     , criterios: []
     , grupos: []
   });
-  private sessaoinicializada?: number;
+  private sessaoConectada?: number;
+  public dataGrupo: any;
+  public dataCriterio: any;
+  public optionsBar: any;
 
   constructor(
     private turmaService: TurmaService,
@@ -68,7 +73,7 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
     private turmaRealTime: TurmaRealTime,
     private authService: AuthService,
     @Inject(PLATFORM_ID) private platformId: Object,
-    @Inject(DestroyRef) private destroyRef: DestroyRef
+    @Inject(DestroyRef) private destroyRef: DestroyRef,
   ){}
 
   ngOnInit() {
@@ -105,15 +110,17 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
       this.turma = turma;
       this.sessaoAtiva = sessaoAtiva;
 
-      if (sessaoAtiva && this.sessaoinicializada !== sessaoAtiva.id){
+      if (this.sessaoAtiva?.id){
+        if (this.sessaoConectada !== this.sessaoAtiva.id){
+          this.conectarSessao(sessaoAtiva.id);
 
-        this.conectarSessao(sessaoAtiva.id);
+          const urlTree = this.router.createUrlTree([`/sessao-qrcode/${sessaoAtiva.id}`]);
+          window.open(this.router.serializeUrl(urlTree), '_blank')
+
+          this.sessaoConectada = sessaoAtiva.id;
+        }
+
         this.loadSessao(sessaoAtiva.id);
-
-        const urlTree = this.router.createUrlTree([`/sessao-qrcode/${sessaoAtiva.id}`]);
-        window.open(this.router.serializeUrl(urlTree), '_blank')
-
-        this.sessaoinicializada = sessaoAtiva.id;
       }
 
       this.cdr.detectChanges();
@@ -124,6 +131,7 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
     this.sessaoService.dashboardSessao(sessaoId).subscribe({
       next: (res) => {
         this.dashboard = res;
+        this.loadChart();
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -146,6 +154,53 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
     });
   }
 
+  private loadChart() {
+
+    this.optionsBar = {
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      scales: {
+        x: {
+          grid: {
+            display: false
+          }
+        },
+        y: {
+          min: 0,
+          max: this.turma.notaMax,
+          grid: {
+            display: false
+          }
+        }
+      }
+    };
+
+    this.dataGrupo = {
+      labels: this.dashboard.grupos.map(g => g.nome),
+      datasets: [
+        {
+          label: 'Média Grupo',
+          data: this.dashboard.grupos.map(g => g.media)
+        }
+      ]
+    };
+    this.dataCriterio = {
+      labels: this.dashboard.criterios.map(c => c.nome),
+      datasets: [
+        {
+          label: 'Média Geral',
+          data: this.dashboard.criterios.map(c => c.mediaGlobal)
+        }
+      ]
+    };
+    console.log(this.dataGrupo);
+    console.log(this.dataCriterio);
+  }
+
   private conectarSessao(sessaoId: number): void {
 
     this.sessaoRealTime.connect()?.then(() => {
@@ -156,7 +211,7 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(id => {
         if (id === sessaoId) {
-          this.loadData(this.turma.id);
+          this.loadSessao(sessaoId);
         }
       });
 
@@ -166,7 +221,7 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
         if (id === sessaoId) {
           this.sessaoRealTime.disconnect();
           this.loadData(this.turma.id);
-          this.sessaoinicializada = undefined;
+          this.sessaoConectada = undefined;
         }
       });
   }
@@ -302,23 +357,52 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
   }
 
   private encerrarSessao() {
-    this.sessaoService.putEncerraSessao(this.sessaoAtiva!).subscribe({
-      next: () => {
-        Swal.mixin({
-          toast: true,
-          position: "top-end",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          }
-        }).fire({
-          icon: 'success',
-          title: 'Sucesso',
-          text: `Período de Avaliação Encerrado!`
+    this.sessaoService.putEncerraSessao(this.sessaoAtiva?.id ?? 0).subscribe({
+      next: async (res) => {
+        if (!res || res.size === 0){
+          Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            }
+          }).fire({
+            icon: 'success',
+            title: 'Sucesso',
+            text: `Período de Avaliação Encerrado!`
+          });
+
+          return
+        }
+
+        const result = await Swal.fire({
+          icon: 'warning',
+          title: 'Sessão encerrada com inconsistências',
+          text: 'Deseja baixar o relatório de erros?',
+          showCancelButton: true,
+          confirmButtonText: 'Baixar relatório',
+          cancelButtonText: 'Fechar'
         });
+
+        if (result.isConfirmed) {
+
+          const url = URL.createObjectURL(res);
+
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `relatorio-erros-${this.sessaoAtiva?.id}.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+        }
+
       },
       error: (err) => {
         Swal.fire({

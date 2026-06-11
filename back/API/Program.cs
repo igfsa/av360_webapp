@@ -59,12 +59,21 @@ var mapper_config = builder.Services.AddAutoMapper(cfg =>
 {
     cfg.LicenseKey = Environment.GetEnvironmentVariable("AUTOMAPPER_KEY");
     _ = cfg.CreateMap<Aluno, AlunoDTO>().ReverseMap();
+    _ = cfg.CreateMap<AlunoGrupo, AlunoGrupoDTO>().ReverseMap();
     _ = cfg.CreateMap<Criterio, CriterioDTO>().ReverseMap();
     _ = cfg.CreateMap<Grupo, GrupoDTO>().ReverseMap();
     _ = cfg.CreateMap<NotaFinal, NotaFinalDTO>().ReverseMap();
     _ = cfg.CreateMap<NotaParcial, NotaParcialDTO>().ReverseMap();
+    _ = cfg.CreateMap<Professor, ProfessorDTO>().ReverseMap();
     _ = cfg.CreateMap<Sessao, SessaoDTO>().ReverseMap();
     _ = cfg.CreateMap<Turma, TurmaDTO>().ReverseMap();
+    _ = cfg.CreateMap<RefreshToken, RefreshTokenDTO>().ReverseMap();
+    _ = cfg.CreateMap<ResultadoSessao, ResultadoSessaoDTO>().ReverseMap();
+    _ = cfg.CreateMap<ResultadoNotaFinal, ResultadoNotaFinalDTO>().ReverseMap();
+    _ = cfg.CreateMap<ResultadoNotaParcial, ResultadoNotaParcialDTO>().ReverseMap();
+    _ = cfg.CreateMap<ResultadoAluno, ResultadoAlunoDTO>().ReverseMap();
+    _ = cfg.CreateMap<ResultadoGrupo, ResultadoGrupoDTO>().ReverseMap();
+    _ = cfg.CreateMap<ResultadoCriterio, ResultadoCriterioDTO>().ReverseMap();
 });
 
 builder.Services.AddScoped<IGeralPersist, GeralPersist>();
@@ -100,6 +109,8 @@ builder.Services.AddScoped<IAlunoGrupoPersist, AlunoGrupoPersist>();
 
 builder.Services.AddScoped<IDashboardCacheService, DashboardCacheService>();
 builder.Services.AddScoped<IDashboardSessaoService, DashboardSessaoService>();
+
+builder.Services.AddScoped<IResultadoPersist, ResultadoPersist>();
 
 builder.Services.AddScoped<IProfessorPersist, ProfessorPersist>();
 
@@ -177,7 +188,7 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-// 🔐 PROTEÇÃO SSR
+// PROTEÇÃO SSR
 app.Use(async (context, next) =>
 {
     var path = context.Request.Path.Value?.ToLower() ?? "";
