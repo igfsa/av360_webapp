@@ -1,3 +1,348 @@
-<p>
-  dashboard_sessao works!
-</p>
+<p-selectbutton
+  [options]="stateOptions"
+  [(ngModel)]="viewMode"
+  optionLabel="label"
+  optionValue="value"
+  [allowEmpty]="false" />
+@if(viewMode === DashboardViewMode.Monitoramento){
+  <div class="dashboard-section">
+    <div class="dashboard-item">
+      <h3 class="item-titulo">
+        Média Geral
+      </h3>
+      <div class="item-conteudo">
+        {{ dashboard.mediaGeral | number:'1.0-1' }}
+      </div>
+    </div>
+    <div class="dashboard-item">
+      <h3 class="item-titulo">
+        Total de Alunos
+      </h3>
+      <div class="item-conteudo">
+        {{ dashboard.totalAlunos }}
+      </div>
+    </div>
+    <div class="dashboard-item">
+      <h3 class="item-titulo">
+        Avaliaram
+      </h3>
+      <div class="item-conteudo">
+        {{ dashboard.avaliaram }}
+      </div>
+    </div>
+    <div class="dashboard-item">
+      <h3 class="item-titulo">
+        Faltantes
+      </h3>
+      <div class="item-conteudo">
+        {{ dashboard.pendentes }}
+      </div>
+    </div>
+  </div>
+
+  <div class="tabela-wrapper">
+    <table class="table table-striped text-center table-hover">
+
+      <thead class="table-dark">
+        <tr class="first-row">
+
+          <th>
+            Critério
+          </th>
+          <th>
+            Média Global
+          </th>
+          <th>
+            Total de notas
+          </th>
+
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (criterio of dashboard.criterios; track criterio.criterioId) {
+          <tr>
+
+            <td style="width: 70%;">
+              {{criterio.nome}}
+            </td>
+
+            <td style="width: 15%;">
+              {{criterio.mediaGlobal | number:'1.0-1'}}
+            </td>
+
+            <td style="width: 15%;">
+              {{criterio.totalNotas}}
+            </td>
+          </tr>
+        }
+      </tbody>
+
+    </table>
+  </div>
+
+  @for(grupo of dashboard.grupos; track grupo.grupoId){
+    <div ngbAccordion>
+      <div ngbAccordionItem>
+        <h2 ngbAccordionHeader>
+          <button ngbAccordionButton>
+            <h2>{{ grupo?.nome }}</h2>
+          </button>
+        </h2>
+        <div ngbAccordionCollapse>
+          <div ngbAccordionBody>
+            <ng-template>
+              <div class="dashboard-section">
+                <div class="dashboard-item">
+                  <h3 class="item-titulo">
+                    Média Geral
+                  </h3>
+                  <div class="item-conteudo">
+                    {{ grupo?.media | number:'1.0-1' }}
+                  </div>
+                </div>
+                <div class="dashboard-item">
+                  <h3 class="item-titulo">
+                    Total de Alunos
+                  </h3>
+                  <div class="item-conteudo">
+                    {{ grupo?.alunos?.length }}
+                  </div>
+                </div>
+                <div class="dashboard-item">
+                  <h3 class="item-titulo">
+                    Avaliaram
+                  </h3>
+                  <div class="item-conteudo">
+                    {{ grupo?.avaliaram }}
+                  </div>
+                </div>
+                <div class="dashboard-item">
+                  <h3 class="item-titulo">
+                    Faltantes
+                  </h3>
+                  <div class="item-conteudo">
+                    {{ grupo?.pendentes }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="tabela-wrapper">
+                <table class="table table-striped text-center table-hover">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>Nome</th>
+                      <th>Avaliou</th>
+                      <th>Média</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (aluno of grupo.alunos; track aluno.alunoId){
+                        <tr>
+                          <td style="width: 70%;">{{aluno.nome}}</td>
+                          <td style="width: 15%;">
+                            @if (aluno.avaliou) {
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-circle" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>
+                              </svg>
+                            } @else {
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#dc3545" class="bi bi-x-circle" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                              </svg>
+                            }
+                          </td>
+                          <td style="width: 15%;">{{aluno.media | number:'1.0-1'}}</td>
+                        </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+}@else{
+  <div class="dashboard-section d-flex gap-3">
+    <p-card [style]="{ width: '20%', overflow: 'hidden' }">
+      <ng-template pTemplate="header" >
+        <div class="card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="#EDE9FE" class="bi bi-award-fill w-50 h-50" viewBox="0 0 16 16">
+            <path d="m8 0 1.669.864 1.858.282.842 1.68 1.337 1.32L13.4 6l.306 1.854-1.337 1.32-.842 1.68-1.858.282L8 12l-1.669-.864-1.858-.282-.842-1.68-1.337-1.32L2.6 6l-.306-1.854 1.337-1.32.842-1.68L6.331.864z"/>
+            <path d="M4 11.794V16l4-1 4 1v-4.206l-2.018.306L8 13.126 6.018 12.1z"/>
+          </svg>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="title">Nota Máxima</ng-template>
+
+      <p class="valor">
+        {{ dashboard.notaMax | number:'1.2-2' }}
+      </p>
+
+    </p-card>
+
+    <p-card [style]="{ width: '20%', overflow: 'hidden' }">
+      <ng-template pTemplate="header" class="card-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="#EDE9FE" class="bi bi-graph-up" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07"/>
+        </svg>
+      </ng-template>
+
+      <ng-template pTemplate="title"> Média Geral </ng-template>
+
+      <p class="valor">
+        {{dashboard.mediaGeral | number:'1.0-1'}}
+      </p>
+    </p-card>
+
+    <p-card [style]="{ width: '20%', overflow: 'hidden' }">
+      <ng-template pTemplate="header" class="card-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="#EDE9FE" class="bi bi-people" viewBox="0 0 16 16">
+          <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002-.014.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7 7 0 0 0 5 9c-4 0-5 3-5 4q0 1 1 1h4.216A2.24 2.24 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816M4.92 10A5.5 5.5 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4"/>
+        </svg>
+      </ng-template>
+
+      <ng-template pTemplate="title"> Total de Alunos </ng-template>
+
+      <p>{{dashboard.totalAlunos}}</p>
+    </p-card>
+
+    <p-card [style]="{ width: '30%', overflow: 'hidden' }">
+      <p-chart
+        type="doughnut"
+        [data]="donutDataTurma">
+      </p-chart>
+    </p-card>
+
+    <p-chart
+      [data]="dataCriteriosTurma"
+      [options]="optionsCriterio"
+      height="300"
+      width="100%">
+    </p-chart>
+
+    @for (criterio of dashboard.criterios; track criterio.criterioId; let i = $index) {
+      <span class="m-2">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          [attr.fill]="hexToRgba( cores[i % this.cores.length],0.2)"
+          class="bi bi-circle-fill"
+          viewBox="0 0 16 16">
+          <circle cx="8" cy="8" r="8"/>
+        </svg>
+        {{ criterio.nome }}
+      </span>
+    }
+
+    <p-chart
+      [data]="dataGruposTurma"
+      [options]="optionsGrupoTurma"
+      height="300"
+      width="100%">
+    </p-chart>
+    @for (grupo of dashboard.grupos; track grupo.grupoId; let i = $index) {
+      <span class="m-2">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          [attr.fill]="hexToRgba( cores[i % this.cores.length],0.2)"
+          class="bi bi-circle-fill"
+          viewBox="0 0 16 16">
+          <circle cx="8" cy="8" r="8"/>
+        </svg>
+        {{ grupo.nome }}
+      </span>
+    }
+  </div>
+
+  @for(grupo of grupoDetailData; track grupo.grupoId){
+    <div ngbAccordion>
+      <div ngbAccordionItem>
+        <h2 ngbAccordionHeader>
+          <button ngbAccordionButton>
+            <h2>{{ grupo?.nome }}</h2>
+          </button>
+        </h2>
+        <div ngbAccordionCollapse>
+          <div ngbAccordionBody>
+            <ng-template>
+              <div class="dashboard-section">
+                <div class="dashboard-item">
+                  <h3 class="item-titulo">
+                    Média Geral
+                  </h3>
+                  <div class="item-conteudo">
+                    {{ grupo?.media | number:'1.0-1' }}
+                  </div>
+                </div>
+                <div class="dashboard-item">
+                  <h3 class="item-titulo">
+                    Total de Alunos
+                  </h3>
+                  <div class="item-conteudo">
+                    {{ grupo?.alunos?.length }}
+                  </div>
+                </div>
+                <div class="dashboard-item">
+                  <h3 class="item-titulo">
+                    Já Avaliaram
+                  </h3>
+                  <div class="item-conteudo">
+                    {{ grupo?.avaliaram }}
+                  </div>
+                </div>
+                <div class="dashboard-item">
+                  <h3 class="item-titulo">
+                    Pendentes
+                  </h3>
+                  <div class="item-conteudo">
+                    {{ grupo?.pendentes }}
+                  </div>
+                </div>
+              </div>
+
+              <p-chart
+                type="bar"
+                [data]="grupo.chartMedia"
+                [options]="grupo.chartMediaOption"
+                height="300"
+                width="50%">
+              </p-chart>
+
+              <p-chart
+                type="radar"
+                [data]="grupo.chartRadar"
+                [options]="grupo.chartRadarOption"
+                height="300"
+                width="50%">
+              </p-chart>
+
+              @for (aluno of grupo.alunos; track aluno.alunoId; let i = $index) {
+                <span class="m-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    [attr.fill]="hexToRgba( cores[i % this.cores.length],0.2)"
+                    class="bi bi-circle-fill"
+                    viewBox="0 0 16 16">
+                    <circle cx="8" cy="8" r="8"/>
+                  </svg>
+                  {{ aluno.nome }}
+                </span>
+              }
+
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+}

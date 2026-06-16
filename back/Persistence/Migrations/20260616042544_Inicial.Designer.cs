@@ -12,8 +12,8 @@ using Persistence.Context;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(APIContext))]
-    [Migration("20260610204743_index-sessao_res-sessao")]
-    partial class indexsessao_ressessao
+    [Migration("20260616042544_Inicial")]
+    partial class Inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

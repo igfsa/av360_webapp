@@ -37,15 +37,8 @@ builder.Services.AddControllers()
 
 builder.Services.AddSignalR();
 
-string npgConnection =
-    $"Host={Environment.GetEnvironmentVariable("DB_AV360_SERVER")};" +
-    $"Port=5432;" +
-    $"Database={Environment.GetEnvironmentVariable("DB_AV360_NAME")};" +
-    $"Username={Environment.GetEnvironmentVariable("DB_AV360_USER")};" +
-    $"Password={Environment.GetEnvironmentVariable("DB_AV360_PASSWORD")}";
-
 builder.Services.AddDbContext<APIContext>(options =>
-    options.UseNpgsql(npgConnection)
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
         .UseSnakeCaseNamingConvention()
     );
 

@@ -40,6 +40,7 @@
     "@microsoft/signalr": "^10.0.0",
     "@ng-bootstrap/ng-bootstrap": "^20.0.0",
     "@popperjs/core": "^2.11.8",
+    "@primeuix/themes": "^2.0.3",
     "bootstrap": "^5.3.8",
     "chart.js": "^4.5.1",
     "concurrently": "^10.0.3",

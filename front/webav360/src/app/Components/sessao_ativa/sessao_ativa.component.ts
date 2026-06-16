@@ -23,20 +23,14 @@ import { DashboardSessao } from '../../Models/Dashboard/DashboardSessao';
 import { AuthService } from '../../auth/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
+import { DashboardSessaoComponent } from '../dashboard_sessao/dashboard_sessao.component';
 
 @Component({
   selector: 'app-sessao-ativa',
   imports: [
-		NgbAccordionButton,
-		NgbAccordionDirective,
-		NgbAccordionItem,
-		NgbAccordionHeader,
-		NgbAccordionToggle,
-		NgbAccordionBody,
-	  NgbAccordionCollapse,
-    DecimalPipe,
     RouterLink,
-    ChartModule
+    ChartModule,
+    DashboardSessaoComponent
   ],
   templateUrl: './sessao_ativa.component.html',
   styleUrls: ['./sessao_ativa.component.scss','../../app.scss']
@@ -59,9 +53,6 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
     , grupos: []
   });
   private sessaoConectada?: number;
-  public dataGrupo: any;
-  public dataCriterio: any;
-  public optionsBar: any;
 
   constructor(
     private turmaService: TurmaService,
@@ -131,7 +122,6 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
     this.sessaoService.dashboardSessao(sessaoId).subscribe({
       next: (res) => {
         this.dashboard = res;
-        this.loadChart();
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -152,53 +142,6 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
         });
       }
     });
-  }
-
-  private loadChart() {
-
-    this.optionsBar = {
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false
-        }
-      },
-      scales: {
-        x: {
-          grid: {
-            display: false
-          }
-        },
-        y: {
-          min: 0,
-          max: this.turma.notaMax,
-          grid: {
-            display: false
-          }
-        }
-      }
-    };
-
-    this.dataGrupo = {
-      labels: this.dashboard.grupos.map(g => g.nome),
-      datasets: [
-        {
-          label: 'Média Grupo',
-          data: this.dashboard.grupos.map(g => g.media)
-        }
-      ]
-    };
-    this.dataCriterio = {
-      labels: this.dashboard.criterios.map(c => c.nome),
-      datasets: [
-        {
-          label: 'Média Geral',
-          data: this.dashboard.criterios.map(c => c.mediaGlobal)
-        }
-      ]
-    };
-    console.log(this.dataGrupo);
-    console.log(this.dataCriterio);
   }
 
   private conectarSessao(sessaoId: number): void {

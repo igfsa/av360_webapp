@@ -19,20 +19,14 @@ import { Sessao } from '../../Models/Sessao';
 import { SessaoService } from '../../Service/Sessao.service';
 import { DashboardSessao } from '../../Models/Dashboard/DashboardSessao';
 import { AuthService } from '../../auth/auth.service';
+import { DashboardSessaoComponent } from "../dashboard_sessao/dashboard_sessao.component";
 
 @Component({
   selector: 'app-sessao-hist',
   imports: [
-		NgbAccordionButton,
-		NgbAccordionDirective,
-		NgbAccordionItem,
-		NgbAccordionHeader,
-		NgbAccordionToggle,
-		NgbAccordionBody,
-	  NgbAccordionCollapse,
-    DecimalPipe,
-    RouterLink
-  ],
+    RouterLink,
+    DashboardSessaoComponent
+],
   templateUrl: './sessao_hist.component.html',
   styleUrls: ['./sessao_hist.component.scss','../../app.scss']
 })

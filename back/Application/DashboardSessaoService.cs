@@ -63,9 +63,6 @@ public class DashboardSessaoService(
             .GroupBy(ag => ag.GrupoId)
             .ToDictionary(g => g.Key, g => g.Select(x => x.AlunoId).ToHashSet());
 
-        Console.WriteLine($"========================================>{notasSessao.Length}");
-        Console.WriteLine("notasSessao");
-
         var alunosDto = alunos.Select(a => 
         {
             var notasAluno = notasPorAluno.GetValueOrDefault(a.Id, []);

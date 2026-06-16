@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 
 namespace Persistence.Context;
 
@@ -7,26 +8,18 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<APIContext
 {
     public APIContext CreateDbContext(string[] args)
     {
+        IConfiguration configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: false)
+            .AddJsonFile("appsettings.Development.json", optional: true)
+            .AddEnvironmentVariables()
+            .Build();
 
-        var server = Environment.GetEnvironmentVariable("DB_AV360_SERVER");
-        var database = Environment.GetEnvironmentVariable("DB_AV360_NAME");
-        var user = Environment.GetEnvironmentVariable("DB_PSQLUSER");
-        var password = Environment.GetEnvironmentVariable("DB_PSQLPWD");
-
-        if (string.IsNullOrEmpty(server) ||
-            string.IsNullOrEmpty(database) ||
-            string.IsNullOrEmpty(user) ||
-            string.IsNullOrEmpty(password))
-        {
-            throw new InvalidOperationException("Variáveis de ambiente do banco não configuradas.");
-        }
-
-        var connectionString =
-            $"Host={server};Port=5432;Database={database};Username={user};Password={password}";
         var optionsBuilder = new DbContextOptionsBuilder<APIContext>();
 
-        optionsBuilder.UseNpgsql(connectionString)
-                      .UseSnakeCaseNamingConvention();
+        optionsBuilder
+            .UseNpgsql(Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection"))
+            .UseSnakeCaseNamingConvention();
 
         return new APIContext(optionsBuilder.Options);
     }
