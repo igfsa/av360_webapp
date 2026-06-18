@@ -1,9 +1,6 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, makeStateKey, PLATFORM_ID, signal, TransferState } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { finalize, of, shareReplay, tap, catchError, Observable, map, switchMap } from 'rxjs';
-import { isPlatformBrowser } from '@angular/common';
-
-const AUTH_KEY = makeStateKey<boolean>('auth');
 
 @Injectable({
   providedIn: 'root'

@@ -5,6 +5,7 @@ using Application.DTOs;
 using Domain.Entities;
 using Persistence.Contracts;
 using Domain.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
@@ -13,7 +14,8 @@ public class GrupoService(IGeralPersist geralPersist,
                     ITurmaPersist turmaPersist,
                     IAlunoGrupoPersist alunoGrupoPersist,
                     IAlunoTurmaPersist alunoTurmaPersist,
-                    IMapper mapper) : IGrupoService
+                    IMapper mapper,
+                    ILogger<GrupoService> logger) : IGrupoService
 {
     private readonly IGeralPersist _geralPersist = geralPersist;
     private readonly IGrupoPersist _grupoPersist = grupoPersist;
@@ -21,6 +23,7 @@ public class GrupoService(IGeralPersist geralPersist,
     private readonly IAlunoGrupoPersist _alunoGrupoPersist = alunoGrupoPersist;
     private readonly IAlunoTurmaPersist _alunoTurmaPersist = alunoTurmaPersist;
     private readonly IMapper _mapper = mapper;
+    private readonly ILogger _logger = logger;
 
     #region get
     public async Task<GrupoDTO> GetGrupoById(int Id)
@@ -92,10 +95,12 @@ public class GrupoService(IGeralPersist geralPersist,
             var grupoRetorno = await _grupoPersist.GetGrupoIdAsync(grupo.Id);
             return _mapper.Map<GrupoDTO>(grupoRetorno);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Erro ao criar grupo: {model.nome} turmaId: {model.TurmaId}", model.Nome, model.TurmaId);
             throw;
         }
+
     }
     #endregion
     #region update
@@ -110,28 +115,37 @@ public class GrupoService(IGeralPersist geralPersist,
             var grupoRetorno = await _grupoPersist.GetGrupoIdAsync(grupoId);
             return _mapper.Map<GrupoDTO>(grupoRetorno);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Erro ao atualizar grupo: {grupoId} turmaId: {model.TurmaId}", grupoId, model.TurmaId);
             throw;
         }
     }
     public async Task AtualizarGrupo(int turmaId, int grupoId, List<int> alunosSelecionados)
     {
-        AlunoGrupo[] alunos = await _alunoGrupoPersist.GetAlunosGrupoTurmaId(turmaId);
-        var remover = alunos.Where(ag => ag.GrupoId == grupoId);
+        try
+        {
+            AlunoGrupo[] alunos = await _alunoGrupoPersist.GetAlunosGrupoTurmaId(turmaId);
+            var remover = alunos.Where(ag => ag.GrupoId == grupoId);
 
-        _geralPersist.DeleteRange(remover);
+            _geralPersist.DeleteRange(remover);
 
-        var novos = alunosSelecionados.Select(alunoId =>
-            new AlunoGrupo
-            (
-                alunoId,
-                grupoId,
-                turmaId
-            ));
+            var novos = alunosSelecionados.Select(alunoId =>
+                new AlunoGrupo
+                (
+                    alunoId,
+                    grupoId,
+                    turmaId
+                ));
 
-        _geralPersist.AddRangeAsync(novos);
-        _ = await _geralPersist.SaveChangesAsync();
+            _geralPersist.AddRangeAsync(novos);
+            _ = await _geralPersist.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao atualizar grupo: {grupoId} turmaId: {turmaId}", grupoId, turmaId);
+            throw;
+        }
     }
     #endregion
 }

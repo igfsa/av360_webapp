@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+
+  api:
+
+    build:
+      context: ../back
+      dockerfile: Dockerfile
+
+    container_name: webav360-api
+
+    restart: unless-stopped
+
+    ports:
+      - "8080:8080"
+
+    env_file:
+      - .env
+
+    depends_on:
+      - redis
+
+    networks:
+      - webav
+
+
+  redis:
+
+    image: redis:7-alpine
+
+    container_name: webav360-redis
+
+    restart: unless-stopped
+
+    command:
+      redis-server /usr/local/etc/redis/redis.conf
+
+    volumes:
+      - redis-data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+
+    networks:
+      - webav
+
+
+volumes:
+
+  redis-data:
+
+
+networks:
+
+  webav:

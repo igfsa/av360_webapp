@@ -6,6 +6,7 @@ using Domain.Entities;
 using Persistence.Contracts;
 using Application.Helpers;
 using Domain.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
@@ -19,7 +20,8 @@ public class SessaoService(IGeralPersist geralPersist,
                     IAlunoTurmaPersist alunoTurmaPerist,
                     ITurmaPersist turmaPersist,
                     IGrupoPersist grupoPersist,
-                    IMapper mapper) : ISessaoService
+                    IMapper mapper,
+                    ILogger<SessaoService> logger) : ISessaoService
 {
     private readonly IGeralPersist _geralPersist = geralPersist;
     private readonly IAlunoService _alunoService = alunoService;
@@ -32,6 +34,7 @@ public class SessaoService(IGeralPersist geralPersist,
     private readonly ITurmaPersist _turmaPersist = turmaPersist;
     private readonly IGrupoPersist _grupoPersist = grupoPersist;
     private readonly IMapper _mapper = mapper;
+    private readonly ILogger _logger = logger;
 
     #region get
     public async Task<SessaoDTO> GetSessaoById(int Id)
@@ -228,8 +231,9 @@ public class SessaoService(IGeralPersist geralPersist,
             var SessaoRetorno = await _sessaoPersist.GetSessaoIdAsync(sessao.Id);
             return _mapper.Map<SessaoDTO>(SessaoRetorno);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Erro ao criar sessão turmaId: {turmaId}", model.TurmaId);
             throw;
         }
     }
@@ -360,10 +364,12 @@ public class SessaoService(IGeralPersist geralPersist,
             }
             return resultado;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Erro ao criar encerrar sessaoId: {sessaoId}", sessaoId);
             throw;
         }
+
     }
     #endregion
 }

@@ -1,19 +1,43 @@
-using Application.Contracts;
-using Application.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using StackExchange.Redis;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
+using Serilog.Formatting.Compact;
 
+using API.Hubs;
+using API.Notifier;
+using Application.Contracts;
+using Application.Services;
+using Application.DTOs;
+using Application.Helpers;
+using Domain.Entities;
 using Persistence;
 using Persistence.Context;
 using Persistence.Contracts;
-using Domain.Entities;
-using Application.DTOs;
-using API.Hubs;
-using API.Notifier;
+using Serilog.Events;
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+    .Enrich.FromLogContext()
+    .Enrich.WithMachineName()
+    .Enrich.WithThreadId()
+
+    .WriteTo.Console()
+
+    .WriteTo.File(
+        new RenderedCompactJsonFormatter(),
+        "logs/log-.json",
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 30)
+
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog();
 
 // builder.Services.AddCors(options =>
 // {
@@ -45,12 +69,12 @@ builder.Services.AddDbContext<APIContext>(options =>
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
-    return ConnectionMultiplexer.Connect(config["Redis:ConnectionString"]);
+    return ConnectionMultiplexer.Connect(builder.Configuration["Redis:Connection"]);
 });
 
 var mapper_config = builder.Services.AddAutoMapper(cfg =>
 {
-    cfg.LicenseKey = Environment.GetEnvironmentVariable("AUTOMAPPER_KEY");
+    cfg.LicenseKey = builder.Configuration["Automapper:Key"];
     _ = cfg.CreateMap<Aluno, AlunoDTO>().ReverseMap();
     _ = cfg.CreateMap<AlunoGrupo, AlunoGrupoDTO>().ReverseMap();
     _ = cfg.CreateMap<Criterio, CriterioDTO>().ReverseMap();
@@ -113,6 +137,8 @@ builder.Services.AddScoped<IAutenticacaoService, AutenticacaoService>();
 
 builder.Services.AddScoped<IExportService, ExportService>();
 
+builder.Services.AddScoped<JWTToken>();
+
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", jwtOptions =>
     {
@@ -123,12 +149,12 @@ builder.Services.AddAuthentication("Bearer")
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
 
-            ValidIssuer = Environment.GetEnvironmentVariable("AV360_ISSUER"),
-            ValidAudience = Environment.GetEnvironmentVariable("AV360_AUDIENCE"),
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
             
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("AV360_KEY")
-            ))
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
+            )
         };
         jwtOptions.Events = new ()
         {
@@ -148,12 +174,11 @@ builder.Services.AddAuthentication("Bearer")
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddReverseProxy()
-    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
-
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 var app = builder.Build();
+
+app.UseSerilogRequestLogging();
 
 if (args.Contains("--seed"))
 {
@@ -216,15 +241,28 @@ app.Use(async (context, next) =>
 {
     context.Response.Headers.ContentSecurityPolicy =
         "default-src 'self'; " +
-        "img-src 'self' data: http://localhost:4000; " +
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-        "style-src 'self' 'unsafe-inline'; " +
-        "connect-src 'self' http://localhost:5074 http://localhost:4000 ws://localhost:* wss://localhost:*; " ;
-        // Atenção para prod
+        "img-src 'self' data:; " +
+        "script-src 'self'; " +
+        "style-src 'self' 'unsafe-inline';";
+
     await next();
 });
 
 app.UseMiddleware<ExceptionMiddleware>();
+
+app.MapGet("/health", () => Results.Ok(new
+{
+    status = "Healthy",
+    version = "1.0"
+}));
+
+app.MapGet("/info", () => Results.Ok(new
+{
+    Name = "WebAV360 API",
+    Version = "1.0.0",
+    Environment = app.Environment.EnvironmentName,
+    Time = DateTime.UtcNow
+}));
 
 app.MapControllers();
 
@@ -233,11 +271,20 @@ app.MapHub<CriterioHub>("/hubs/criterio");
 app.MapHub<GrupoHub>("/hubs/grupo");
 app.MapHub<SessaoHub>("/hubs/sessao");
 
-app.MapReverseProxy();
-
 using (var scope = app.Services.CreateScope())
 {
     await DbInitializer.Seed(scope.ServiceProvider);
 }
 
-app.Run();
+try
+{
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "A aplicação encerrou inesperadamente.");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

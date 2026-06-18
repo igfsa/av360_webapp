@@ -9,18 +9,21 @@ using Application.Helpers;
 using Domain.Entities;
 using Persistence.Contracts;
 using Domain.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
 public class TurmaService(IGeralPersist geralPersist,
                     ITurmaPersist turmaPersist,
                     ICriterioPersist criterioPersist,
-                    IMapper mapper) : ITurmaService
+                    IMapper mapper,
+                    ILogger<TurmaService> logger) : ITurmaService
 {
     private readonly IGeralPersist _geralPersist = geralPersist;
     private readonly ITurmaPersist _turmaPersist = turmaPersist;
     private readonly ICriterioPersist _criterioPersist = criterioPersist;
     private readonly IMapper _mapper = mapper;
+    private readonly ILogger _logger = logger;
 
     #region get
     public async Task<IEnumerable<TurmaDTO>> GetTurmas()
@@ -65,8 +68,9 @@ public class TurmaService(IGeralPersist geralPersist,
 
             return _mapper.Map<TurmaDTO>(turma);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Erro ao criar turma: {model.nome}", model.Cod);
             throw;
         }
     }
@@ -82,72 +86,80 @@ public class TurmaService(IGeralPersist geralPersist,
             await _geralPersist.SaveChangesAsync();
             return _mapper.Map<TurmaDTO>(turma);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Erro ao adicionar critério: {model.CriterioIds.ToString()} turma: {model.TurmaId}", model.CriterioIds.ToString(), model.TurmaId);
             throw;
         }
     }
     public async Task<CsvImportResultDTO> ImportarAlunosAsync(int turmaId, CsvImportRequestDTO dto)
     {
-        var resultado = new CsvImportResultDTO();
-        var delimiter = CSV.DetectarDelimitador(dto.Arquivo.OpenReadStream());
+        try{
+            var resultado = new CsvImportResultDTO();
+            var delimiter = CSV.DetectarDelimitador(dto.Arquivo.OpenReadStream());
 
-        var config = new CsvConfiguration(new CultureInfo("pt-BR"))
-        {
-            HasHeaderRecord = true,
-            Delimiter = delimiter,
-            TrimOptions = TrimOptions.Trim,
-            IgnoreBlankLines = true,
-            MissingFieldFound = null,
-            BadDataFound = null,
-            HeaderValidated = null
-        };
-        using var stream = dto.Arquivo.OpenReadStream();
-        var encoding = Texto.EncodingDetector(stream);
-        using var reader = new StreamReader(stream, encoding, detectEncodingFromByteOrderMarks: true);
-        using var csv = new CsvReader(reader, config);
-        await csv.ReadAsync();
-        csv.ReadHeader();
-        var headers = csv.HeaderRecord
-            ?? throw new Exception($"Colunas da tabela não encontradas.");
-        foreach (var h in headers)
-        {
-            Console.WriteLine($"HEADER: '{h}'");
-        }
-        var colunaNome = headers.FirstOrDefault(h => Texto.Normalizar(h) == Texto.Normalizar(dto.ColunaNome))
-            ?? throw new BusinessException($"Coluna '{dto.ColunaNome}' não encontrada.");
-        Turma turma = await _turmaPersist.GetTurmaIdAsync(turmaId)
-            ?? throw new NotFoundException("Turma não encontrada");
-        int linha = 1;
-        while (await csv.ReadAsync())
-        {
-            linha++;
-            resultado.Total++;
-            var nome = csv.GetField(colunaNome);
-            try
+            var config = new CsvConfiguration(new CultureInfo("pt-BR"))
             {
-                if (string.IsNullOrWhiteSpace(nome))
-                    throw new Domain.Exceptions.ValidationException("Nome vazio");
-                var aluno = new Aluno(nome);
-                _geralPersist.Add(aluno);
-                await _geralPersist.SaveChangesAsync();
-                turma.AdicionarAluno(aluno);
-                await _geralPersist.SaveChangesAsync();
-                resultado.Sucesso++;
+                HasHeaderRecord = true,
+                Delimiter = delimiter,
+                TrimOptions = TrimOptions.Trim,
+                IgnoreBlankLines = true,
+                MissingFieldFound = null,
+                BadDataFound = null,
+                HeaderValidated = null
+            };
+            using var stream = dto.Arquivo.OpenReadStream();
+            var encoding = Texto.EncodingDetector(stream);
+            using var reader = new StreamReader(stream, encoding, detectEncodingFromByteOrderMarks: true);
+            using var csv = new CsvReader(reader, config);
+            await csv.ReadAsync();
+            csv.ReadHeader();
+            var headers = csv.HeaderRecord
+                ?? throw new Exception($"Colunas da tabela não encontradas.");
+            foreach (var h in headers)
+            {
+                Console.WriteLine($"HEADER: '{h}'");
             }
-            catch (Exception ex)
+            var colunaNome = headers.FirstOrDefault(h => Texto.Normalizar(h) == Texto.Normalizar(dto.ColunaNome))
+                ?? throw new BusinessException($"Coluna '{dto.ColunaNome}' não encontrada.");
+            Turma turma = await _turmaPersist.GetTurmaIdAsync(turmaId)
+                ?? throw new NotFoundException("Turma não encontrada");
+            int linha = 1;
+            while (await csv.ReadAsync())
             {
-                resultado.Falhas++;
-                resultado.Erros.Add(new CsvImportErrorDTO
+                linha++;
+                resultado.Total++;
+                var nome = csv.GetField(colunaNome);
+                try
                 {
-                    Linha = linha,
-                    Nome = nome,
-                    Erro = ex.Message
-                });
+                    if (string.IsNullOrWhiteSpace(nome))
+                        throw new Domain.Exceptions.ValidationException("Nome vazio");
+                    var aluno = new Aluno(nome);
+                    _geralPersist.Add(aluno);
+                    await _geralPersist.SaveChangesAsync();
+                    turma.AdicionarAluno(aluno);
+                    await _geralPersist.SaveChangesAsync();
+                    resultado.Sucesso++;
+                }
+                catch (Exception ex)
+                {
+                    resultado.Falhas++;
+                    resultado.Erros.Add(new CsvImportErrorDTO
+                    {
+                        Linha = linha,
+                        Nome = nome,
+                        Erro = ex.Message
+                    });
+                }
             }
+            await _geralPersist.SaveChangesAsync();
+            return resultado;
         }
-        await _geralPersist.SaveChangesAsync();
-        return resultado;
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao adicionar alunos na turma: {turmaId}", turmaId);
+            throw;
+        }
     }
     #endregion
     #region update
@@ -162,8 +174,9 @@ public class TurmaService(IGeralPersist geralPersist,
             var TurmaRetorno = await _turmaPersist.GetTurmaIdAsync(turmaId);
             return _mapper.Map<TurmaDTO>(TurmaRetorno);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Erro ao atualizar turma: {turmaId}", turmaId);
             throw;
         }
     }

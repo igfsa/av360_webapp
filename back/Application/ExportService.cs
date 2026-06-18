@@ -2,11 +2,13 @@ using ClosedXML.Excel;
 
 using Application.DTOs;
 using Application.Contracts;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
-public class ExportService() :IExportService
+public class ExportService(ILogger<ExportService> logger) :IExportService
 {
+    private readonly ILogger _logger = logger;
     public async Task<byte[]> ExportAvaliacaoConsolidada(List<AvaliacaoConsolidadaExportDTO> alunosNotas)
     {
         try
@@ -45,8 +47,9 @@ public class ExportService() :IExportService
 
             return stream.ToArray();
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Erro ao exportar de sessão");
             throw;
         }
     }
@@ -118,10 +121,12 @@ public class ExportService() :IExportService
 
             return stream.ToArray();
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Erro ao exportar de sessão");
             throw;
         }
+
     }
     private static void PreencherAba(
         IXLWorksheet ws,

@@ -18,7 +18,7 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<APIContext
         var optionsBuilder = new DbContextOptionsBuilder<APIContext>();
 
         optionsBuilder
-            .UseNpgsql(Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection"))
+            .UseNpgsql(Environment.GetEnvironmentVariable("DefaultConnection"))
             .UseSnakeCaseNamingConvention();
 
         return new APIContext(optionsBuilder.Options);

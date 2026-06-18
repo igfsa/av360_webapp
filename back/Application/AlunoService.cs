@@ -6,6 +6,7 @@ using Domain.Entities;
 using Persistence.Contracts;
 using Application.Helpers;
 using Domain.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
@@ -14,7 +15,8 @@ public class AlunoService(IGeralPersist geralPersist,
                     IAlunoGrupoPersist alunoGrupoPersist,
                     IGrupoPersist grupoPersist,
                     ITurmaPersist turmaPersist,
-                    IMapper mapper) : IAlunoService
+                    IMapper mapper,
+                    ILogger<AlunoService> logger) : IAlunoService
 {
     private readonly IGeralPersist _geralPersist = geralPersist;
     private readonly IAlunoTurmaPersist _alunoTurmaPersist = alunoTurmaPersist;
@@ -22,6 +24,7 @@ public class AlunoService(IGeralPersist geralPersist,
     private readonly IGrupoPersist _grupoPersist = grupoPersist;
     private readonly ITurmaPersist _turmaPersist = turmaPersist;
     private readonly IMapper _mapper = mapper;
+    private readonly ILogger _logger = logger;
 
     #region get
 
@@ -121,8 +124,9 @@ public class AlunoService(IGeralPersist geralPersist,
             var alunoRetorno = await _alunoTurmaPersist.GetExisteAlunoTurma(turma.Id, aluno.Id);
             return _mapper.Map<AlunoDTO>(alunoRetorno);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Erro ao adicionar aluno {alunoDto.Nome} na turma: {turmaId}", alunoDto.Nome, turmaId);
             throw;
         }
     }

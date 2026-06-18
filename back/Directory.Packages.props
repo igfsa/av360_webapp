@@ -22,15 +22,20 @@
     <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.7" />
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
     <PackageVersion Include="Ude.NetStandard" Version="1.2.0" />
-    <PackageVersion Include="StackExchange.Redis" Version="2.12.14" />
+    <PackageVersion Include="StackExchange.Redis" Version="3.0.0" />
     <PackageVersion Include="BCrypt.Net-Next" Version="4.1.0"/>
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0" />
-    <PackageVersion Include="Yarp.ReverseProxy" Version="2.3.0" />
     <PackageVersion Include="ClosedXML" Version="0.105.0" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.9" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.FileExtensions" Version="10.0.9" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.9" />
 
+    <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageVersion Include="Serilog.Sinks.File" Version="8.0.0-nblumhardt-02322" />
+    <PackageVersion Include="Serilog.Formatting.Compact" Version="3.0.0" />
+    <PackageVersion Include="Serilog.Enrichers.Environment" Version="3.0.1" />
+    <PackageVersion Include="Serilog.Enrichers.Thread" Version="4.0.0" />
     
   </ItemGroup>
 </Project>

@@ -6,3 +6,5 @@ const bootstrap = (context: BootstrapContext) =>
     bootstrapApplication(App, serverConfig,context);
 
 export default bootstrap;
+
+export const baseURL = `https://webav-360.fly.dev`;

@@ -2,6 +2,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { Subject } from 'rxjs';
+import { baseURL } from '../../main.server';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +22,7 @@ export class SessaoRealTime {
     }
 
     this.hub = new HubConnectionBuilder()
-      .withUrl(`/hubs/sessao`, {
+      .withUrl(`${baseURL}/hubs/sessao`, {
           withCredentials: true,
           accessTokenFactory: () => localStorage.getItem('token')!
       })

@@ -3,6 +3,7 @@ using Application.DTOs;
 using Domain.Entities;
 using Persistence.Contracts;
 using Domain.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
@@ -16,7 +17,8 @@ public class AvaliacaoService(IGeralPersist geralPersist,
                     IGrupoService grupoService,
                     IGrupoPersist grupoPersist,
                     ITurmaService turmaService,
-                    IDashboardCacheService dashboardCache
+                    IDashboardCacheService dashboardCache,
+                    ILogger<AvaliacaoService> logger
                     ) : IAvaliacaoService
 {
     private readonly IGeralPersist _geralPersist = geralPersist;
@@ -30,6 +32,7 @@ public class AvaliacaoService(IGeralPersist geralPersist,
     private readonly IGrupoPersist _grupoPersist = grupoPersist;
     private readonly ITurmaService _turmaService = turmaService;
     private readonly IDashboardCacheService _dashboardCache = dashboardCache;
+    private readonly ILogger _logger = logger;
 
     #region get
     public async Task<AvaliacaoPublicaDTO> GetValidaSessaoChavePub(string token)
@@ -170,8 +173,9 @@ public class AvaliacaoService(IGeralPersist geralPersist,
             
             return resultado;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Erro ao criar avaliação alunoId: {model.AvaliadorId}, sessaoId: {model.SessaoId}", model.AvaliadorId, model.SessaoId);
             throw;
         }
     }

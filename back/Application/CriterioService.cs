@@ -5,19 +5,22 @@ using Application.DTOs;
 using Domain.Entities;
 using Persistence.Contracts;
 using Domain.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
 public class CriterioService(IGeralPersist geralPersist,
                     ICriterioPersist criterioPersist,
                     IMapper mapper,
-                    ICriterioTurmaPersist criterioTurmaPersist) : ICriterioService
+                    ICriterioTurmaPersist criterioTurmaPersist,
+                    ILogger<CriterioService> logger) : ICriterioService
 {
     private readonly IGeralPersist _geralPersist = geralPersist;
     private readonly ICriterioPersist _criterioPersist = criterioPersist;
     private readonly ICriterioTurmaPersist _criterioTurmaPersist = criterioTurmaPersist;
 
     private readonly IMapper _mapper = mapper;
+    private readonly ILogger _logger = logger;
 
     #region get
     public async Task<IEnumerable<CriterioDTO>> GetCriterios()
@@ -63,8 +66,9 @@ public class CriterioService(IGeralPersist geralPersist,
             var CriterioRetorno = await _criterioPersist.GetCriterioIdAsync(criterio.Id);
             return _mapper.Map<CriterioDTO>(CriterioRetorno);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Erro ao criar Critério: {model.Nome}", model.Nome);
             throw;
         }
     }
@@ -82,8 +86,9 @@ public class CriterioService(IGeralPersist geralPersist,
             var criterioRetorno = await _criterioPersist.GetCriterioIdAsync(criterioId);
             return _mapper.Map<CriterioDTO>(criterioRetorno);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Erro ao atualizar Critério: {criterioId}", criterioId);
             throw;
         }
     }

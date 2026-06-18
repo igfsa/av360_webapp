@@ -24,22 +24,22 @@ import { TurmaService } from '../../Service/Turma.service';
 import { Turma } from '../../Models/Turma';
 import { CriterioService } from '../../Service/Criterio.service';
 import { Criterio } from '../../Models/Criterio';
-import { TurmaEditarModalComponent } from './Modals/turma_editar.component';
-import { TurmaCriterioModalComponent } from './Modals/turma_criterio_add.component';
+import { TurmaEditarModalComponent } from './modals/turma_editar.component';
+import { TurmaCriterioModalComponent } from './modals/turma_criterio_add.component';
 import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
-import { TurmaImportModalComponent } from '../turmas/Modals/turma_import.component';
+import { TurmaImportModalComponent } from '../turmas/modals/turma_import.component';
 import { ImportAlunos } from '../../Models/TurmaImport';
-import { TurmaGrupoModalComponent } from './Modals/grupo_att.component';
+import { TurmaGrupoModalComponent } from './modals/grupo_att.component';
 import { GrupoService } from '../../Service/Grupo.service';
 import { Grupo } from '../../Models/Grupo';
-import { CriterioEditarModalComponent } from '../criterios/Modals/criterio_editar.component';
-import { AlunoGrupoModalComponent } from './Modals/aluno_grupo_att.component';
+import { CriterioEditarModalComponent } from '../criterios/modals/criterio_editar.component';
+import { AlunoGrupoModalComponent } from './modals/aluno_grupo_att.component';
 import { AlunoGrupo } from '../../Models/AlunoGrupo';
 import { Sessao } from '../../Models/Sessao';
 import { SessaoService } from '../../Service/Sessao.service';
 import { AlunoGrupoNomes } from '../../Models/AlunoGrupoNomes';
 import { AuthService } from '../../auth/auth.service';
-import { AlunoTurmaAddModalComponent } from './Modals/aluno_turma_add.component';
+import { AlunoTurmaAddModalComponent } from './modals/aluno_turma_add.component';
 
 @Component({
   selector: 'app-alunos-turma',

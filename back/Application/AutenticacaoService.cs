@@ -7,19 +7,24 @@ using Domain.Entities;
 using Persistence.Contracts;
 using Domain.Exceptions;
 using Microsoft.AspNetCore.Http;
-using Persistence;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
 public class AutenticacaoService(IGeralPersist geralPersist,
                     IProfessorPersist professorPersist,
                     IRefreshTokenPersist refreshTokenPersist,
-                    IMapper mapper) : IAutenticacaoService
+                    IMapper mapper,
+                    JWTToken jwtToken,
+                    ILogger<AutenticacaoService> logger) : IAutenticacaoService
 {
     private readonly IGeralPersist _geralPersist = geralPersist;
     private readonly IProfessorPersist _professorPersist = professorPersist;
     private readonly IRefreshTokenPersist _refreshTokenPersist = refreshTokenPersist;
     private readonly IMapper _mapper = mapper;
+    private readonly JWTToken _jwtToken = jwtToken;
+
+    private readonly ILogger _logger = logger;
 
     #region get
     public async Task Login(string userName, string senha, HttpResponse response)
@@ -38,14 +43,15 @@ public class AutenticacaoService(IGeralPersist geralPersist,
 
             _geralPersist.Add(refreshToken);
 
-            var novoAccessToken = JWTToken.GenerateJWTToken();
+            var novoAccessToken = _jwtToken.GenerateJWTToken();
 
             await _geralPersist.SaveChangesAsync();
 
             CookiesHelper.SetCookies(response, novoAccessToken, refreshToken.Token);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Erro de login: {userName}", userName);
             throw;
         }
     }
@@ -68,8 +74,9 @@ public class AutenticacaoService(IGeralPersist geralPersist,
 
             return _mapper.Map<ProfessorDTO>(professor);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Erro ao criar Professor: {model.Nome}", model.Nome);
             throw;
         }
     }
@@ -96,7 +103,7 @@ public class AutenticacaoService(IGeralPersist geralPersist,
 
             _geralPersist.Add(novoRefresh);
 
-            var novoAccessToken = JWTToken.GenerateJWTToken();
+            var novoAccessToken = _jwtToken.GenerateJWTToken();
 
             await _geralPersist.SaveChangesAsync();
 

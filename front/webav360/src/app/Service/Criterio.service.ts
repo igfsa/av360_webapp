@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Criterio } from '../Models/Criterio';
+import { baseURL } from '../../main.server';
 
 @Injectable({
   providedIn: 'root'
@@ -11,19 +12,19 @@ export class CriterioService {
   constructor(private http :HttpClient) { }
 
   public getCriterios(): Observable<Criterio[]> {
-    return this.http.get<Criterio[]>(`/api/Criterio/GetAllCriterios`);
+    return this.http.get<Criterio[]>(`${baseURL}/api/Criterio/GetAllCriterios`);
   }
 
   public getCriteriosTurma(id: number): Observable<Criterio[]> {
-    return this.http.get<Criterio[]>(`/api/Criterio/GetCriteriosTurma/${id}`);
+    return this.http.get<Criterio[]>(`${baseURL}/api/Criterio/GetCriteriosTurma/${id}`);
   }
 
   public putCriterio (criterio: Criterio): Observable<Criterio>{
-    return this.http.put<Criterio>(`/api/Criterio/PutCriterio/${criterio.id}`, criterio);
+    return this.http.put<Criterio>(`${baseURL}/api/Criterio/PutCriterio/${criterio.id}`, criterio);
   }
 
   public postCriterio (criterio: Criterio): Observable<Criterio>{
-    return this.http.post<Criterio>(`/api/Criterio/PostCriterio`, criterio);
+    return this.http.post<Criterio>(`${baseURL}/api/Criterio/PostCriterio`, criterio);
   }
 
 }

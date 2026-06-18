@@ -8,10 +8,10 @@ import Swal from 'sweetalert2';
 
 import { Turma } from '../../Models/Turma';
 import { TurmaService } from '../../Service/Turma.service';
-import { TurmaCriarModalComponent } from './Modals/turma_criar.component';
+import { TurmaCriarModalComponent } from './modals/turma_criar.component';
 import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
 import { ImportAlunos } from '../../Models/TurmaImport';
-import { TurmaImportModalComponent } from './Modals/turma_import.component';
+import { TurmaImportModalComponent } from './modals/turma_import.component';
 import { AuthService } from '../../auth/auth.service';
 
 @Component({

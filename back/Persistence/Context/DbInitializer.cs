@@ -11,12 +11,16 @@ public static class DbInitializer
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<APIContext>();
 
+        Console.WriteLine("[MIGRATE] Iniciando...");
+
+        await context.Database.MigrateAsync();
+
         Console.WriteLine("[SEED] Iniciando...");
 
-        var senha = Environment.GetEnvironmentVariable("AV360_ADMINPWD");
+        var senha = Environment.GetEnvironmentVariable("Others__Admin_Pwd");
 
         if (string.IsNullOrEmpty(senha))
-            throw new InvalidOperationException("AV360_ADMINPWD não configurada");
+            throw new InvalidOperationException("Others__Admin_Pwd não configurada");
 
         if(await context.Professores.AnyAsync(p => p.UserName == "admin01"))
         {

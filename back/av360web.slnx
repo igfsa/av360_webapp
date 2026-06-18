@@ -5,7 +5,7 @@
   <Project Path="Persistence/Persistence.csproj" />
 
   <PropertyGroup>
-  <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-  <RestoreLockedMode>true</RestoreLockedMode>
-</PropertyGroup>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode>true</RestoreLockedMode>
+  </PropertyGroup>
 </Solution>
