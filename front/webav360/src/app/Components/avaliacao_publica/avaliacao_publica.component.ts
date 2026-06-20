@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -23,6 +23,7 @@ import { AvaliacaoEnvio } from '../../Models/AvaliacaoEnvio';
     FormsModule,
   ],
   templateUrl: './avaliacao_publica.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./avaliacao_publica.component.scss']
 })
 

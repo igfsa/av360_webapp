@@ -14,6 +14,7 @@ import { Grupo } from '../../../Models/Grupo';
     CommonModule,
     ReactiveFormsModule
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="modal-header">
       <h1 class="modal-title" style = "font-size: 2.4rem;">Equipes Turma {{ turma.cod }}</h1>

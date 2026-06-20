@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, Inject, OnDestroy, OnInit, PLATFORM_ID, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CriterioService } from '../../Service/Criterio.service';
@@ -19,6 +19,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     FormsModule,
    ],
   templateUrl: './criterios.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./criterios.component.scss', '../../app.scss'],
 })
 export class CriteriosComponent implements OnInit, OnDestroy {

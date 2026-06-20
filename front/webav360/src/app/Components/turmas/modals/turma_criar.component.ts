@@ -17,6 +17,7 @@ import Swal from 'sweetalert2';
     FormsModule,
     FormField,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
   <div class="modal-header">
     <h1 class="modal-title" >Nova Turma</h1>

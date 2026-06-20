@@ -5,10 +5,10 @@ import { CriteriosComponent } from './Components/criterios/criterios.component';
 import { AlunoTurmaComponent } from './Components/alunos_turma/alunos_turma.component';
 import { SessaoAtivaComponent } from './Components/sessao_ativa/sessao_ativa.component';
 import { AvaliacaoPublicaComponent } from './Components/avaliacao_publica/avaliacao_publica.component';
-import { AvaliacaoEncerradaComponent } from './Components/avaliacao_publica/Aux/avaliacao_encerrada.component';
+import { AvaliacaoEncerradaComponent } from './Components/avaliacao_publica/aux/avaliacao_encerrada.component';
 import { AuthGuard } from './auth/auth.guard';
 import { LoginComponent } from './Components/login/login.component';
-import { SessaoQrCodeComponent } from './Components/sessao_ativa/Aux/sessao_qrcode.component';
+import { SessaoQrCodeComponent } from './Components/sessao_ativa/aux/sessao_qrcode.component';
 import { SessaoHistComponent } from './Components/sessao_hist/sessao_hist.component';
 
 export const routes: Routes = [
