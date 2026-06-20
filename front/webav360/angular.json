@@ -23,7 +23,9 @@
           "options": {
             "security": {
               "allowedHosts": [
-                "localhost"
+                "localhost",
+                "av360-webapp-e5aeeqqts-icaro-sanches-projects.vercel.app",
+                "av360-webapp.vercel.app"
               ]
             },
             "browser": "src/main.ts",
