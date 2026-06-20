@@ -17,6 +17,7 @@ import { FormsHelper } from '../../../Helpers/formsHelper';
     FormsModule,
     FormField,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="modal-header">
       <h1 class="modal-title" >Critério: {{ criterio.nome }}</h1>
