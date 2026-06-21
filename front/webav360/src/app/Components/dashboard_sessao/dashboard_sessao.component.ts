@@ -1,5 +1,5 @@
 import { DecimalPipe } from '@angular/common';
-import { Component, Input, OnChanges, Type, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 
 import { NgbAccordionBody, NgbAccordionButton, NgbAccordionCollapse, NgbAccordionDirective, NgbAccordionHeader, NgbAccordionItem, NgbAccordionToggle } from '@ng-bootstrap/ng-bootstrap';
 import { ChartModule } from 'primeng/chart';
@@ -35,7 +35,6 @@ type GrupoDashboardView = GrupoDashboard & {
     FormsModule,
   ],
   templateUrl: './dashboard_sessao.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./dashboard_sessao.component.scss','../../app.scss']
 })
 export class DashboardSessaoComponent implements OnChanges {

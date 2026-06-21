@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { form, FormField, required } from '@angular/forms/signals';
 import { AuthService } from '../../auth/auth.service';
 import Swal from 'sweetalert2';
@@ -16,7 +16,6 @@ import { FormsHelper } from '../../Helpers/formsHelper';
     FormField,
    ],
   templateUrl: './login.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./login.component.scss', '../../app.scss'],
 })
 export class LoginComponent implements OnInit {

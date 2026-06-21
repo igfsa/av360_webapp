@@ -1,4 +1,4 @@
-import { Component, HostListener, Inject, TemplateRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, HostListener, Inject, TemplateRef } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
@@ -13,7 +13,6 @@ import { AuthService } from '../../auth/auth.service';
               RouterOutlet
             ],
   templateUrl: './nav.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./nav.component.scss', '../../app.scss'],
 })
 export class NavComponent {

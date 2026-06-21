@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, Inject, OnInit, PLATFORM_ID, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../auth/auth.service';
 import { SessaoService } from '../../../Service/Sessao.service';
@@ -11,7 +11,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   selector: 'sessao-qrcode',
   standalone: true,
   imports: [],
-  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="container">
       @if (!carregando) {

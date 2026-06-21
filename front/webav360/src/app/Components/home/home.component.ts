@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-home',
@@ -6,7 +6,6 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
   imports: [
   ],
   templateUrl: './home.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./home.component.scss', '../../app.scss'],
 })
 export class HomeComponent {

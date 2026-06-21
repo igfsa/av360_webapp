@@ -50,10 +50,8 @@ public class Turma
     {
         var novosIds = novosCriterios.Select(c => c.Id).ToHashSet();
 
-        // remover
         _ = _criterios.RemoveAll(c => !novosIds.Contains(c.Id));
 
-        // adicionar
         foreach (var criterio in novosCriterios)
         {
             if (!_criterios.Any(c => c.Id == criterio.Id))

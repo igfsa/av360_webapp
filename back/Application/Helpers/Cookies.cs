@@ -9,10 +9,10 @@ public class CookiesHelper
         response.Cookies.Append("auth_token", accessToken, new CookieOptions
         {
             HttpOnly = true,
-            Expires = DateTime.UtcNow.AddMinutes(30),
+            Expires = DateTime.UtcNow.AddMinutes(120),
             Path = "/",
-            SameSite = SameSiteMode.Lax,
-            Secure = false
+            SameSite = SameSiteMode.None,
+            Secure = true
         });
 
         response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
@@ -20,8 +20,8 @@ public class CookiesHelper
             HttpOnly = true,
             Expires = DateTime.UtcNow.AddDays(30),
             Path = "/",
-            SameSite = SameSiteMode.Lax,
-            Secure = false
+            SameSite = SameSiteMode.None,
+            Secure = true
         });
     }
 }

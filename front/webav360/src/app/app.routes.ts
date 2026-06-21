@@ -28,5 +28,5 @@ export const routes: Routes = [
       {path: '', redirectTo: 'turmas', pathMatch: 'full' },
     ]},
 
-  {path: '**', redirectTo: ''},
+  {path: '**', redirectTo: 'login'},
 ];

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -14,7 +14,6 @@ import { CriterioCheckbox } from '../../../Models/CriterioCheckbox';
     CommonModule,
     FormsModule,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="modal-header">
       <h1 class="modal-title">Turma {{ turma.cod }}</h1>

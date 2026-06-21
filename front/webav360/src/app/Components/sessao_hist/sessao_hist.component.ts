@@ -1,16 +1,7 @@
-import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, PLATFORM_ID, ChangeDetectionStrategy } from '@angular/core';
-import { DecimalPipe, isPlatformBrowser } from '@angular/common'
+import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common'
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
-import {
-	NgbAccordionButton,
-	NgbAccordionDirective,
-	NgbAccordionItem,
-	NgbAccordionHeader,
-	NgbAccordionToggle,
-	NgbAccordionBody,
-	NgbAccordionCollapse,
-} from '@ng-bootstrap/ng-bootstrap/accordion';
 import Swal from 'sweetalert2';
 
 import { Turma } from '../../Models/Turma';
@@ -28,7 +19,6 @@ import { DashboardSessaoComponent } from "../dashboard_sessao/dashboard_sessao.c
     DashboardSessaoComponent
 ],
   templateUrl: './sessao_hist.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./sessao_hist.component.scss','../../app.scss']
 })
 export class SessaoHistComponent implements OnInit, OnDestroy {

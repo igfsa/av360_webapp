@@ -1,4 +1,4 @@
-import { Component, input, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -12,7 +12,6 @@ import { AlunoGrupo } from '../../../Models/AlunoGrupo';
   selector: 'app-aluno-grupo-add-modal',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="modal-header">
       <h4 class="modal-title" style = "font-size: 2.4rem;">Equipe {{ grupo.nome }}</h4>

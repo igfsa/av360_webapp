@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { finalize, of, shareReplay, tap, catchError, Observable, map, switchMap } from 'rxjs';
 
+import { baseURL } from '../../main.server';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -16,7 +18,7 @@ export class AuthService {
   public checkAuth() {
     if (this.checkAuth$) return this.checkAuth$;
 
-    this.checkAuth$ = this.http.get('/api/Autenticacao/Me', {
+    this.checkAuth$ = this.http.get(`${baseURL}/api/Autenticacao/Me`, {
       withCredentials: true,
       observe: 'response'
     }).pipe(
@@ -31,7 +33,7 @@ export class AuthService {
   }
 
   public login(userName: string, senha: string) {
-    return this.http.post('/api/Autenticacao/Login',
+    return this.http.post(`${baseURL}/api/Autenticacao/Login`,
       { userName, senha },
       { withCredentials: true }
     ).pipe(
@@ -43,7 +45,7 @@ export class AuthService {
   }
 
   public logout() {
-    this.http.post('/api/Autenticacao/Logout', {}, {
+    this.http.post(`${baseURL}/api/Autenticacao/Logout`, {}, {
       withCredentials: true
     }).subscribe();
     this.isLogged.set(false);

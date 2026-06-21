@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { form, FormField, min, max, required, maxLength } from '@angular/forms/signals';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -17,7 +17,6 @@ import Swal from 'sweetalert2';
     FormsModule,
     FormField,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
   <div class="modal-header">
     <h1 class="modal-title" >Nova Turma</h1>

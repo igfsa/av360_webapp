@@ -1,9 +1,12 @@
 import { HttpBackend, HttpClient, HttpInterceptorFn } from '@angular/common/http';
 import { catchError, switchMap, throwError } from 'rxjs';
-import { AuthService } from './auth.service';
 import { inject, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
+
+import { AuthService } from './auth.service';
+import { baseURL } from '../../main.server';
+
 
 export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
 
@@ -40,7 +43,7 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
 
       if (err.status === 401 && !isPublic && !isRefresh && !isLogin) {
         return http
-          .post('/api/Autenticacao/Refresh', {}, { withCredentials: true })
+          .post(`${baseURL}/api/Autenticacao/Refresh`, {}, { withCredentials: true })
           .pipe(
             switchMap(() => next(authReq)),
               catchError(refreshErr => {

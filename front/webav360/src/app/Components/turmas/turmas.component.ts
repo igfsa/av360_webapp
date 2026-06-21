@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, Inject, OnDestroy, OnInit, PLATFORM_ID, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -23,7 +23,6 @@ import { AuthService } from '../../auth/auth.service';
     RouterLink
    ],
   templateUrl: './turmas.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./turmas.component.scss', '../../app.scss'],
 })
 export class TurmasComponent implements OnInit, OnDestroy {

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Inject, Input, OnInit, PLATFORM_ID, DestroyRef, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, Input, OnInit, PLATFORM_ID, DestroyRef, OnDestroy } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -57,7 +57,6 @@ import { AlunoTurmaAddModalComponent } from './modals/aluno_turma_add.component'
     RouterLink,
    ],
   templateUrl: './alunos_turma.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./alunos_turma.component.scss', '../../app.scss'],
 })
 export class AlunoTurmaComponent implements OnInit, OnDestroy {

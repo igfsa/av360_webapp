@@ -19,7 +19,7 @@ export class SessaoService {
   }
 
   public getSessaoAtivaTurma(turmaId: number): Observable<Sessao> {
-    return this.http.get<Sessao>(`/api/Sessao/GetSessaoAtivaTurma/${turmaId}`);
+    return this.http.get<Sessao>(`${baseURL}/api/Sessao/GetSessaoAtivaTurma/${turmaId}`);
   }
 
   public getSessoesTurmaId(turmaId: number): Observable<Sessao[]> {

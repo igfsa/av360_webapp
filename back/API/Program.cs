@@ -39,15 +39,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog();
 
-// builder.Services.AddCors(options =>
-// {
-//     options.AddPolicy("Allowlocalhost",
-//         policy => policy
-//             .WithOrigins("http://localhost:4000")
-//             .AllowAnyHeader()
-//             .AllowAnyMethod()
-//             .AllowCredentials());
-// });
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowWeb",
+        policy => policy
+            .WithOrigins("http://localhost:4000",
+                            "https://webav360.riss.com.br",
+                            "https://av360-webapp.vercel.app")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials());
+});
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -200,6 +202,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowWeb");
+
 app.UseRouting();
 
 app.UseAuthentication();
@@ -243,7 +247,8 @@ app.Use(async (context, next) =>
         "default-src 'self'; " +
         "img-src 'self' data:; " +
         "script-src 'self'; " +
-        "style-src 'self' 'unsafe-inline';";
+        "style-src 'self' 'unsafe-inline';" +
+        "connect-src 'self' https://webav360.riss.com.br;";
 
     await next();
 });

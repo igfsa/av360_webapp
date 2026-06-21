@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ChangeDetectionStrategy, Inject, } from '@angular/core';
+import { Component, Input, OnInit, Inject, } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -14,7 +14,6 @@ import { Grupo } from '../../../Models/Grupo';
     CommonModule,
     ReactiveFormsModule
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="modal-header">
       <h1 class="modal-title" style = "font-size: 2.4rem;">Equipes Turma {{ turma.cod }}</h1>

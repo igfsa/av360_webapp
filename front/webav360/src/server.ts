@@ -69,7 +69,6 @@ if (isMainModule(import.meta.url) || process.env['pm_id']) {
   app.listen(port, (error) => {
     if (error) throw error;
 
-    console.log(`🚀 SSR rodando em http://localhost:${port}`);
   });
 }
 

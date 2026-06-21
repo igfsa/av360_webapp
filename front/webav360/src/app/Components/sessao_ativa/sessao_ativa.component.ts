@@ -1,15 +1,7 @@
-import { ChangeDetectorRef, Component, DestroyRef, inject, Inject, Input, OnDestroy, OnInit, PLATFORM_ID, ChangeDetectionStrategy } from '@angular/core';
-import { DecimalPipe, isPlatformBrowser } from '@angular/common'
+import { ChangeDetectorRef, Component, DestroyRef, inject, Inject, Input, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common'
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs';import {
-	NgbAccordionButton,
-	NgbAccordionDirective,
-	NgbAccordionItem,
-	NgbAccordionHeader,
-	NgbAccordionToggle,
-	NgbAccordionBody,
-	NgbAccordionCollapse,
-} from '@ng-bootstrap/ng-bootstrap/accordion';
+import { forkJoin } from 'rxjs';
 import Swal from 'sweetalert2';
 import { ChartModule } from 'primeng/chart';
 
@@ -33,7 +25,6 @@ import { DashboardSessaoComponent } from '../dashboard_sessao/dashboard_sessao.c
     DashboardSessaoComponent
   ],
   templateUrl: './sessao_ativa.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./sessao_ativa.component.scss','../../app.scss']
 })
 export class SessaoAtivaComponent implements OnInit, OnDestroy {
