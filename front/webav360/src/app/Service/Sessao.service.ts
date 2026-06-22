@@ -1,33 +1,33 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Sessao } from '../Models/Sessao';
 import { DashboardSessao } from '../Models/Dashboard/DashboardSessao';
 import { SessaoValidacao } from '../Models/SessaoValidacao';
 import { Aluno } from '../Models/Aluno';
-import { baseURL } from '../../main.server';
+import { API_URL } from '../app.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SessaoService {
 
-  constructor(private http :HttpClient) { }
+  constructor(private http :HttpClient, @Inject(API_URL) public readonly baseURL: string) { }
 
   public getSessaoId(id: number): Observable<Sessao> {
-    return this.http.get<Sessao>(`${baseURL}/api/Sessao/GetSessaoId/${id}`);
+    return this.http.get<Sessao>(`${this.baseURL}/api/Sessao/GetSessaoId/${id}`);
   }
 
   public getSessaoAtivaTurma(turmaId: number): Observable<Sessao> {
-    return this.http.get<Sessao>(`${baseURL}/api/Sessao/GetSessaoAtivaTurma/${turmaId}`);
+    return this.http.get<Sessao>(`${this.baseURL}/api/Sessao/GetSessaoAtivaTurma/${turmaId}`);
   }
 
   public getSessoesTurmaId(turmaId: number): Observable<Sessao[]> {
-    return this.http.get<Sessao[]>(`${baseURL}/api/Sessao/GetSessoesTurmaId/${turmaId}`);
+    return this.http.get<Sessao[]>(`${this.baseURL}/api/Sessao/GetSessoesTurmaId/${turmaId}`);
   }
 
   public getExportConsolidado(sessaoId: number): void {
-    this.http.get(`${baseURL}/api/Sessao/GetExportConsolidado/${sessaoId}`,{responseType: 'blob'})
+    this.http.get(`${this.baseURL}/api/Sessao/GetExportConsolidado/${sessaoId}`,{responseType: 'blob'})
       .subscribe(blob => {
 
         const url =
@@ -47,30 +47,30 @@ export class SessaoService {
   }
 
   public getValidaInicioSessao(turmaId: number): Observable<SessaoValidacao> {
-    return this.http.get<SessaoValidacao>(`${baseURL}/api/Sessao/GetValidaInicioSessao/${turmaId}`);
+    return this.http.get<SessaoValidacao>(`${this.baseURL}/api/Sessao/GetValidaInicioSessao/${turmaId}`);
   }
 
   public getFaltamAvaliarSessao(sessaoId: number): Observable<Aluno[]> {
-    return this.http.get<Aluno[]>(`${baseURL}/api/Sessao/GetFaltamAvaliarSessao/${sessaoId}`);
+    return this.http.get<Aluno[]>(`${this.baseURL}/api/Sessao/GetFaltamAvaliarSessao/${sessaoId}`);
   }
 
   public postSessao (sessao: Sessao): Observable<Sessao>{
-    return this.http.post<Sessao>(`${baseURL}/api/Sessao/PostSessao`, sessao);
+    return this.http.post<Sessao>(`${this.baseURL}/api/Sessao/PostSessao`, sessao);
   }
 
   public putEncerraSessao (sessaoId: number): Observable<Blob>{
-    return this.http.put<Blob>(`${baseURL}/api/Sessao/PutEncerraSessao/${sessaoId}`,{responseType: 'blob'});
+    return this.http.put<Blob>(`${this.baseURL}/api/Sessao/PutEncerraSessao/${sessaoId}`,{responseType: 'blob'});
   }
 
   public dashboardSessao (id: number): Observable<DashboardSessao>{
-    return this.http.get<DashboardSessao>(`${baseURL}/api/Dashboard/GetDashboard/${id}`);
+    return this.http.get<DashboardSessao>(`${this.baseURL}/api/Dashboard/GetDashboard/${id}`);
   }
 
   public dashboardResetSessao (id: number): Observable<DashboardSessao>{
-    return this.http.post<DashboardSessao>(`${baseURL}/api/Dashboard/PostDashboardReset/${id}`, id);
+    return this.http.post<DashboardSessao>(`${this.baseURL}/api/Dashboard/PostDashboardReset/${id}`, id);
   }
 
   public dashboardResultadoSessao (id: number): Observable<DashboardSessao>{
-    return this.http.get<DashboardSessao>(`${baseURL}/api/Dashboard/GetResultadoDashboard/${id}`);
+    return this.http.get<DashboardSessao>(`${this.baseURL}/api/Dashboard/GetResultadoDashboard/${id}`);
   }
 }

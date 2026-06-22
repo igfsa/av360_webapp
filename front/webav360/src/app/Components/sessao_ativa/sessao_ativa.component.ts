@@ -16,6 +16,7 @@ import { AuthService } from '../../auth/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
 import { DashboardSessaoComponent } from '../dashboard_sessao/dashboard_sessao.component';
+import { FRONT_URL } from '../../app.config';
 
 @Component({
   selector: 'app-sessao-ativa',
@@ -31,7 +32,7 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
 
   public turma: Turma = ({id: 0, cod: '', notaMax: 0});
   public sessaoAtiva?: Sessao;
-  public qrCode: string = '';
+  public urlQrCode: string = '';
   public dashboard: DashboardSessao = ({
      sessaoId: 0
     , totalAlunos: 0
@@ -57,6 +58,7 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     @Inject(PLATFORM_ID) private platformId: Object,
     @Inject(DestroyRef) private destroyRef: DestroyRef,
+    @Inject(FRONT_URL) public readonly frontURL: string
   ){}
 
   ngOnInit() {
@@ -113,6 +115,7 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
   public loadSessao(sessaoId: number){
     this.sessaoService.dashboardSessao(sessaoId).subscribe({
       next: (res) => {
+        this.urlQrCode = `${this.frontURL}/avaliacao/publica/${this.sessaoAtiva?.tokenPublico}`
         this.dashboard = res;
         this.cdr.detectChanges();
       },

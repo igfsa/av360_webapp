@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "dev:ssr": "concurrently \"ng build --watch\" \"nodemon dist/webav360/server/server.mjs\"",
+    "dev:ssr": "concurrently \"ng build --watch --configuration development\" \"NODE_TLS_REJECT_UNAUTHORIZED=0 nodemon dist/webav360/server/server.mjs\"",
     "build:ssr": "ng build && ng run webav360:server"
   },
   "prettier": {

@@ -2,7 +2,7 @@ import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr'
 import { isPlatformBrowser } from '@angular/common';
 import { Subject } from 'rxjs';
-import { baseURL } from '../../main.server';
+import { API_URL } from '../app.config';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,7 @@ export class GrupoRealTime {
 
   grupoAtualizado$ = new Subject<number>();
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, @Inject(API_URL) public readonly baseURL: string) {}
 
   connect() {
 
@@ -21,7 +21,7 @@ export class GrupoRealTime {
     }
 
     this.hub = new HubConnectionBuilder()
-      .withUrl(`${baseURL}/hubs/grupo`, {
+      .withUrl(`${this.baseURL}/hubs/grupo`, {
           withCredentials: true,
           accessTokenFactory: () => localStorage.getItem('token')!
        })

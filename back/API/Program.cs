@@ -41,14 +41,17 @@ builder.Host.UseSerilog();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowWeb",
-        policy => policy
-            .WithOrigins("http://localhost:4000",
-                            "https://webav360.riss.com.br",
-                            "https://av360-webapp.vercel.app")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials());
+    options.AddPolicy("DevelopmentPolicy", policy =>
+        policy.WithOrigins("http://localhost:4000")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials());
+
+    options.AddPolicy("ProductionPolicy", policy =>
+        policy.WithOrigins("https://webav360.riss.com.br", "https://av360-webapp.vercel.app")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials());
 });
 
 // Add services to the container.
@@ -70,8 +73,20 @@ builder.Services.AddDbContext<APIContext>(options =>
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
-    var config = sp.GetRequiredService<IConfiguration>();
-    return ConnectionMultiplexer.Connect(builder.Configuration["Redis:Connection"]);
+    var configuration = sp.GetRequiredService<IConfiguration>();
+
+    Console.WriteLine($"Redis:{configuration["Redis:Connection"]}");
+
+    var options = ConfigurationOptions.Parse(configuration["Redis:Connection"]!);
+
+    options.AbortOnConnectFail = false;
+    options.ConnectRetry = 5;
+    options.ConnectTimeout = 15000;
+    options.SyncTimeout = 15000;
+
+    options.AllowAdmin = true;
+
+    return ConnectionMultiplexer.Connect(options);
 });
 
 var mapper_config = builder.Services.AddAutoMapper(cfg =>
@@ -202,7 +217,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowWeb");
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors("DevelopmentPolicy");
+}
+else
+{
+    app.UseCors("ProductionPolicy");
+}
 
 app.UseRouting();
 
@@ -248,7 +270,7 @@ app.Use(async (context, next) =>
         "img-src 'self' data:; " +
         "script-src 'self'; " +
         "style-src 'self' 'unsafe-inline';" +
-        "connect-src 'self' https://webav360.riss.com.br;";
+        "connect-src 'self' https://webav360.riss.com.br http://localhost:4000;";
 
     await next();
 });

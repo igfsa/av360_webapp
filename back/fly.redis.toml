@@ -1,0 +1,26 @@
+app = "webav-360-redis"
+primary_region = "gru"
+
+[build]
+  dockerfile = "Dockerfile.redis"
+
+[[mounts]]
+  source = "redis_data"
+  destination = "/data"
+
+[[services]]
+  internal_port = 6379
+  protocol = "tcp"
+  
+  [[services.ports]]
+    port = 6379
+    handlers = ["tls"]
+
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  memory = "256mb"
+  cpu_kind = "shared"
+  cpus = 1

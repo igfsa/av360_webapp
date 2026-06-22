@@ -6,6 +6,7 @@ import { SessaoRealTime } from '../../../Service/SessaoRealTime.service';
 import { Sessao } from '../../../Models/Sessao';
 import { isPlatformBrowser } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { API_URL, FRONT_URL } from '../../../app.config';
 
 @Component({
   selector: 'sessao-qrcode',
@@ -17,7 +18,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
         @if (sessaoAtiva && sessaoAtiva.ativo) {
           <h1>Turma {{sessaoAtiva.turma.cod}}</h1>
           <figure class="figure w-100 p-2">
-            <figcaption class="figure-caption">http://localhost:5074/avaliacao/publica/{{sessaoAtiva.tokenPublico}}</figcaption>
+            <figcaption class="figure-caption">{{url}}</figcaption>
             <img [src]="qrCode"
               alt="QR Code da Avaliação"
               class="figure-img img-fluid rounded w-50"
@@ -33,6 +34,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 export class SessaoQrCodeComponent implements OnInit {
 
   public qrCode: string = '';
+  public url: string = '';
   public sessaoAtiva?: Sessao;
   public carregando: boolean = true;
 
@@ -43,7 +45,9 @@ export class SessaoQrCodeComponent implements OnInit {
     private sessaoRealTime: SessaoRealTime,
     public authService: AuthService,
     @Inject(PLATFORM_ID) private platformId: Object,
-    @Inject(DestroyRef) private destroyRef: DestroyRef
+    @Inject(DestroyRef) private destroyRef: DestroyRef,
+    @Inject(API_URL) public readonly baseURL: string,
+    @Inject(FRONT_URL) public readonly frontURL: string
   ) {}
 
   ngOnInit(): void {
@@ -73,7 +77,8 @@ export class SessaoQrCodeComponent implements OnInit {
       this.sessaoAtiva = sessaoAtiva;
 
       if (sessaoAtiva.ativo){
-        this.qrCode = `/api/Sessao/GetQrCode/${sessaoAtiva.id}`
+        this.qrCode = `${this.baseURL}/api/Sessao/GetQrCode/${sessaoAtiva.id}`;
+        this.url = `${this.frontURL}/avaliacao/publica/${sessaoAtiva.tokenPublico}`;
 
         this.sessaoRealTime.connect()?.then(() => {
           this.sessaoRealTime.acessarSessao(sessaoAtiva.id);

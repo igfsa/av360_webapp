@@ -4,6 +4,7 @@ import { App } from './app/app';
 import { serverConfig } from './app/app.config.server';
 import { appConfig } from './app/app.config';
 
+
 const bootstrap = (context: BootstrapContext) =>
   bootstrapApplication(
     App,
@@ -12,5 +13,3 @@ const bootstrap = (context: BootstrapContext) =>
   );
 
 export default bootstrap;
-
-export const baseURL = `https://webav-360.fly.dev`;

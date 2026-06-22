@@ -1,20 +1,20 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AvaliacaoPublica } from '../Models/AvaliacaoPublica';
 import { AvaliacaoEnvio } from '../Models/AvaliacaoEnvio';
 import { AvaliacaoPostResult } from '../Models/AvaliacaoPostResult';
-import { baseURL } from '../../main.server';
+import { API_URL } from '../app.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AvaliacaoService {
 
-  constructor(private http :HttpClient) { }
+  constructor(private http :HttpClient, @Inject(API_URL) public readonly baseURL: string) { }
 
   public getValidaSessaoChavePub(token: string): Observable<AvaliacaoPublica> {
-    return this.http.get<AvaliacaoPublica>(`${baseURL}/api/Avaliacao/GetValidaSessaoChavePub`,  {params: {token}});
+    return this.http.get<AvaliacaoPublica>(`${this.baseURL}/api/Avaliacao/GetValidaSessaoChavePub`,  {params: {token}});
   }
 
   public getNovaAvaliacaoEnvio(sessaoId: number, grupoId: number, avaliadorId: number, hash: string): Observable<AvaliacaoEnvio> {
@@ -23,10 +23,10 @@ export class AvaliacaoService {
       .set('grupoId', grupoId)
       .set('avaliadorId', avaliadorId)
       .set(`deviceHash`, hash);
-    return this.http.get<AvaliacaoEnvio>(`${baseURL}/api/Avaliacao/GetNovaAvaliacaoEnvio`, {params});
+    return this.http.get<AvaliacaoEnvio>(`${this.baseURL}/api/Avaliacao/GetNovaAvaliacaoEnvio`, {params});
   }
 
   public postAvaliacao(avaliacao: AvaliacaoEnvio): Observable<AvaliacaoPostResult>{
-    return this.http.post<AvaliacaoPostResult>(`${baseURL}/api/Avaliacao/PostAvaliacao`,  avaliacao);
+    return this.http.post<AvaliacaoPostResult>(`${this.baseURL}/api/Avaliacao/PostAvaliacao`,  avaliacao);
   }
 }

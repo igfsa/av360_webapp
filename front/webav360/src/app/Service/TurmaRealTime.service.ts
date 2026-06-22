@@ -2,7 +2,7 @@ import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr'
 import { isPlatformBrowser } from '@angular/common';
 import { Subject } from 'rxjs';
-import { baseURL } from '../../main.server';
+import { API_URL } from '../app.config';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +15,7 @@ export class TurmaRealTime {
   criterioTurmaAtualizada$ = new Subject<number>();
   sessaoTurmaCriada$ = new Subject<number>();
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, @Inject(API_URL) public readonly baseURL: string) {}
 
   public connect() {
 
@@ -24,7 +24,7 @@ export class TurmaRealTime {
     }
 
     this.hub = new HubConnectionBuilder()
-      .withUrl(`${baseURL}/hubs/turma`, {
+      .withUrl(`${this.baseURL}/hubs/turma`, {
           withCredentials: true,
           accessTokenFactory: () => localStorage.getItem('token')!
        })

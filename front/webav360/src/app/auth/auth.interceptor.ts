@@ -5,8 +5,7 @@ import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 
 import { AuthService } from './auth.service';
-import { baseURL } from '../../main.server';
-
+import { API_URL } from '../app.config';
 
 export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
 
@@ -15,6 +14,7 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
   const backend = inject(HttpBackend);
   const http = new HttpClient(backend);
   const platformId = inject(PLATFORM_ID)
+  const baseURL = inject(API_URL);
 
   if (!isPlatformBrowser(platformId)) {
     return next(req);

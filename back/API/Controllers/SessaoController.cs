@@ -56,7 +56,7 @@ public class SessaoController(ISessaoService sessoesService,
     {
         var sessao = await _sessoesService.GetSessaoById(sessaoId);
 
-        var qrBytes = GeradorQrCode.GenerateQrCode($"/avaliacao/publica/{sessao.TokenPublico}");
+        var qrBytes = GeradorQrCode.GenerateQrCode($"https://webav360.riss.com.br/avaliacao/publica/{sessao.TokenPublico}");
 
         return File(qrBytes, "image/png");
     }
