@@ -61,7 +61,7 @@ public class AutenticacaoService(IGeralPersist geralPersist,
     {
         try
         {
-            var existe = _professorPersist.GetProfessorUser(model.UserName);
+            var existe = await _professorPersist.GetProfessorUser(model.UserName);
             if (existe != null)
                 throw new BusinessException("Usuário já existe");
 

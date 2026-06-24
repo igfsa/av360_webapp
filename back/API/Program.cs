@@ -98,7 +98,8 @@ var mapper_config = builder.Services.AddAutoMapper(cfg =>
     _ = cfg.CreateMap<Grupo, GrupoDTO>().ReverseMap();
     _ = cfg.CreateMap<NotaFinal, NotaFinalDTO>().ReverseMap();
     _ = cfg.CreateMap<NotaParcial, NotaParcialDTO>().ReverseMap();
-    _ = cfg.CreateMap<Professor, ProfessorDTO>().ReverseMap();
+    _ = cfg.CreateMap<Professor, ProfessorDTO>().ForMember(dest => dest.SenhaHash, opt => opt.Ignore());
+    _ = cfg.CreateMap<ProfessorDTO, Professor>();
     _ = cfg.CreateMap<Sessao, SessaoDTO>().ReverseMap();
     _ = cfg.CreateMap<Turma, TurmaDTO>().ReverseMap();
     _ = cfg.CreateMap<RefreshToken, RefreshTokenDTO>().ReverseMap();
@@ -146,7 +147,9 @@ builder.Services.AddScoped<IDashboardSessaoService, DashboardSessaoService>();
 
 builder.Services.AddScoped<IResultadoPersist, ResultadoPersist>();
 
+builder.Services.AddScoped<IProfessorService, ProfessorService>();
 builder.Services.AddScoped<IProfessorPersist, ProfessorPersist>();
+builder.Services.AddScoped<IProfessorNotifier, ProfessorNotifier>();
 
 builder.Services.AddScoped<IRefreshTokenPersist, RefreshTokenPersist>();
 
@@ -297,6 +300,7 @@ app.MapHub<TurmaHub>("/hubs/turma");
 app.MapHub<CriterioHub>("/hubs/criterio");
 app.MapHub<GrupoHub>("/hubs/grupo");
 app.MapHub<SessaoHub>("/hubs/sessao");
+app.MapHub<ProfessorHub>("/hubs/professor");
 
 using (var scope = app.Services.CreateScope())
 {

@@ -16,7 +16,17 @@
 
     <label>
       Senha:
-      <input type="password" class="form-control" [formField]="loginForm.senha" aria-label="Senha">
+      <input [type]="ocultarSenha() ? 'password' : 'text'"
+        class="form-control"
+        [formField]="loginForm.senha"
+        aria-label="Senha">
+    </label>
+    <label style="display: inline-block">
+      <input type="checkbox"
+        class="form-check-input"
+        [checked]="!ocultarSenha()"
+        (click)="ocultarSenha.update(v => !v)">
+      Mostrar Senha
     </label>
     @if (loginForm.senha().touched() && loginForm.senha().invalid()) {
       <ul class="error-list">

@@ -25,6 +25,8 @@ export class LoginComponent implements OnInit {
     senha: ''
   })
 
+  ocultarSenha = signal<boolean>(true);
+
   loginForm = form(this.loginModel, schemaPath => {
     required(schemaPath.userName, {message: `Usuário deve ser informado`});
     required(schemaPath.senha, {message: `Senha deve ser informada`});

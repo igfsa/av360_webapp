@@ -8,17 +8,20 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]")]
-public class AutenticacaoController(IAutenticacaoService autenticacaoService) : ControllerBase
+public class AutenticacaoController(IAutenticacaoService autenticacaoService,
+                                    IProfessorNotifier professorNotifier) : ControllerBase
 {
     private readonly IAutenticacaoService _autenticacaoService = autenticacaoService;
+    private readonly IProfessorNotifier _professorNotifier = professorNotifier;
 
-    [AllowAnonymous]
     [HttpPost]
     public async Task<ActionResult> Register(ProfessorDTO model)
     {
         try
         {
             var professor = await _autenticacaoService.Add(model);
+
+            await _professorNotifier.ProfessorAtualizado(professor.Id);
             return Ok();
         }
         catch

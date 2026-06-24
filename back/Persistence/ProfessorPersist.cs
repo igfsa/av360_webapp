@@ -10,6 +10,12 @@ public class ProfessorPersist(APIContext context) : IProfessorPersist
 {
     private readonly APIContext _context = context;
 
+    public async Task<Professor[]> GetAllProfessores()
+    {
+        return await _context.Professores
+        .OrderBy(p => p.Nome)
+            .ToArrayAsync();
+    }
     public async Task<Professor?> GetProfessorUser(string userName)
     {
         return await _context.Professores

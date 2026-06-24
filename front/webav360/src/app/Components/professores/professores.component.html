@@ -1,0 +1,47 @@
+<div class="container">
+  <div class="row m-2">
+    <div class="col-8">
+      <h1>Professores</h1>
+    </div>
+    <button id="btn-buscar" class="btn btn-success col-4" (click)="adicionarProfessor();">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+      </svg>
+      Adicionar Professor
+    </button>
+  </div>
+
+  <input type="text" class="form-control w-100 h-100 m-2" style = "font-size: 1.6rem;" placeholder="Filtrar" [(ngModel)]="filtroLista">
+
+  <div class="tabela-wrapper">
+    <table id="main-table" class="table table-striped text-center table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th style = 'width: 10%; text-align: center;'>#</th>
+          <th>Nome</th>
+          <th style = 'width: 20%; text-align: center;'>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (professoresFiltrados && professores.length){
+          @for (professor of professoresFiltrados; track professor.id){
+            <tr>
+              <td style= 'text-align: center'>{{professor.id}}</td>
+              <td>{{professor.nome}}</td>
+              <td>{{professor.userName}}</td>
+            </tr>
+          }
+        }
+      </tbody>
+      <tfoot >
+        @if (!professoresFiltrados.length){
+          <tr>
+            <td colspan="8" class="text-center">
+              <h4>Nenhum professor encontrado!</h4>
+            </td>
+          </tr>
+        }
+      </tfoot>
+    </table>
+  </div>
+</div>

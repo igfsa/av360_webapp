@@ -10,6 +10,7 @@ import { AuthGuard } from './auth/auth.guard';
 import { LoginComponent } from './Components/login/login.component';
 import { SessaoQrCodeComponent } from './Components/sessao_ativa/aux/sessao_qrcode.component';
 import { SessaoHistComponent } from './Components/sessao_hist/sessao_hist.component';
+import { ProfessoresComponent } from './Components/professores/professores.component';
 
 export const routes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -25,6 +26,7 @@ export const routes: Routes = [
       {path: 'sessao-ativa/:id', component: SessaoAtivaComponent},
       {path: `sessao-qrcode/:id`, component: SessaoQrCodeComponent},
       {path: 'sessao-hist/:id', component: SessaoHistComponent},
+      {path: 'professores', component: ProfessoresComponent},
       {path: '', redirectTo: 'turmas', pathMatch: 'full' },
     ]},
 
