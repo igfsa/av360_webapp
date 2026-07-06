@@ -59,7 +59,7 @@ export class SessaoService {
   }
 
   public putEncerraSessao (sessaoId: number): Observable<Blob>{
-    return this.http.put<Blob>(`${this.baseURL}/api/Sessao/PutEncerraSessao/${sessaoId}`,{responseType: 'blob'});
+    return this.http.put(`${this.baseURL}/api/Sessao/PutEncerraSessao/${sessaoId}`,null,{responseType: `blob`});
   }
 
   public dashboardSessao (id: number): Observable<DashboardSessao>{

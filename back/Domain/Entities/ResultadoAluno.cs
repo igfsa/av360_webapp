@@ -23,7 +23,7 @@ public class ResultadoAluno
     public int AlunoId { get; private set; } 
     public int ResultadoSessaoId { get; private set; } 
     public ResultadoSessao ResultadoSessao { get; private set; } = null!;
-    public int ResultadoGrupoId { get; private set; } 
+    public int? ResultadoGrupoId { get; private set; } 
     public ResultadoGrupo? ResultadoGrupo { get; private set; }
     public string Nome { get; private set; } = null!;
 }

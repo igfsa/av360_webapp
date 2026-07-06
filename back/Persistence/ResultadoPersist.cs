@@ -15,6 +15,7 @@ public class ResultadoPersist(APIContext context) : IResultadoPersist
             .Include(s => s.NotasFinais)
             .Include(s => s.Alunos)
             .Include(s => s.Grupos)
+            .Include(s => s.Criterios)
             .FirstOrDefaultAsync(s => s.SessaoId == sessaoId);
     }
 

@@ -146,6 +146,7 @@ builder.Services.AddScoped<IDashboardCacheService, DashboardCacheService>();
 builder.Services.AddScoped<IDashboardSessaoService, DashboardSessaoService>();
 
 builder.Services.AddScoped<IResultadoPersist, ResultadoPersist>();
+builder.Services.AddScoped<IResultadoService, ResultadoService>();
 
 builder.Services.AddScoped<IProfessorService, ProfessorService>();
 builder.Services.AddScoped<IProfessorPersist, ProfessorPersist>();

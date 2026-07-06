@@ -12,6 +12,7 @@ public class ResultadoSessaoDTO
     public decimal NotaMaxima { get; set; }
     public DateTime DataInicio { get; set; }
     public DateTime DataFim { get; set; }
+    public bool Inconsistencia { get; set; }
     private readonly List<ResultadoNotaFinalDTO> _notasFinais = [];
     public IReadOnlyCollection<ResultadoNotaFinalDTO> NotasFinais => _notasFinais;
     private readonly List<ResultadoGrupoDTO> _grupos = [];

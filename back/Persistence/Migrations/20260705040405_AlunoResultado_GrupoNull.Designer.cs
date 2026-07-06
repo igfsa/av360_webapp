@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Persistence.Context;
@@ -11,9 +12,11 @@ using Persistence.Context;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(APIContext))]
-    partial class APIContextModelSnapshot : ModelSnapshot
+    [Migration("20260705040405_AlunoResultado_GrupoNull")]
+    partial class AlunoResultado_GrupoNull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -602,10 +605,6 @@ namespace Persistence.Migrations
                     b.Property<DateTime>("DataInicio")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("data_inicio");
-
-                    b.Property<bool>("Inconsistencia")
-                        .HasColumnType("boolean")
-                        .HasColumnName("inconsistencia");
 
                     b.Property<decimal>("NotaMaxima")
                         .HasColumnType("numeric")

@@ -1,4 +1,3 @@
-using System.Runtime.Serialization;
 using Domain.Exceptions;
 
 namespace Domain.Entities;
@@ -24,6 +23,7 @@ public class ResultadoSessao
     public decimal NotaMaxima { get; private set; }
     public DateTime DataInicio { get; private set; }
     public DateTime DataFim { get; private set; }
+    public bool Inconsistencia { get; private set; } = true;
     private readonly List<ResultadoNotaFinal> _notasFinais = [];
     public IReadOnlyCollection<ResultadoNotaFinal> NotasFinais => _notasFinais;
     private readonly List<ResultadoGrupo> _grupos = [];
@@ -68,5 +68,10 @@ public class ResultadoSessao
         _criterios.Add(c);
         
         return c;
+    }
+
+    public void EditInconsistencia (bool inc)
+    {
+        Inconsistencia = inc;
     }
 }

@@ -42,6 +42,7 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
     , totalNotas: 0
     , notaMax: 0
     , turmaCod: ``
+    , inconsistencia: false
     , criterios: []
     , grupos: []
   });

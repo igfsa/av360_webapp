@@ -10,6 +10,7 @@ public class DashboardSessaoDTO
     public int TotalNotas { get; set; }
     public decimal NotaMax { get; set; }
     public string TurmaCod { get; set; } = "";
+    public bool Inconsistencia { get; set; } = false;
     
     public List<CriterioDashboardDTO> Criterios { get; set; } = [];
     public List<GrupoDashboardDTO> Grupos { get; set; } = [];

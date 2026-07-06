@@ -93,7 +93,7 @@ public class DashboardSessaoService(
                 Nome = a.Nome,
                 TotalNotas = totalNotas,
                 Media = totalNotas > 0 ? notasAluno.Average(n => n.Nota) : 0,
-                GrupoId = alunosGrupo.FirstOrDefault(ag => ag.AlunoId == a.Id)?.GrupoId ?? 0,
+                GrupoId = alunosGrupo.FirstOrDefault(ag => ag.AlunoId == a.Id)?.GrupoId,
                 Avaliou = notasFinais.Any(nf => nf.AvaliadorId == a.Id),
                 CriterioAluno = mediasCriterios
             };
@@ -133,6 +133,24 @@ public class DashboardSessaoService(
                 Alunos = alunosGrupo
             };
         }).ToList();
+
+        var alunosSemGrupo = alunosDto
+            .Where(a => !a.GrupoId.HasValue || a.GrupoId == 0)
+            .ToList();
+
+        if (alunosSemGrupo.Count > 0)
+        {
+            gruposDto.Add(new GrupoDashboardDTO
+            {
+                GrupoId = 0,
+                Nome = "Sem Grupo",
+                Media = 0,
+                TotalNotas = 0,
+                Avaliaram = 0,
+                Pendentes = alunosSemGrupo.Count,
+                Alunos = alunosSemGrupo
+            });
+        }
 
         var avaliaram = alunosDto.Count(a => a.Avaliou);
 
@@ -213,7 +231,7 @@ public class DashboardSessaoService(
                 .ToDictionary(g => g.Key, g => g.ToList());
 
             var alunosPorGrupo = alunos
-                .GroupBy(a => a.ResultadoGrupoId)
+                .GroupBy(a => a.ResultadoGrupoId ?? 0)
                 .ToDictionary(g => g.Key, g => g.Select(x => x.Id).ToHashSet());
 
             var alunosDto = alunos.Select(a => 
@@ -284,6 +302,24 @@ public class DashboardSessaoService(
                 };
             }).ToList();
 
+            var alunosSemGrupo = alunosDto
+                .Where(a => !a.GrupoId.HasValue)
+                .ToList();
+
+            if (alunosSemGrupo.Count > 0)
+            {
+                gruposDto.Add(new GrupoDashboardDTO
+                {
+                    GrupoId = 0,
+                    Nome = "Sem Grupo",
+                    Media = 0,
+                    TotalNotas = 0,
+                    Avaliaram = 0,
+                    Pendentes = alunosSemGrupo.Count,
+                    Alunos = alunosSemGrupo
+                });
+            }
+
             var avaliaram = alunosDto.Count(a => a.Avaliou);
 
             var mediaGeral = notasSessao.Length > 0 ? notasSessao.Average(n => n.Nota) : 0;
@@ -300,7 +336,8 @@ public class DashboardSessaoService(
                 NotaMax = sessaoResultado.NotaMaxima,
                 TurmaCod = sessaoResultado.TurmaCod,
                 Criterios = criteriosDto,
-                Grupos = gruposDto
+                Grupos = gruposDto,
+                Inconsistencia = sessaoResultado.Inconsistencia 
             };
         }
         catch (Exception ex)

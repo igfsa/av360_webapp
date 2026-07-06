@@ -206,6 +206,7 @@ public class APIContext(DbContextOptions<APIContext> options) : DbContext(option
             .HasOne(x => x.ResultadoGrupo)
             .WithMany(g => g.Alunos)
             .HasForeignKey(x => x.ResultadoGrupoId)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         _ = modelBuilder.Entity<ResultadoAluno>()

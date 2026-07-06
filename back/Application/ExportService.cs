@@ -19,6 +19,7 @@ public class ExportService(ILogger<ExportService> logger) :IExportService
 
             ws.Cell(1, 1).Value = "Aluno";
             ws.Cell(1, 2).Value = "Média";
+            ws.Cell(1, 3).Value = "Avaliou";
 
             int linha = 2;
 
@@ -26,6 +27,7 @@ public class ExportService(ILogger<ExportService> logger) :IExportService
             {
                 ws.Cell(linha, 1).Value = item.Aluno;
                 ws.Cell(linha, 2).Value = item.Nota;
+                ws.Cell(linha, 3).Value = item.Avaliou ? "Sim" : "Não";
 
                 linha++;
             }

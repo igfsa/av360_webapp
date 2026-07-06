@@ -11,7 +11,8 @@ export interface DashboardSessao {
   totalNotas: number,
   notaMax: number
   turmaCod: string,
+  inconsistencia: boolean,
 
-  criterios: CriterioDashboard[];
-  grupos: GrupoDashboard[];
+  criterios: CriterioDashboard[],
+  grupos: GrupoDashboard[],
 }

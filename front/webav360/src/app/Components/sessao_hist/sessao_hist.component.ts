@@ -11,6 +11,7 @@ import { SessaoService } from '../../Service/Sessao.service';
 import { DashboardSessao } from '../../Models/Dashboard/DashboardSessao';
 import { AuthService } from '../../auth/auth.service';
 import { DashboardSessaoComponent } from "../dashboard_sessao/dashboard_sessao.component";
+import { ResultadoService } from '../../Service/Resultado.service';
 
 @Component({
   selector: 'app-sessao-hist',
@@ -43,12 +44,14 @@ export class SessaoHistComponent implements OnInit, OnDestroy {
     , totalNotas: 0
     , notaMax: 0
     , turmaCod: ``
+    , inconsistencia: false
     , criterios: []
     , grupos: []
   });
 
   constructor(
     private sessaoService: SessaoService,
+    private resultadoService: ResultadoService,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private authService: AuthService,
@@ -99,7 +102,67 @@ export class SessaoHistComponent implements OnInit, OnDestroy {
     }}
   )};
 
-  exportar(): void {
+  public exportar(): void {
     this.sessaoService.getExportConsolidado(this.sessao.id ?? 0);
+  }
+
+  public recalcularSessao(): void {
+    this.resultadoService.putEncerraSessao(this.sessao.id).subscribe({
+      next: async (res) => {
+        this.loadData(this.sessao.id);
+
+        if (!res || res.size === 0){
+          Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            }
+          }).fire({
+            icon: 'success',
+            title: 'Sucesso',
+            text: `Dados de Avaliação Reprocessados!`
+          });
+
+          return
+        }
+
+        const result = await Swal.fire({
+          icon: 'warning',
+          title: 'Sessão reprocessada com inconsistências',
+          text: 'Deseja baixar o relatório de erros?',
+          showCancelButton: true,
+          confirmButtonText: 'Baixar relatório',
+          cancelButtonText: 'Fechar'
+        });
+
+        if (result.isConfirmed) {
+
+          const url = URL.createObjectURL(res);
+
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `relatorio-erros-${this.sessao?.id}.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+        }
+
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: err.error?.message ?? `Erro ao reprocessar dados`
+        });
+      }
+    });
   }
 }

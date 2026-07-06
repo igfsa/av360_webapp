@@ -14,6 +14,7 @@ public class SessaoService(IGeralPersist geralPersist,
                     IAlunoService alunoService,
                     IAlunoGrupoPersist alunoGrupoPersist,
                     INotaParcialPersist notaParcialPersist,
+                    INotaFinalPersist notaFinalPersist,
                     ISessaoPersist SessaoPersist,
                     IResultadoPersist ResultadoPersist,
                     ICriterioTurmaPersist criterioTurmaPersist,
@@ -27,6 +28,7 @@ public class SessaoService(IGeralPersist geralPersist,
     private readonly IAlunoService _alunoService = alunoService;
     private readonly IAlunoGrupoPersist _alunoGrupoPersist = alunoGrupoPersist;
     private readonly INotaParcialPersist _notaParcialPersist = notaParcialPersist;
+    private readonly INotaFinalPersist _notaFinalPersist = notaFinalPersist;
     private readonly ISessaoPersist _sessaoPersist = SessaoPersist;
     private readonly IResultadoPersist _resultadoPersist = ResultadoPersist;
     private readonly ICriterioTurmaPersist _criterioturmaPersist = criterioTurmaPersist;
@@ -89,6 +91,7 @@ public class SessaoService(IGeralPersist geralPersist,
             if (sessao.Ativo)
             {
                 var notasParciais = await _notaParcialPersist.GetNotaParcialSessaoIdAsync(sessaoId);
+                var notasFinais = await _notaFinalPersist.GetNotasFinalSessaoIdAsync(sessaoId);
                 var alunos = await _alunoService.GetAlunosTurma(sessao.TurmaId);
 
                 alunoNota = [.. alunos
@@ -100,7 +103,8 @@ public class SessaoService(IGeralPersist geralPersist,
                                 "Não identificado",
                             Nota = notas.Any()
                                 ? notas.Average(c => c.Nota)
-                                : 0
+                                : 0,
+                            Avaliou = notasFinais.Any(nf => nf.AvaliadorId == a.Id)
                         };
                     })
                     .OrderBy(an => an.Aluno)];
@@ -108,6 +112,7 @@ public class SessaoService(IGeralPersist geralPersist,
                 var sessaoRes = await _resultadoPersist.GetResultadoSessaoIdAsync(sessaoId)
                     ?? throw new NotFoundException("Resultado Sessão não encontrado");
                 var notasParciais = await _resultadoPersist.GetNotaParcialResultadoSessaoIdAsync(sessaoRes.Id);
+                var notasFinais = await _notaFinalPersist.GetNotasFinalSessaoIdAsync(sessaoId);
                 var alunos = await _resultadoPersist.GetAlunosResultadoSessaoIdAsync(sessaoRes.Id);
 
                 alunoNota = [.. alunos
@@ -119,7 +124,8 @@ public class SessaoService(IGeralPersist geralPersist,
                                 "Não identificado",
                             Nota = notas.Any()
                                 ? notas.Average(c => c.Nota)
-                                : 0
+                                : 0,
+                            Avaliou = notasFinais.Any(nf => nf.AvaliadorId == a.Id)
                         };
                     })
                     .OrderBy(an => an.Aluno)];
@@ -275,7 +281,7 @@ public class SessaoService(IGeralPersist geralPersist,
                     {
                         Tipo = "criterio",
                         Nome = c.Nome,
-                        Erro = ex.Message
+                        Erro = InnerErrorMessage.ObterMensagemErro(ex)
                     });
                 }
             }
@@ -293,7 +299,7 @@ public class SessaoService(IGeralPersist geralPersist,
                     {
                         Tipo = "grupo",
                         Nome = g.Nome,
-                        Erro = ex.Message
+                        Erro = InnerErrorMessage.ObterMensagemErro(ex)
                     });
                 }
             }
@@ -313,7 +319,7 @@ public class SessaoService(IGeralPersist geralPersist,
                     {
                         Tipo = "aluno",
                         Nome = a.Nome,
-                        Erro = ex.Message
+                        Erro = InnerErrorMessage.ObterMensagemErro(ex)
                     });
                 }
             }
@@ -349,7 +355,7 @@ public class SessaoService(IGeralPersist geralPersist,
                             {
                                 Tipo = "notaParcial",
                                 Nome = avaliadorRes.Nome,
-                                Erro = ex.Message
+                                Erro = InnerErrorMessage.ObterMensagemErro(ex)
                             });
                         }
                     }
@@ -358,10 +364,14 @@ public class SessaoService(IGeralPersist geralPersist,
                     {
                         Tipo = "notaFinal",
                         Nome = avaliadorRes.Nome,
-                        Erro = ex.Message
+                        Erro = InnerErrorMessage.ObterMensagemErro(ex)
                     });
                 }
             }
+
+            sessaoResult.EditInconsistencia(resultado.TotalGeralErros != 0);
+            _ = await _geralPersist.SaveChangesAsync();
+
             return resultado;
         }
         catch (Exception ex)
