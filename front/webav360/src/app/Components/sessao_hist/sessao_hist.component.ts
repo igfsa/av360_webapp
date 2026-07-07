@@ -12,12 +12,14 @@ import { DashboardSessao } from '../../Models/Dashboard/DashboardSessao';
 import { AuthService } from '../../auth/auth.service';
 import { DashboardSessaoComponent } from "../dashboard_sessao/dashboard_sessao.component";
 import { ResultadoService } from '../../Service/Resultado.service';
+import { LoadingComponent } from "../shared/loading/loading.component";
 
 @Component({
   selector: 'app-sessao-hist',
   imports: [
     RouterLink,
-    DashboardSessaoComponent
+    DashboardSessaoComponent,
+    LoadingComponent
 ],
   templateUrl: './sessao_hist.component.html',
   styleUrls: ['./sessao_hist.component.scss','../../app.scss']
@@ -48,6 +50,7 @@ export class SessaoHistComponent implements OnInit, OnDestroy {
     , criterios: []
     , grupos: []
   });
+  public loading: boolean = true;
 
   constructor(
     private sessaoService: SessaoService,
@@ -80,6 +83,8 @@ export class SessaoHistComponent implements OnInit, OnDestroy {
       this.sessao = sessao;
 
       this.dashboard = dashboard
+
+      this.loading = false;
 
       this.cdr.detectChanges();
     },

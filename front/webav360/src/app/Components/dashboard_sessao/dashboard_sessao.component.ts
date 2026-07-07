@@ -1,7 +1,7 @@
 import { DecimalPipe } from '@angular/common';
 import { Component, Input, OnChanges } from '@angular/core';
 
-import { NgbAccordionBody, NgbAccordionButton, NgbAccordionCollapse, NgbAccordionDirective, NgbAccordionHeader, NgbAccordionItem, NgbAccordionToggle } from '@ng-bootstrap/ng-bootstrap';
+import { AccordionModule } from 'primeng/accordion';
 import { ChartModule } from 'primeng/chart';
 import { CardModule } from 'primeng/card';
 import { SelectButtonModule } from 'primeng/selectbutton';
@@ -21,19 +21,13 @@ type GrupoDashboardView = GrupoDashboard & {
 @Component({
   selector: 'app-dashboard_sessao',
   imports: [
-		NgbAccordionButton,
-		NgbAccordionDirective,
-		NgbAccordionItem,
-		NgbAccordionHeader,
-		NgbAccordionToggle,
-		NgbAccordionBody,
-	  NgbAccordionCollapse,
+    AccordionModule,
     DecimalPipe,
     ChartModule,
     CardModule,
     SelectButtonModule,
-    FormsModule,
-  ],
+    FormsModule
+],
   templateUrl: './dashboard_sessao.component.html',
   styleUrls: ['./dashboard_sessao.component.scss','../../app.scss']
 })

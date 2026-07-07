@@ -17,14 +17,16 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
 import { DashboardSessaoComponent } from '../dashboard_sessao/dashboard_sessao.component';
 import { FRONT_URL } from '../../app.config';
+import { LoadingComponent } from "../shared/loading/loading.component";
 
 @Component({
   selector: 'app-sessao-ativa',
   imports: [
     RouterLink,
     ChartModule,
-    DashboardSessaoComponent
-  ],
+    DashboardSessaoComponent,
+    LoadingComponent
+],
   templateUrl: './sessao_ativa.component.html',
   styleUrls: ['./sessao_ativa.component.scss','../../app.scss']
 })
@@ -47,6 +49,7 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
     , grupos: []
   });
   private sessaoConectada?: number;
+  public loading: boolean = true;
 
   constructor(
     private turmaService: TurmaService,
@@ -109,6 +112,7 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
         this.loadSessao(sessaoAtiva.id);
       }
 
+      this.loading = false;
       this.cdr.detectChanges();
     });
   }

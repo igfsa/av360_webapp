@@ -34,7 +34,9 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(withFetch(), withInterceptors([AuthInterceptor])),
+    provideHttpClient(withFetch(), withInterceptors([
+      AuthInterceptor
+    ])),
     provideClientHydration(),
     providePrimeNG({
       theme: {

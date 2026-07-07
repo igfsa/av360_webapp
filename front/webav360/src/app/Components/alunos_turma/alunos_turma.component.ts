@@ -6,17 +6,11 @@ import { catchError, forkJoin, map, ObservableInput, of  } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
-import {
-	NgbAccordionButton,
-	NgbAccordionDirective,
-	NgbAccordionItem,
-	NgbAccordionHeader,
-	NgbAccordionToggle,
-	NgbAccordionBody,
-	NgbAccordionCollapse,
-} from '@ng-bootstrap/ng-bootstrap/accordion';
+import { AccordionModule } from 'primeng/accordion';
 
 import Swal from 'sweetalert2';
+
+import { LoadingComponent } from '../shared/loading/loading.component';
 
 import { AlunoService } from '../../Service/Aluno.service';
 import { Aluno } from '../../Models/Aluno';
@@ -45,17 +39,12 @@ import { AlunoTurmaAddModalComponent } from './modals/aluno_turma_add.component'
   selector: 'app-alunos-turma',
   standalone: true,
   imports: [
-		NgbAccordionButton,
-		NgbAccordionDirective,
-		NgbAccordionItem,
-		NgbAccordionHeader,
-		NgbAccordionToggle,
-		NgbAccordionBody,
-	  NgbAccordionCollapse,
     CommonModule,
     FormsModule,
     RouterLink,
-   ],
+    AccordionModule,
+    LoadingComponent,
+],
   templateUrl: './alunos_turma.component.html',
   styleUrls: ['./alunos_turma.component.scss', '../../app.scss'],
 })
@@ -77,6 +66,7 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
   public turma: Turma = ({id: 0, cod: '', notaMax: 0});
   public sessaoAtiva?: Sessao;
   public alunoGrupo: AlunoGrupoNomes[] = [];
+  public loading: boolean = true;
 
   public get filtroAlunos() {
     return this._filtroAlunos
@@ -199,6 +189,8 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
       this.alunoGrupo = alunoGrupo;
 
       this.sessaoAtiva = sessaoAtiva;
+
+      this.loading = false;
 
       this.cdr.detectChanges();
     });
