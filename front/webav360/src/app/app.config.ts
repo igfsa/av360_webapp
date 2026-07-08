@@ -10,6 +10,7 @@ import Material from '@primeuix/themes/material';
 import { AuthInterceptor } from './auth/auth.interceptor';
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
+import { DialogService } from 'primeng/dynamicdialog';
 
 const AV360Theme = definePreset(Material, {
     semantic: {
@@ -47,6 +48,7 @@ export const appConfig: ApplicationConfig = {
       }
     }),
     apiURLProvider,
-    frontURLProvider
+    frontURLProvider,
+    DialogService
   ]
 };

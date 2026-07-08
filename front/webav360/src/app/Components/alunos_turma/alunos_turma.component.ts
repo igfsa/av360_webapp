@@ -5,8 +5,8 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { catchError, forkJoin, map, ObservableInput, of  } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
 import { AccordionModule } from 'primeng/accordion';
+import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
 
 import Swal from 'sweetalert2';
 
@@ -27,13 +27,15 @@ import { TurmaGrupoModalComponent } from './modals/grupo_att.component';
 import { GrupoService } from '../../Service/Grupo.service';
 import { Grupo } from '../../Models/Grupo';
 import { CriterioEditarModalComponent } from '../criterios/modals/criterio_editar.component';
-import { AlunoGrupoModalComponent } from './modals/aluno_grupo_att.component';
+import { AlunoGrupoModalComponent } from './modals/aluno_grupo_add.component';
 import { AlunoGrupo } from '../../Models/AlunoGrupo';
 import { Sessao } from '../../Models/Sessao';
 import { SessaoService } from '../../Service/Sessao.service';
 import { AlunoGrupoNomes } from '../../Models/AlunoGrupoNomes';
 import { AuthService } from '../../auth/auth.service';
 import { AlunoTurmaAddModalComponent } from './modals/aluno_turma_add.component';
+import { ModalService } from '../shared/modal/modal.service';
+import { AlunoGrupoModalData, TurmaCriterioModalData, TurmaGrupoModalData, TurmaGrupoModalOut } from '../../Models/ModalData';
 
 @Component({
   selector: 'app-alunos-turma',
@@ -44,7 +46,9 @@ import { AlunoTurmaAddModalComponent } from './modals/aluno_turma_add.component'
     RouterLink,
     AccordionModule,
     LoadingComponent,
-],
+    DynamicDialogModule
+  ],
+  providers: [DialogService],
   templateUrl: './alunos_turma.component.html',
   styleUrls: ['./alunos_turma.component.scss', '../../app.scss'],
 })
@@ -133,8 +137,8 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private turmaRealTime: TurmaRealTime,
     private authService: AuthService,
+    private modal: ModalService,
     @Inject(PLATFORM_ID) private platformId: Object,
-    @Inject(NgbModal) private modalService: NgbModal,
     @Inject(DestroyRef) private destroyRef: DestroyRef
   ){}
 
@@ -197,16 +201,12 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
   }
 
   public editarTurma (): void{
-    const ref = this.modalService.open(TurmaEditarModalComponent, {
-      size: 'lg',
-      backdrop: 'static',
-      centered: true,
-      fullscreen: true,
-      scrollable: true
-    });
-    ref.componentInstance.turma = this.turma;
 
-    ref.result.then((turmaEditada: Turma) => {
+    this.modal.open<Turma, Turma>(
+      TurmaEditarModalComponent,
+       this.turma,
+      { header: `Editar Turma` }
+    ).subscribe((turmaEditada) => {
       if (!turmaEditada) return;
 
       this.turmaService.putTurma(turmaEditada).subscribe({
@@ -226,69 +226,62 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
           });
         }
       });
-    }).catch(() => {});
+    });
   }
 
   public alterarCriterioTurma (): void{
     forkJoin({
       criterios: this.criterioService.getCriterios(),
     }).subscribe(res => {
-      const ref = this.modalService.open(TurmaCriterioModalComponent, {
-        size: 'lg',
-        backdrop: 'static',
-        centered: true,
-        fullscreen: true,
-        scrollable: true
+
+      this.modal.open<TurmaCriterioModalData, number[]>(
+        TurmaCriterioModalComponent,
+        {
+          turma: this.turma,
+          criteriosTurma: this.criterios,
+          criterios: res.criterios
+        },
+        { header: `Alterar Critérios` }
+        ).subscribe((cts) => {
+          if (!cts) return;
+
+          this.turmaService.putCriterioTurma({
+            turmaId: this.turma.id,
+            criterioIds: cts
+          }).subscribe(({
+            next: () => {
+              Swal.fire({
+                icon: 'success',
+                title: 'Sucesso',
+                text: `Critérios da turma ${this.turma.cod} alterados com sucesso!`
+              });
+            },
+            error: (err) => {
+              Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: err.error?.message ?? `Erro ao alterar critérios da turma ${this.turma.cod}`
+              });
+            }
+          }))
       });
-
-      ref.componentInstance.turma = this.turma;
-      ref.componentInstance.criteriosTurma = this.criterios;
-      ref.componentInstance.criterios = res.criterios;
-
-      ref.result.then((cts: number[]) =>{
-        if (!cts) return;
-
-        this.turmaService.putCriterioTurma({
-          turmaId: this.turma.id,
-          criterioIds: cts
-        }).subscribe(({
-          next: () => {
-            Swal.fire({
-              icon: 'success',
-              title: 'Sucesso',
-              text: `Critérios da turma ${this.turma.cod} alterados com sucesso!`
-            });
-          },
-          error: (err) => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Erro',
-              text: err.error?.message ?? `Erro ao alterar critérios da turma ${this.turma.cod}`
-            });
-          }
-        }))
-      }).catch(() => {});
     })
   }
 
   public alterarGruposTurma (): void{
-    const ref = this.modalService.open(TurmaGrupoModalComponent, {
-      size: 'lg',
-      backdrop: 'static',
-      centered: true,
-      fullscreen: true,
-      scrollable: true
-    });
-
-    ref.componentInstance.turma = this.turma;
-    ref.componentInstance.gruposOrig = this.grupos;
-
-    ref.result.then(({ add, edit }) => {
+    this.modal.open<TurmaGrupoModalData, TurmaGrupoModalOut>(
+      TurmaGrupoModalComponent, {
+        turma: this.turma,
+        gruposOrig: this.grupos,
+      },
+      { header: `Alterar Grupos` }
+    ).subscribe((resultado) => {
+      if (!resultado) return;
 
       const requests: ObservableInput<any>[] = [];
 
-      if (add?.length) {
-        add.forEach((g: Grupo) => {
+      if (resultado.add?.length) {
+        resultado.add.forEach((g: Grupo) => {
           g.turmaId = this.turma.id;
 
           requests.push(
@@ -309,8 +302,8 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
         });
       }
 
-      if (edit?.length) {
-        edit.forEach((g: Grupo) => {
+      if (resultado.edit?.length) {
+        resultado.edit.forEach((g: Grupo) => {
           requests.push(
             this.grupoService.putGrupo(g).pipe(
               map(() => ({
@@ -348,25 +341,23 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
           `
         });
       });
-    }).catch(() => {});
+    });
   }
 
   public alterarAlunosGrupo (grupo: Grupo): void{
     forkJoin({
       alunoGrupoCheckbox: this.grupoService.getAlunoGruposCheckbox(grupo.id, this.turma.id),
     }).subscribe(res => {
-      const ref = this.modalService.open(AlunoGrupoModalComponent, {
-        size: 'lg',
-        backdrop: 'static',
-        centered: true,
-        fullscreen: true,
-        scrollable: true
-      });
-      ref.componentInstance.turma = this.turma;
-      ref.componentInstance.grupo = grupo;
-      ref.componentInstance.alunosCheck = res.alunoGrupoCheckbox;
-      ref.componentInstance.gruposTurma = this.grupos;
-      ref.result.then((alunosGrupo: AlunoGrupo) => {
+      this.modal.open<AlunoGrupoModalData, AlunoGrupo>(
+        AlunoGrupoModalComponent,
+        {
+          turma: this.turma,
+          grupo: grupo,
+          alunosCheck: res.alunoGrupoCheckbox,
+          gruposTurma: this.grupos
+        },
+        { header: `Modificar Grupo` }
+      ).subscribe((alunosGrupo) => {
         if (!alunosGrupo) return;
         this.grupoService.putAtualizarGrupo({
           grupoId: alunosGrupo.grupoId,
@@ -377,33 +368,27 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
             Swal.fire({
               icon: 'success',
               title: 'Sucesso',
-              text: `Alunos do grupo ${grupo.nome} alterados com sucesso!`
+              text: `Alunos da equipe ${grupo.nome} alterados com sucesso!`
             });
           },
           error: (err) => {
             Swal.fire({
               icon: 'error',
               title: 'Erro',
-              text: err.error?.message ?? `Erro ao alterar alunos do grupo ${grupo.nome}`
+              text: err.error?.message ?? `Erro ao alterar alunos da equipe ${grupo.nome}`
             });
           }
         }))
-      }).catch(() => {});
+      });
   })}
 
 
   public importAlunos(): void{
-    const ref = this.modalService.open(TurmaImportModalComponent, {
-      size: 'lg',
-      backdrop: 'static',
-      centered: true,
-      fullscreen: true,
-      scrollable: true
-    });
-
-    ref.componentInstance.turma = this.turma;
-
-    ref.result.then((ImportAlunos: ImportAlunos) => {
+    this.modal.open<Turma, ImportAlunos>(
+      TurmaImportModalComponent,
+      this.turma ,
+      { header: `Importar Alunos` }
+    ).subscribe((ImportAlunos) => {
       if (!ImportAlunos) return;
 
     this.turmaService.postImportarAlunos(ImportAlunos)
@@ -425,21 +410,15 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
           });
         }
       });
-    }).catch(() => {});
+    });
   }
 
   public editarCriterio (criterio: Criterio): void{
-    const ref = this.modalService.open(CriterioEditarModalComponent, {
-      size: 'lg',
-      backdrop: 'static',
-      centered: true,
-      fullscreen: true,
-      scrollable: true
-    });
-
-    ref.componentInstance.criterio = criterio;
-
-    ref.result.then((criterioEditado: Criterio) => {
+    this.modal.open<Criterio, Criterio>(
+      CriterioEditarModalComponent,
+      criterio,
+      { header: `Editar Critério` }
+    ).subscribe((criterioEditado ) => {
       if (!criterioEditado) return;
 
       this.criterioService.putCriterio(criterioEditado).subscribe({
@@ -468,7 +447,7 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
           });
         }
       });
-    }).catch(() => {});
+    });
   }
 
   public buscaAlunoGrupoId(id: number){
@@ -476,15 +455,11 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
   }
 
   public adicionarAluno(){
-    const ref = this.modalService.open(AlunoTurmaAddModalComponent, {
-      size: 'lg',
-      backdrop: 'static',
-      centered: true,
-      fullscreen: true,
-      scrollable: true
-    });
-
-    ref.result.then((aluno: Aluno) => {
+    this.modal.open<null, Aluno>(
+      AlunoTurmaAddModalComponent,
+      null ,
+      { header: `Adicionar Aluno` }
+    ).subscribe((aluno) => {
       if (!aluno)
         return
 
@@ -514,6 +489,6 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
           })
         }
       })
-    }).catch(() => {});
+    });
   }
 }

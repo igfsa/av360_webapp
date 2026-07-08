@@ -1,12 +1,14 @@
 import { Component, Input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import Swal from 'sweetalert2';
 import { form, FormField, max, maxLength, min, required } from '@angular/forms/signals';
+
+import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
+import Swal from 'sweetalert2';
 
 import { Turma } from '../../../Models/Turma';
 import { FormsHelper } from '../../../Helpers/formsHelper';
+import { ModalLayoutComponent } from "../../shared/modal/modal.component";
 
 
 @Component({
@@ -16,14 +18,13 @@ import { FormsHelper } from '../../../Helpers/formsHelper';
     CommonModule,
     FormsModule,
     FormField,
-  ],
+    ModalLayoutComponent
+],
   template: `
-    <div class="modal-header">
-      <h1>Turma {{ turma.cod }}</h1>
-    </div>
-
-  <form (ngSubmit)="salvar()" class="d-flex flex-column vh-100">
-    <div class="modal-body flex-grow-1 overflow-auto" >
+  <app-modal-layout
+    (cancelar) = "ref.close()"
+    (confirmar) = "confirmar()">
+    <div class="flex-grow-1 overflow-auto" >
       <label>Código: </label>
       <input type="text" class="form-control w-50" [formField]="turmaForm.cod" aria-label="Cod" >
       <small [class.text-danger]="turmaForm.cod().value().length >= 100">
@@ -46,17 +47,11 @@ import { FormsHelper } from '../../../Helpers/formsHelper';
         </ul>
       }
     </div>
+  </app-modal-layout>
 
-    <div class="modal-footer mt-auto" >
-      <button class="btn btn-secondary btn-danger" type="button" (click)="cancelar($event)">Cancelar</button>
-      <button class="btn btn-secondary btn-success" type="submit" >Salvar</button>
-    </div>
-  </form>
   `
 })
 export class TurmaEditarModalComponent implements OnInit {
-
-  @Input() turma!: Turma;
 
   turmaModel = signal<Turma>({
     id: 0,
@@ -73,23 +68,23 @@ export class TurmaEditarModalComponent implements OnInit {
     max(schemaPath.notaMax, 100, {message: `Nota Máxima não pode ser maior que 100`});
   });
 
-  constructor(public modal: NgbActiveModal,
-    private formHelper: FormsHelper) {}
+  constructor(
+    public ref: DynamicDialogRef,
+    public config: DynamicDialogConfig<Turma>,
+    private formHelper: FormsHelper
+  ) {}
+
+  private get data(): Turma {
+    return this.config.data!;
+  }
 
   ngOnInit(): void {
     this.turmaModel.set({
-      ...this.turma
+      ...this.data
     });
   }
 
-  public cancelar(event: MouseEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-
-    this.modal.dismiss('cancelar')
-  }
-
-  public salvar(): void {
+  public confirmar(): void {
     this.formHelper.markAllTouched(this.turmaForm);
 
     if (this.turmaForm().invalid())
@@ -112,6 +107,6 @@ export class TurmaEditarModalComponent implements OnInit {
       return
     }
 
-    this.modal.close(this.turmaModel())
+    this.ref.close(this.turmaModel())
   }
 }

@@ -1,11 +1,13 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 
 import { Turma } from '../../../Models/Turma';
 import { Criterio } from '../../../Models/Criterio';
 import { CriterioCheckbox } from '../../../Models/CriterioCheckbox';
+import { TurmaCriterioModalData } from '../../../Models/ModalData';
+import { ModalLayoutComponent } from "../../shared/modal/modal.component";
 
 @Component({
   selector: 'app-turma-criterio-add-modal',
@@ -13,59 +15,53 @@ import { CriterioCheckbox } from '../../../Models/CriterioCheckbox';
   imports: [
     CommonModule,
     FormsModule,
-  ],
+    ModalLayoutComponent
+],
   template: `
-    <div class="modal-header">
-      <h1 class="modal-title">Turma {{ turma.cod }}</h1>
-    </div>
-    <div class="d-flex flex-column vh-100">
-      <div class="modal-body flex-grow-1 overflow-auto" >
-        <table class="table table-hover">
-          <thead>
-            <tr (click)="toggleTodos()"
-                  style="cursor: pointer">
-              <td width="4rem">
-                <input type="checkbox" class="form-check-input"
-                  [checked]="todosSelecionados"
-                  [indeterminate]="algunsSelecionados"
-                  (click)="onToggleTodosCheckbox($event)" />
-              </td>
-              <td>
-                {{ todosSelecionados
-                ? 'Desmarcar todos'
-                : 'Marcar todos' }}
-              </td>
-            </tr>
-          </thead>
-          <tbody>
-            @for (criterio of criteriosCheck; track criterio.id){
-              <tr (click)="toggleCriterio(criterio)"
-                  style="cursor: pointer">
-                <td width="4rem">
-                  <input type="checkbox" class="form-check-input"
-                        [(ngModel)]="criterio.selecionado"
-                        (click)="$event.stopPropagation()" />
-                </td>
-                <td>
-                  {{ criterio.nome }}
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-      <div class="modal-footer mt-auto">
-        <button class="btn btn-secondary btn-danger" (click)="modal.dismiss()">Cancelar</button>
-        <button class="btn btn-secondary btn-success" (click)="salvar()">Salvar</button>
-      </div>
-    </div>
+  <app-modal-layout
+    (cancelar) = "ref.close()"
+    (confirmar) = "confirmar()">
+    <table class="table table-hover">
+      <thead>
+        <tr (click)="toggleTodos()"
+              style="cursor: pointer">
+          <td width="4rem">
+            <input type="checkbox" class="form-check-input"
+              [checked]="todosSelecionados"
+              [indeterminate]="algunsSelecionados"
+              (click)="onToggleTodosCheckbox($event)" />
+          </td>
+          <td>
+            {{ todosSelecionados
+            ? 'Desmarcar todos'
+            : 'Marcar todos' }}
+          </td>
+        </tr>
+      </thead>
+      <tbody>
+        @for (criterio of criteriosCheck; track criterio.id){
+          <tr (click)="toggleCriterio(criterio)"
+              style="cursor: pointer">
+            <td width="4rem">
+              <input type="checkbox" class="form-check-input"
+                    [(ngModel)]="criterio.selecionado"
+                    (click)="$event.stopPropagation()" />
+            </td>
+            <td>
+              {{ criterio.nome }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </app-modal-layout>
   `
 })
 export class TurmaCriterioModalComponent implements OnInit {
 
-  @Input() turma!: Turma;
-  @Input() criteriosTurma!: Criterio[];
-  @Input() criterios!: Criterio[]
+  turma!: Turma;
+  criteriosTurma!: Criterio[];
+  criterios!: Criterio[]
 
   public criterioId: number[] = [];
   public criteriosCheck: CriterioCheckbox[] = [];
@@ -83,10 +79,19 @@ export class TurmaCriterioModalComponent implements OnInit {
   }
 
   constructor(
-    public modal: NgbActiveModal,
+    public ref: DynamicDialogRef,
+    public config: DynamicDialogConfig<TurmaCriterioModalData>,
   ) {}
 
+  private get data(): TurmaCriterioModalData {
+    return this.config.data!;
+  }
+
   ngOnInit(): void {
+    this.turma = this.data.turma;
+    this.criterios = this.data.criterios;
+    this.criteriosTurma = this.data.criteriosTurma;
+
     this.getCriterios();
   }
 
@@ -121,12 +126,12 @@ export class TurmaCriterioModalComponent implements OnInit {
     this.toggleTodos();
   }
 
-  public salvar(): void {
+  public confirmar(): void {
     const criteriosSelecionados = this.criteriosCheck
       .filter(c => c.selecionado)
       .map(c => c.id);
 
-      this.modal.close(criteriosSelecionados);
+      this.ref.close(criteriosSelecionados);
   }
 }
 

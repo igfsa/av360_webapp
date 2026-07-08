@@ -1,22 +1,23 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 
 import { Turma } from '../../../Models/Turma';
 import { Grupo } from '../../../Models/Grupo';
 import { AlunoGrupoCheckbox } from '../../../Models/AlunoGrupoCheckbox';
 import { AlunoGrupo } from '../../../Models/AlunoGrupo';
+import { AlunoGrupoModalData } from '../../../Models/ModalData';
+import { ModalLayoutComponent } from "../../shared/modal/modal.component";
 
 @Component({
   selector: 'app-aluno-grupo-add-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ModalLayoutComponent],
   template: `
-    <div class="modal-header">
-      <h4 class="modal-title" style = "font-size: 2.4rem;">Equipe {{ grupo.nome }}</h4>
-    </div>
-    <div class="modal-body">
+    <app-modal-layout
+    (cancelar) = "ref.close()"
+    (confirmar) = "confirmar()">
       <table id="main-table" class="table table-striped text-center table-hover">
         <thead class="table-dark">
           <tr>
@@ -56,35 +57,39 @@ import { AlunoGrupo } from '../../../Models/AlunoGrupo';
           }
         </tbody>
       </table>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary btn-danger" (click)="modal.dismiss('cancel')">Cancelar</button>
-      <button class="btn btn-secondary btn-success" (click)="salvar()">Salvar</button>
-    </div>
+    </app-modal-layout>
   `
 })
 export class AlunoGrupoModalComponent implements OnInit {
 
-  @Input() turma!: Turma;
-  @Input() grupo!: Grupo;
-  @Input() gruposTurma: Grupo[] = [];
-  @Input() alunosCheck: AlunoGrupoCheckbox[] = [];
+  turma!: Turma;
+  grupo!: Grupo;
+  gruposTurma: Grupo[] = [];
+  alunosCheck: AlunoGrupoCheckbox[] = [];
 
   constructor(
-    public modal: NgbActiveModal,
+    public ref: DynamicDialogRef,
+    public config: DynamicDialogConfig<AlunoGrupoModalData>,
   ) {}
 
-  ngOnInit(): void {
-
+  private get data(): AlunoGrupoModalData {
+    return this.config.data!;
   }
 
-  public salvar(): void {
+  ngOnInit(): void {
+    this.turma = this.data.turma;
+    this.grupo = this.data.grupo;
+    this.gruposTurma = this.data.gruposTurma;
+    this.alunosCheck = this.data.alunosCheck;
+  }
+
+  public confirmar(): void {
     const alunosRes: AlunoGrupo = {
       grupoId: this.grupo.id,
       turmaId: this.turma.id,
       alunoIds: (this.alunosCheck.filter(c => c.selecionado && !c.desabilitado).map(c => c.alunoId))
     }
-      this.modal.close(alunosRes);
+      this.ref.close(alunosRes);
   }
 
   public toggleAluno(aluno: AlunoGrupoCheckbox): void {
@@ -99,5 +104,3 @@ export class AlunoGrupoModalComponent implements OnInit {
     return res;
   }
 }
-
-

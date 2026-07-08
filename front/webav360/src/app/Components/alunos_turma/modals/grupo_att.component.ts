@@ -1,25 +1,29 @@
-import { Component, Input, OnInit, Inject, } from '@angular/core';
+import { Component, OnInit, Inject, } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+
+import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import Swal from 'sweetalert2';
 
 import { Turma } from '../../../Models/Turma';
 import { Grupo } from '../../../Models/Grupo';
+import { TurmaGrupoModalData } from '../../../Models/ModalData';
+import { ModalLayoutComponent } from "../../shared/modal/modal.component";
 
 @Component({
   selector: 'app-turma-grupo-add-modal',
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule
-  ],
+    ReactiveFormsModule,
+    ModalLayoutComponent
+],
   template: `
-    <div class="modal-header">
-      <h1 class="modal-title" style = "font-size: 2.4rem;">Equipes Turma {{ turma.cod }}</h1>
-    </div>
-    <form (ngSubmit)="salvar()" [formGroup]="form" class="d-flex flex-column vh-100">
-      <div class="modal-body flex-grow-1 overflow-auto" formArrayName="grupos">
+  <app-modal-layout
+    (cancelar) = "ref.close()"
+    (confirmar) = "confirmar()">
+    <form [formGroup]="form">
+      <div class="flex-grow-1 overflow-auto" formArrayName="grupos">
         @for (grupo of grupos.controls; track grupo.get('id')?.value; let i = $index)
         {
           <div [formGroupName]="i">
@@ -51,18 +55,14 @@ import { Grupo } from '../../../Models/Grupo';
           Nova Equipe
         </button>
       </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary btn-danger" (click)="cancelar($event)">Cancelar</button>
-        <button type="submit" class="btn btn-secondary btn-success">Salvar</button>
-      </div>
-  </form>
+    </form>
+  </app-modal-layout>
   `
 })
 export class TurmaGrupoModalComponent implements OnInit {
 
-  @Input() turma!: Turma;
-  @Input() gruposOrig: Grupo[] = [];
+  turma!: Turma;
+  gruposOrig: Grupo[] = [];
   @Inject(FormBuilder) private fb: FormBuilder = new FormBuilder;
 
   public gruposEdit: Grupo[] = [];
@@ -72,8 +72,13 @@ export class TurmaGrupoModalComponent implements OnInit {
   });
 
   constructor(
-    public modal: NgbActiveModal,
+    public ref: DynamicDialogRef,
+    public config: DynamicDialogConfig<TurmaGrupoModalData>,
   ) {}
+
+  private get data(): TurmaGrupoModalData {
+    return this.config.data!;
+  }
 
   get grupos(): FormArray {
     return this.form.get('grupos') as FormArray;
@@ -109,16 +114,12 @@ export class TurmaGrupoModalComponent implements OnInit {
   ngOnInit(): void {
     this.grupos.clear();
 
+    this.turma = this.data.turma;
+    this.gruposOrig = this.data.gruposOrig;
+
     this.gruposOrig.forEach(g =>
       this.grupos.push(this.criaGrupo({nome: g.nome, id: g.id, turmaId: g.turmaId}))
     )
-  }
-
-  public cancelar(event: MouseEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-
-    this.modal.dismiss('cancelar')
   }
 
   public addGrupo() {
@@ -169,7 +170,7 @@ export class TurmaGrupoModalComponent implements OnInit {
     }
   }
 
-  public salvar(): void {
+  public confirmar(): void {
     this.form.markAllAsTouched();
 
     if (!this.podeSalvar){
@@ -195,7 +196,7 @@ export class TurmaGrupoModalComponent implements OnInit {
 
     const differences = this.getDiff(this.gruposOrig, this.grupos.value as Grupo[]);
 
-    this.modal.close({edit: differences.edit, add: differences.add});
+    this.ref.close({edit: differences.edit, add: differences.add});
   }
 
   public getDiff(original: Grupo[], novo: Grupo[]) {
@@ -205,11 +206,6 @@ export class TurmaGrupoModalComponent implements OnInit {
           const correspOrigin = original.find(o => o.id === u.id);
           return correspOrigin && u.nome !== correspOrigin.nome;
       });
-
       return {add, edit};
   }
-
-
 }
-
-
