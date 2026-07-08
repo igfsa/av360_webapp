@@ -3,7 +3,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
 import Swal from 'sweetalert2';
 
 import { Turma } from '../../Models/Turma';
@@ -13,6 +13,9 @@ import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
 import { ImportAlunos } from '../../Models/TurmaImport';
 import { TurmaImportModalComponent } from './modals/turma_import.component';
 import { AuthService } from '../../auth/auth.service';
+import { ModalService } from '../shared/modal/modal.service';
+import { TurmaCriarModalData } from '../../Models/ModalData';
+import { LoadingComponent } from "../shared/loading/loading.component";
 
 @Component({
   selector: 'app-turmas',
@@ -20,8 +23,9 @@ import { AuthService } from '../../auth/auth.service';
   imports: [
     CommonModule,
     FormsModule,
-    RouterLink
-   ],
+    RouterLink,
+    LoadingComponent
+],
   templateUrl: './turmas.component.html',
   styleUrls: ['./turmas.component.scss', '../../app.scss'],
 })
@@ -30,6 +34,7 @@ export class TurmasComponent implements OnInit, OnDestroy {
   public turmas: Turma[] = [];
   public turmasFiltradas : Turma[] = [];
   private _filtroLista: string = '';
+  public loading: boolean = true;
 
   public get filtroLista() {
     return this._filtroLista
@@ -56,8 +61,8 @@ export class TurmasComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private turmaRealTime: TurmaRealTime,
     private authService: AuthService,
+    private modal: ModalService,
     @Inject(PLATFORM_ID) private platformId: Object,
-    @Inject(NgbModal) private modalService: NgbModal,
     @Inject(DestroyRef) private destroyRef: DestroyRef
   ) { }
 
@@ -89,20 +94,20 @@ export class TurmasComponent implements OnInit, OnDestroy {
         this.turmas = turmas;
         this.turmasFiltradas = this.turmas;
 
+        this.loading = false;
         this.cdr.detectChanges();
       })
   }
 
   public adicionarTurma(): void{
-    const ref = this.modalService.open(TurmaCriarModalComponent, {
-      backdrop: 'static',
-      centered: true,
-      fullscreen: true,
-      scrollable: true
-    });
-    ref.result.then(({Turma, ImportAlunos}) => {
-      if (!Turma) return;
-      this.turmaService.postTurma(Turma)
+    this.modal.open<null, TurmaCriarModalData>(
+      TurmaCriarModalComponent,
+      null ,
+      { header: `Adicionar Aluno` }
+    ).subscribe((res) => {
+      const turma = res?.turma
+      if (!turma) return;
+      this.turmaService.postTurma(turma)
         .subscribe({
           next: turma => {
             Swal.fire({
@@ -110,7 +115,7 @@ export class TurmasComponent implements OnInit, OnDestroy {
               title: 'Sucesso',
               text: `Turma ${turma.cod} criada com sucesso!`
             }).then(() => {
-              if (ImportAlunos)
+              if (res.importarAlunos)
                 this.ImportarAlunos(turma);
             })
           },
@@ -118,44 +123,41 @@ export class TurmasComponent implements OnInit, OnDestroy {
             Swal.fire({
               icon: 'error',
               title: 'Erro',
-              text: err.error?.message ?? `Erro ao criar turma ${Turma.cod}`
+              text: err.error?.message ?? `Erro ao criar turma ${turma.cod}`
             });
           }
         });
-    }).catch(() => {});
+    });
   }
 
   public ImportarAlunos(turma: Turma){
-    const refImport = this.modalService.open(TurmaImportModalComponent, {
-      size: 'lg',
-      backdrop: 'static',
-      centered: true,
-      fullscreen: true,
-      scrollable: true
-    });
-    refImport.componentInstance.turma = turma;
-    refImport.result.then((ImportAlunos: ImportAlunos) => {
+    this.modal.open<Turma, ImportAlunos>(
+      TurmaImportModalComponent,
+      turma ,
+      { header: `Importar Alunos` }
+    ).subscribe((ImportAlunos) => {
       if (!ImportAlunos) return;
-      ImportAlunos.turmaId = turma.id;
-      this.turmaService.postImportarAlunos(ImportAlunos)
-        .subscribe({
-          next: imported => {
-            Swal.fire({
-              icon: 'info',
-              title: 'Sucesso',
-              text: `${imported.total} alunos da turma ${turma.cod} processados!
-                    ${imported.sucesso} importados com sucesso.
-                    ${imported.falhas} com falha.`
-            });
-          },
-          error: (err) => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Erro',
-              text: err.error?.message ?? `Erro ao importar alunos para a turma ${turma.cod}`
-            });
-          }
-        });
-      }).catch(() => {});
+
+    this.turmaService.postImportarAlunos(ImportAlunos)
+      .subscribe({
+        next: imported => {
+          Swal.fire({
+            icon: 'info',
+            title: 'Sucesso',
+            html: `${imported.total} alunos da turma ${turma.cod} processados!<br>
+                  ${imported.sucesso} importados com sucesso.<br>
+                  ${imported.falhas} com falha.`
+          });
+        },
+        error: (err) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: err.error?.message ?? `Erro ao importar alunos para a turma ${turma.cod}`
+          });
+        }
+      });
+    });
   }
 }
+

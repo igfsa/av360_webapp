@@ -1,12 +1,14 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import Swal from 'sweetalert2';
 import { form, FormField, maxLength, minLength, pattern, required, validate } from '@angular/forms/signals';
+
+import { DynamicDialogRef } from 'primeng/dynamicdialog';
+import Swal from 'sweetalert2';
 
 import { Professor } from '../../../Models/Professor';
 import { FormsHelper } from '../../../Helpers/formsHelper';
+import { ModalLayoutComponent } from "../../shared/modal/modal.component";
 
 
 @Component({
@@ -16,13 +18,12 @@ import { FormsHelper } from '../../../Helpers/formsHelper';
     CommonModule,
     FormsModule,
     FormField,
-  ],
+    ModalLayoutComponent
+],
   template: `
-    <div class="modal-header">
-      <h1 class="modal-title">Novo Professor</h1>
-    </div>
-
-    <form (ngSubmit)="salvar()" class="d-flex flex-column vh-100">
+  <app-modal-layout
+    (cancelar) = "ref.close()"
+    (confirmar) = "confirmar()">
       <div class="modal-body flex-grow-1 overflow-auto" >
         <label>Nome: </label>
         <input type="text" class="form-control" [formField]="professorForm.nome" aria-label="Nome" >
@@ -86,12 +87,7 @@ import { FormsHelper } from '../../../Helpers/formsHelper';
         }
 
      </div>
-
-      <div class="modal-footer mt-auto">
-        <button type="button" class="btn btn-secondary btn-danger" (click)="cancelar($event)">Cancelar</button>
-        <button type="submit" class="btn btn-secondary btn-success">Salvar</button>
-      </div>
-    </form>
+  </app-modal-layout>
   `
 })
 export class ProfessorCriarModalComponent implements OnInit {
@@ -136,20 +132,14 @@ export class ProfessorCriarModalComponent implements OnInit {
     });
   })
 
-  constructor(public modal: NgbActiveModal,
+  constructor(
+    public ref: DynamicDialogRef,
     private formHelper: FormsHelper) {}
 
   ngOnInit(): void {
   }
 
-  public cancelar(event: MouseEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-
-    this.modal.dismiss('cancelar')
-  }
-
-  public salvar(): void {
+  public confirmar(): void {
     this.formHelper.markAllTouched(this.professorForm);
 
     if (this.professorForm().invalid())
@@ -174,6 +164,6 @@ export class ProfessorCriarModalComponent implements OnInit {
 
     const { confirmarSenha, ...professor } = this.professorModel();
 
-    this.modal.close(professor)
+    this.ref.close(professor)
   }
 }

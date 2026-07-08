@@ -7,28 +7,31 @@ import { Sessao } from '../../../Models/Sessao';
 import { isPlatformBrowser } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { API_URL, FRONT_URL } from '../../../app.config';
+import { LoadingComponent } from "../../shared/loading/loading.component";
 
 @Component({
   selector: 'sessao-qrcode',
   standalone: true,
-  imports: [],
+  imports: [LoadingComponent],
   template: `
-    <div class="container">
-      @if (!carregando) {
-        @if (sessaoAtiva && sessaoAtiva.ativo) {
-          <h1>Turma {{sessaoAtiva.turma.cod}}</h1>
-          <figure class="figure w-100 p-2">
-            <figcaption class="figure-caption">{{url}}</figcaption>
-            <img [src]="qrCode"
-              alt="QR Code da Avaliação"
-              class="figure-img img-fluid rounded w-50"
-              style="margin: 0 25%;">
-          </figure>
-        } @else {
-          <h2>Sessão não encontrada ou inválida</h2>
-        }
+  <div class="container">
+    @if (loading) {
+      <app-loading />
+    } @else {
+      @if (sessaoAtiva && sessaoAtiva.ativo) {
+        <h1>Turma {{sessaoAtiva.turma.cod}}</h1>
+        <figure class="figure w-100 p-2">
+          <figcaption class="figure-caption">{{url}}</figcaption>
+          <img [src]="qrCode"
+            alt="QR Code da Avaliação"
+            class="figure-img img-fluid rounded w-50"
+            style="margin: 0 25%;">
+        </figure>
+      } @else {
+        <h2>Sessão não encontrada ou inválida</h2>
       }
-    </div>
+    }
+  </div>
   `
 })
 export class SessaoQrCodeComponent implements OnInit {
@@ -36,7 +39,7 @@ export class SessaoQrCodeComponent implements OnInit {
   public qrCode: string = '';
   public url: string = '';
   public sessaoAtiva?: Sessao;
-  public carregando: boolean = true;
+  public loading: boolean = true;
 
   constructor(
     private sessaoService: SessaoService,
@@ -92,7 +95,7 @@ export class SessaoQrCodeComponent implements OnInit {
         });
       }
 
-      this.carregando = false;
+      this.loading = false;
       this.cdr.detectChanges();
     });
   }

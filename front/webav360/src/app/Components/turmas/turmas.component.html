@@ -1,4 +1,7 @@
 <div class="container">
+  @if (loading) {
+    <app-loading />
+  } @else {
   <div class="row m-2">
     <div class="col-8">
       <h1>Turmas</h1>
@@ -54,4 +57,5 @@
       </tfoot>
     </table>
   </div>
+  }
 </div>

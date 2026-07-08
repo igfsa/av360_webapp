@@ -14,6 +14,7 @@ import { DeviceService } from '../../Helpers/hashGen';
 import { AvaliacaoItem } from '../../Models/AvaliacaoItem';
 import { AvaliacaoAgrupada } from '../../Models/AvaliacaoAgrupada';
 import { AvaliacaoEnvio } from '../../Models/AvaliacaoEnvio';
+import { LoadingComponent } from "../shared/loading/loading.component";
 
 @Component({
   selector: 'app-avaliacao_publica',
@@ -21,7 +22,8 @@ import { AvaliacaoEnvio } from '../../Models/AvaliacaoEnvio';
   imports: [
     CommonModule,
     FormsModule,
-  ],
+    LoadingComponent
+],
   templateUrl: './avaliacao_publica.component.html',
   styleUrls: ['./avaliacao_publica.component.scss']
 })

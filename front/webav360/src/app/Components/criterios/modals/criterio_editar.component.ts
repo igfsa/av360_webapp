@@ -1,12 +1,14 @@
 import { Component, Input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { form, FormField, maxLength, required } from '@angular/forms/signals';
+
+import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import Swal from 'sweetalert2';
 
 import { Criterio } from '../../../Models/Criterio';
 import { FormsHelper } from '../../../Helpers/formsHelper';
+import { ModalLayoutComponent } from "../../shared/modal/modal.component";
 
 
 @Component({
@@ -16,14 +18,13 @@ import { FormsHelper } from '../../../Helpers/formsHelper';
     CommonModule,
     FormsModule,
     FormField,
-  ],
+    ModalLayoutComponent
+],
   template: `
-    <div class="modal-header">
-      <h1 class="modal-title" >Critério: {{ criterio.nome }}</h1>
-    </div>
-
-  <form (ngSubmit)="salvar()" class="d-flex flex-column vh-100">
-    <div class="modal-body flex-grow-1 overflow-auto" >
+  <app-modal-layout
+    (cancelar) = "ref.close()"
+    (confirmar) = "confirmar()">
+    <div class="flex-grow-1 overflow-auto" >
       <p class="text-primary">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle-fill" viewBox="0 0 16 16">
           <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4m.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2"/>
@@ -44,17 +45,12 @@ import { FormsHelper } from '../../../Helpers/formsHelper';
         </ul>
       }
     </div>
-
-    <div class="modal-footer mt-auto" >
-      <button class="btn btn-secondary btn-danger" type="button" (click)="cancelar($event)">Cancelar</button>
-      <button class="btn btn-secondary btn-success" type="submit" >Salvar</button>
-    </div>
-  </form>
+  </app-modal-layout>
   `
 })
 export class CriterioEditarModalComponent implements OnInit {
 
-  @Input() criterio!: Criterio;
+  criterio!: Criterio;
 
   criterioModel = signal<Criterio>({
     id: 0,
@@ -66,23 +62,22 @@ export class CriterioEditarModalComponent implements OnInit {
     maxLength(schemaPath.nome, 100, {message: 'Critério não pode ter mais de 100 caracteres.'});
   });
 
-  constructor(public modal: NgbActiveModal,
+  constructor(
+    public ref: DynamicDialogRef,
+    public config: DynamicDialogConfig<Criterio>,
     private formHelper: FormsHelper) {}
+
+  private get data(): Criterio {
+    return this.config.data!;
+  }
 
   ngOnInit(): void {
     this.criterioModel.set({
-      ...this.criterio
+      ...this.data
     });
   }
 
-  public cancelar(event: MouseEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-
-    this.modal.dismiss('cancelar')
-  }
-
-  public salvar(): void {
+  public confirmar(): void {
     this.formHelper.markAllTouched(this.criterioForm);
 
     if (this.criterioForm().invalid())
@@ -105,6 +100,6 @@ export class CriterioEditarModalComponent implements OnInit {
       return
     }
 
-    this.modal.close(this.criterioModel())
+    this.ref.close(this.criterioModel())
   }
 }

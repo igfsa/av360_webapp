@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { form, FormField, required } from '@angular/forms/signals';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
@@ -10,6 +9,8 @@ import Papa from 'papaparse';
 import { Turma } from '../../../Models/Turma';
 import { ImportAlunos } from '../../../Models/TurmaImport';
 import { FormsHelper } from '../../../Helpers/formsHelper';
+import { ModalLayoutComponent } from "../../shared/modal/modal.component";
+import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 
 @Component({
   selector: 'app-turma-criar-modal',
@@ -18,15 +19,14 @@ import { FormsHelper } from '../../../Helpers/formsHelper';
     CommonModule,
     FormsModule,
     FormField,
-  ],
+    ModalLayoutComponent
+],
   styleUrls: ['../turmas.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-  <div class="modal-header">
-    <h1 class="modal-title">Importar Alunos</h1>
-  </div>
-
-  <form (ngSubmit)="salvar()" class="d-flex flex-column vh-100">
+  <app-modal-layout
+    (cancelar) = "ref.close()"
+    (confirmar) = "confirmar()">
     <div class="modal-body flex-grow-1 overflow-auto" >
       <label>Arquivo .csv: </label>
       <input type="file" accept=".csv" class="form-control" (change)="onFile($event)">
@@ -80,16 +80,11 @@ import { FormsHelper } from '../../../Helpers/formsHelper';
         </div>
       }
     </div>
-
-    <div class="modal-footer mt-auto">
-      <button type="button" class="btn btn-secondary btn-danger" (click)="cancelar($event)">Cancelar</button>
-      <button type="submit" class="btn btn-secondary btn-success">Salvar</button>
-    </div>
-  </form>
+  </app-modal-layout>
   `
 })
 export class TurmaImportModalComponent implements OnInit {
-  @Input() turma!: Turma
+  turma!: Turma;
 
   importModel = signal<ImportAlunos>({
     colunaNome: '',
@@ -106,17 +101,17 @@ export class TurmaImportModalComponent implements OnInit {
 
   previewRows = signal<any[]>([]);
 
-  constructor(public modal: NgbActiveModal,
+  constructor(
+    public ref: DynamicDialogRef,
+    public config: DynamicDialogConfig<Turma>,
     private formHelper: FormsHelper) {}
 
-  ngOnInit(): void {
+  private get data(): Turma {
+    return this.config.data!;
   }
 
-  public cancelar(event: MouseEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-
-    this.modal.dismiss('cancelar')
+  ngOnInit(): void {
+    this.turma = this.data;
   }
 
   public onFile(event: any): void {
@@ -212,7 +207,7 @@ export class TurmaImportModalComponent implements OnInit {
     this.importForm.file().markAsTouched();
   }
 
-  public salvar(): void {
+  public confirmar(): void {
     this.formHelper.markAllTouched(this.importForm);
 
     if (this.importForm().invalid())
@@ -240,6 +235,6 @@ export class TurmaImportModalComponent implements OnInit {
       turmaId: this.turma.id
     }));
 
-    this.modal.close(this.importModel())
+    this.ref.close(this.importModel())
   }
 }

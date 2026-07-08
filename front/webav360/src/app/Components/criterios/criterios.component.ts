@@ -1,15 +1,18 @@
 import { ChangeDetectorRef, Component, DestroyRef, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CriterioService } from '../../Service/Criterio.service';
-import { Criterio } from '../../Models/Criterio';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+import Swal from 'sweetalert2';
+
+import { LoadingComponent } from '../shared/loading/loading.component';
+import { AuthService } from '../../auth/auth.service';
 import { CriterioCriarModalComponent } from './modals/criterio_criar.component';
 import { CriterioRealTime } from '../../Service/CriterioRealTime.service';
 import { CriterioEditarModalComponent } from './modals/criterio_editar.component';
-import Swal from 'sweetalert2';
-import { AuthService } from '../../auth/auth.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CriterioService } from '../../Service/Criterio.service';
+import { Criterio } from '../../Models/Criterio';
+import { ModalService } from '../shared/modal/modal.service';
 
 @Component({
   selector: 'app-criterios',
@@ -17,7 +20,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   imports: [
     CommonModule,
     FormsModule,
-   ],
+    LoadingComponent
+],
   templateUrl: './criterios.component.html',
   styleUrls: ['./criterios.component.scss', '../../app.scss'],
 })
@@ -26,6 +30,7 @@ export class CriteriosComponent implements OnInit, OnDestroy {
   public criterios: Criterio[]  = [];
   public criteriosFiltrados : Criterio[] = [];
   private _filtroLista: string = '';
+  public loading: boolean = true;
 
   public get filtroLista() {
     return this._filtroLista
@@ -51,7 +56,7 @@ export class CriteriosComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private criterioRealTime: CriterioRealTime,
     private authService: AuthService,
-    @Inject(NgbModal) private modalService: NgbModal,
+    private modal: ModalService,
     @Inject(PLATFORM_ID) private platformId: Object,
     @Inject(DestroyRef) private destroyRef: DestroyRef
   ){}
@@ -83,23 +88,20 @@ export class CriteriosComponent implements OnInit, OnDestroy {
         this.criterios = criterios;
         this.criteriosFiltrados = this.criterios;
 
+        this.loading = false;
         this.cdr.detectChanges();
       })
   }
 
   public adicionarCriterio (): void{
-    const ref = this.modalService.open(CriterioCriarModalComponent, {
-      size: 'lg',
-      backdrop: 'static',
-      centered: true,
-      fullscreen: true,
-      scrollable: true
-    });
+    this.modal.open<null, Criterio>(
+      CriterioCriarModalComponent,
+      null ,
+      { header: `Adicionar Critério` }
+    ).subscribe((criterio) => {
+      if (!criterio) return;
 
-    ref.result.then((criterioEditado: Criterio) => {
-      if (!criterioEditado) return;
-
-    this.criterioService.postCriterio(criterioEditado)
+    this.criterioService.postCriterio(criterio)
       .subscribe({
         next: criterio => {
           Swal.mixin({
@@ -122,25 +124,19 @@ export class CriteriosComponent implements OnInit, OnDestroy {
           Swal.fire({
             icon: 'error',
             title: 'Erro',
-            text: err.error?.message ?? `Erro ao criar critério ${criterioEditado.nome}`
+            text: err.error?.message ?? `Erro ao criar critério ${criterio.nome}`
           });
         }
       });
-    }).catch(() => {});
+    });
   }
 
   public editarCriterio (criterio: Criterio): void{
-    const ref = this.modalService.open(CriterioEditarModalComponent, {
-      size: 'lg',
-      backdrop: 'static',
-      centered: true,
-      fullscreen: true,
-      scrollable: true
-    });
-
-    ref.componentInstance.criterio = criterio;
-
-    ref.result.then((criterioEditado: Criterio) => {
+    this.modal.open<Criterio, Criterio>(
+      CriterioEditarModalComponent,
+      criterio ,
+      { header: `Adicionar Critério` }
+    ).subscribe((criterioEditado) => {
       if (!criterioEditado) return;
 
       this.criterioService.putCriterio(criterioEditado).subscribe({
@@ -170,6 +166,6 @@ export class CriteriosComponent implements OnInit, OnDestroy {
           });
         }
       });
-    }).catch(() => {});
+    });
   }
 }

@@ -2,41 +2,37 @@
   <nav class="menu fixed-top d-flex align-items-center justify-content-between bg-gradient-x">
     @if (!authService.loading()) {
       @if (authService.isLogged()) {
-        <ng-template #menu let-offcanvas >
-          <div class="offcanvas-header">
-            <h1 class="offcanvas-title" >Menu</h1>
-            <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="offcanvas.dismiss()"></button>
-          </div>
-          <div class="offcanvas-body d-flex vh-100">
-            <ul class="navbar-nav flex-column vw-100 list-unstyled">
-              <li class="nav-item nav-link">
-                  <button class="nav-link active" (click)="offcanvas.dismiss('Close click')" routerLink="/turmas" routerLinkActive="active" >Turmas</button>
-              </li>
-              <li class="nav-item nav-link">
-                  <button class="nav-link active" (click)="offcanvas.dismiss('Close click')" routerLink="/criterios" routerLinkActive="active" >Critérios</button>
-              </li>
-              <li class="nav-item nav-link mt-auto">
-                  <button class="nav-link active" (click)="logout(); offcanvas.dismiss('Close click');" >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16">
-                      <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0z"/>
-                      <path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708z"/>
-                    </svg>
-                    Logout
-                  </button>
-              </li>
-            </ul>
-          </div>
-        </ng-template>
-
-        <button class="btn" (click)="open(menu)">
+        <button type="button" class="btn" (click)="visible = true">
           <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="ico bi bi-list" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
           </svg>
         </button>
-      }}
-      <a class="navbar-brand" routerLink="" routerLinkActive="active">
-        <h1 class = "titulo display-3" >av360web</h1>
-      </a>
-    </nav>
+    }}
+    <a class="navbar-brand" routerLink="" routerLinkActive="active">
+      <h1 class = "titulo display-3" >av360web</h1>
+    </a>
+  </nav>
+  <p-drawer [(visible)]="visible" header="Menu" styleClass="menu-drawer">
+    <div class="d-flex h-100">
+      <ul class="navbar-nav flex-column vw-100 list-unstyled">
+        <li class="nav-item nav-link">
+            <button class="nav-link active" (click)="visible = false" routerLink="/turmas" routerLinkActive="active" >Turmas</button>
+        </li>
+        <li class="nav-item nav-link">
+            <button class="nav-link active" (click)="visible = false" routerLink="/criterios" routerLinkActive="active" >Critérios</button>
+        </li>
+        <li class="nav-item nav-link mt-auto">
+          <button class="nav-link active" (click)="logout(); visible = false;" >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0z"/>
+              <path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708z"/>
+            </svg>
+            Logout
+          </button>
+        </li>
+      </ul>
+    </div>
+  </p-drawer>
+
   <router-outlet></router-outlet>
 </header>

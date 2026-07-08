@@ -1,12 +1,13 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { form, FormField, min, max, required, maxLength } from '@angular/forms/signals';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { Turma } from '../../../Models/Turma';
 import { FormsModule } from '@angular/forms';
 import { FormsHelper } from '../../../Helpers/formsHelper';
 import Swal from 'sweetalert2';
+import { TurmaCriarModalData } from '../../../Models/ModalData';
+import { DynamicDialogRef } from 'primeng/dynamicdialog';
+import { ModalLayoutComponent } from "../../shared/modal/modal.component";
 
 
 @Component({
@@ -16,31 +17,30 @@ import Swal from 'sweetalert2';
     CommonModule,
     FormsModule,
     FormField,
-  ],
+    ModalLayoutComponent
+],
   template: `
-  <div class="modal-header">
-    <h1 class="modal-title" >Nova Turma</h1>
-  </div>
-
-  <form (ngSubmit)="salvar()" class="d-flex flex-column vh-100">
+  <app-modal-layout
+    (cancelar) = "ref.close()"
+    (confirmar) = "confirmar()">
     <div class="modal-body flex-grow-1 overflow-auto" >
       <label>Nome da Turma: </label>
-      <input type="text" class="form-control" [formField]="turmaForm.cod" aria-label="Cod" >
-      <small [class.text-danger]="turmaForm.cod().value().length >= 100">
-        {{ turmaForm.cod().value().length }}/100
+      <input type="text" class="form-control" [formField]="turmaForm.turma.cod" aria-label="Cod" >
+      <small [class.text-danger]="turmaForm.turma.cod().value().length >= 100">
+        {{ turmaForm.turma.cod().value().length }}/100
       </small>
-      @if (turmaForm.cod().touched() && turmaForm.cod().invalid()) {
+      @if (turmaForm.turma.cod().touched() && turmaForm.turma.cod().invalid()) {
         <ul class="error-list">
-          @for (error of turmaForm.cod().errors(); track error) {
+          @for (error of turmaForm.turma.cod().errors(); track error) {
             <li>{{ error.message }}</li>
           }
         </ul>
       }
       <label>Nota Máxima: </label>
-      <input type="number" class="form-control" [formField]="turmaForm.notaMax" aria-label="Nota Máxima" >
-      @if (turmaForm.notaMax().touched() && turmaForm.notaMax().invalid()){
+      <input type="number" class="form-control" [formField]="turmaForm.turma.notaMax" aria-label="Nota Máxima" >
+      @if (turmaForm.turma.notaMax().touched() && turmaForm.turma.notaMax().invalid()){
         <ul class="error-list">
-          @for (error of turmaForm.notaMax().errors(); track error) {
+          @for (error of turmaForm.turma.notaMax().errors(); track error) {
             <li>{{ error.message }}</li>
           }
         </ul>
@@ -50,46 +50,38 @@ import Swal from 'sweetalert2';
         Importar alunos após salvar
       </label>
     </div>
-
-    <div class="modal-footer mt-auto" >
-      <button class="btn btn-secondary btn-danger" type="button" (click)="cancelar($event)">Cancelar</button>
-      <button class="btn btn-secondary btn-success" type="submit" >Salvar</button>
-    </div>
-  </form>
+  </app-modal-layout>
   `
 })
 export class TurmaCriarModalComponent implements OnInit {
 
-  turmaModel = signal<Turma & {importarAlunos: boolean}>({
-    id: 0,
-    cod: '',
-    notaMax: 0,
+  turmaModel = signal<TurmaCriarModalData>({
+    turma: {
+      id: 0,
+      cod: '',
+      notaMax: 0
+    },
     importarAlunos: true
   })
 
   turmaForm = form(this.turmaModel, schemaPath => {
-    required(schemaPath.cod, {message: `Nome da Turma deve ser inserido`})
-    maxLength(schemaPath.cod, 100, {message: 'Nome da Turma não pode ter mais de 100 caracteres.'});
+    required(schemaPath.turma.cod, {message: `Nome da Turma deve ser inserido`})
+    maxLength(schemaPath.turma.cod, 100, {message: 'Nome da Turma não pode ter mais de 100 caracteres.'});
 
-    required(schemaPath.notaMax, {message: `Nota Máxima da turma deve ser inserida`});
-    min(schemaPath.notaMax, 1, {message: `Nota Máxima não pode ser menor que 1`});
-    max(schemaPath.notaMax, 100, {message: `Nota Máxima não pode ser maior que 100`});
+    required(schemaPath.turma.notaMax, {message: `Nota Máxima da turma deve ser inserida`});
+    min(schemaPath.turma.notaMax, 1, {message: `Nota Máxima não pode ser menor que 1`});
+    max(schemaPath.turma.notaMax, 100, {message: `Nota Máxima não pode ser maior que 100`});
   });
 
-  constructor(public modal: NgbActiveModal,
-    private formHelper: FormsHelper) {}
+  constructor(
+    public ref: DynamicDialogRef,
+    private formHelper: FormsHelper
+  ) {}
 
   ngOnInit(): void {
   }
 
-  public cancelar(event: MouseEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-
-    this.modal.dismiss('cancelar')
-  }
-
-  public salvar(): void {
+  public confirmar(): void {
     this.formHelper.markAllTouched(this.turmaForm);
 
     if (this.turmaForm().invalid())
@@ -112,11 +104,6 @@ export class TurmaCriarModalComponent implements OnInit {
       return
     }
 
-    const model = this.turmaModel();
-
-    this.modal.close({
-      Turma: model,
-      ImportAlunos: model.importarAlunos
-    });
+    this.ref.close(this.turmaModel());
   }
 }

@@ -1,14 +1,17 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ChangeDetectorRef, Component, DestroyRef, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
 import Swal from 'sweetalert2';
+
 import { AuthService } from '../../auth/auth.service';
 import { Professor } from '../../Models/Professor';
 import { ProfessorService } from '../../Service/Professor.service';
 import { ProfessorRealTime } from '../../Service/ProfessorRealTime.service';
 import { FormsModule } from '@angular/forms';
 import { ProfessorCriarModalComponent } from './modals/professor_criar.component';
+import { LoadingComponent } from "../shared/loading/loading.component";
+import { ModalService } from '../shared/modal/modal.service';
 
 @Component({
   selector: 'app-professores',
@@ -16,7 +19,8 @@ import { ProfessorCriarModalComponent } from './modals/professor_criar.component
   imports: [
     CommonModule,
     FormsModule,
-   ],
+    LoadingComponent
+],
   templateUrl: './professores.component.html',
   styleUrls: ['./professores.component.scss']
 })
@@ -25,6 +29,7 @@ export class ProfessoresComponent implements OnInit {
   public professores: Professor[]  = [];
   public professoresFiltrados : Professor[] = [];
   private _filtroLista: string = '';
+  public loading: boolean = true;
 
   public get filtroLista() {
     return this._filtroLista
@@ -47,7 +52,7 @@ export class ProfessoresComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private professorRealTime: ProfessorRealTime,
     private authService: AuthService,
-    @Inject(NgbModal) private modalService: NgbModal,
+    private modal: ModalService,
     @Inject(PLATFORM_ID) private platformId: Object,
     @Inject(DestroyRef) private destroyRef: DestroyRef
   ){}
@@ -79,20 +84,17 @@ export class ProfessoresComponent implements OnInit {
         this.professores = professores;
         this.professoresFiltrados = this.professores;
 
+        this.loading = false;
         this.cdr.detectChanges();
       })
   }
 
   public adicionarProfessor (): void{
-    const ref = this.modalService.open(ProfessorCriarModalComponent, {
-      size: 'lg',
-      backdrop: 'static',
-      centered: true,
-      fullscreen: true,
-      scrollable: true
-    });
-
-    ref.result.then((novoProfessor: Professor) => {
+    this.modal.open<null, Professor>(
+      ProfessorCriarModalComponent,
+      null,
+      { header: `Adicionar Professor`}
+    ).subscribe((novoProfessor) => {
       if (!novoProfessor) return;
 
     this.professorService.postProfessor(novoProfessor)
@@ -122,7 +124,6 @@ export class ProfessoresComponent implements OnInit {
           });
         }
       });
-    }).catch(() => {});
+    });
   }
-
 }

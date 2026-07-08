@@ -6,11 +6,12 @@ import { provideClientHydration } from '@angular/platform-browser';
 import { providePrimeNG } from 'primeng/config';
 import { definePreset } from '@primeuix/themes';
 import Material from '@primeuix/themes/material';
+import { DialogService } from 'primeng/dynamicdialog';
+import { Drawer } from 'primeng/drawer';
 
 import { AuthInterceptor } from './auth/auth.interceptor';
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
-import { DialogService } from 'primeng/dynamicdialog';
 
 const AV360Theme = definePreset(Material, {
     semantic: {
@@ -49,6 +50,7 @@ export const appConfig: ApplicationConfig = {
     }),
     apiURLProvider,
     frontURLProvider,
-    DialogService
+    DialogService,
+    Drawer
   ]
 };

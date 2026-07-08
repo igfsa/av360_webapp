@@ -1,7 +1,8 @@
 import { Component, HostListener, Inject, TemplateRef } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
-import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { Drawer, DrawerModule } from 'primeng/drawer';
+
 import { AuthService } from '../../auth/auth.service';
 
 @Component({
@@ -10,24 +11,22 @@ import { AuthService } from '../../auth/auth.service';
   imports:  [
               RouterLink,
               RouterLinkActive,
-              RouterOutlet
+              RouterOutlet,
+              DrawerModule,
+              Drawer,
             ],
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.scss', '../../app.scss'],
 })
 export class NavComponent {
 
-  mostrarScrollTop = false;
+  mostrarScrollTop: boolean = false;
+  visible: boolean = false;
 
   constructor(
     private router: Router
     , public authService: AuthService
-    , @Inject(NgbOffcanvas) private offcanvasService: NgbOffcanvas
   ) {}
-
-  open(content: TemplateRef<any>) {
-    setTimeout(() => this.offcanvasService.open(content));
-	}
 
   logout() {
     this.authService.logout();

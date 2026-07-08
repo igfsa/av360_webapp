@@ -24,3 +24,8 @@ export interface TurmaCriterioModalData {
   criterios: Criterio[];
   criteriosTurma: Criterio[];
 }
+
+export interface TurmaCriarModalData {
+  turma: Turma
+  importarAlunos: boolean
+}

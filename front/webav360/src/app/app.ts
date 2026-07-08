@@ -1,8 +1,6 @@
 import { Component, HostListener, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-
 import { NavComponent } from './Components/nav/nav.component';
 import { AuthService } from './auth/auth.service';
 
@@ -12,7 +10,6 @@ import { AuthService } from './auth/auth.service';
   imports: [
     RouterOutlet,
     NavComponent,
-    NgbModule
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss']

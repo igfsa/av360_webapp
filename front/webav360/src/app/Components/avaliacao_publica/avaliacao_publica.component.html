@@ -1,5 +1,7 @@
 <div class="container">
-  @if(!carregandoDados){
+  @if(carregandoDados){
+    <app-loading />
+  } @else {
     <div class="d-flex justify-content-between">
       <h1>Avaliação da Turma {{dados.turma.cod}}</h1>
       <h2>Etapa {{step}} de 5</h2>
@@ -116,7 +118,5 @@
       </div>
     } @else {
       <p>Ocorreu um erro</p>
-    }} @else {
-      <span>Buscando Dados de Sessão...</span>
-    }
+    }} 
 </div>

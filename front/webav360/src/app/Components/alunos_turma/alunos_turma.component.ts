@@ -6,7 +6,6 @@ import { catchError, forkJoin, map, ObservableInput, of  } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AccordionModule } from 'primeng/accordion';
-import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
 
 import Swal from 'sweetalert2';
 
@@ -46,9 +45,9 @@ import { AlunoGrupoModalData, TurmaCriterioModalData, TurmaGrupoModalData, Turma
     RouterLink,
     AccordionModule,
     LoadingComponent,
-    DynamicDialogModule
+
   ],
-  providers: [DialogService],
+  providers: [],
   templateUrl: './alunos_turma.component.html',
   styleUrls: ['./alunos_turma.component.scss', '../../app.scss'],
 })

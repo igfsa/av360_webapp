@@ -166,3 +166,22 @@ p-dialog .p-dialog-title {
   font-weight: 500;
   color: var(--dark);
 }
+
+.menu-drawer.p-drawer {
+
+  background-color: var(--light);
+  padding: 0;
+  border: none;
+
+  .p-drawer-header {
+    color: var(--dark);
+    background-color: var(--primary);
+    padding: 2rem;
+  }
+
+  .p-drawer-title{
+    font-size: 2.5rem;
+    font-weight: 500;
+    color: var(--dark);
+  }
+}
