@@ -1,13 +1,12 @@
-import { ChangeDetectorRef, Component, DestroyRef, inject, Inject, Input, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common'
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
-import Swal from 'sweetalert2';
+
 import { ChartModule } from 'primeng/chart';
 
 import { Turma } from '../../Models/Turma';
 import { Sessao } from '../../Models/Sessao';
-
 import { TurmaService } from '../../Service/Turma.service';
 import { SessaoService } from '../../Service/Sessao.service';
 import { SessaoRealTime } from '../../Service/SessaoRealTime.service';
@@ -18,6 +17,8 @@ import { TurmaRealTime } from '../../Service/TurmaRealTime.service';
 import { DashboardSessaoComponent } from '../dashboard_sessao/dashboard_sessao.component';
 import { FRONT_URL } from '../../app.config';
 import { LoadingComponent } from "../shared/loading/loading.component";
+import { AlertService } from '../shared/alert/alert.service';
+import { AlertHelper } from '../shared/alert/alert.helper';
 
 @Component({
   selector: 'app-sessao-ativa',
@@ -35,19 +36,7 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
   public turma: Turma = ({id: 0, cod: '', notaMax: 0});
   public sessaoAtiva?: Sessao;
   public urlQrCode: string = '';
-  public dashboard: DashboardSessao = ({
-     sessaoId: 0
-    , totalAlunos: 0
-    , avaliaram: 0
-    , pendentes: 0
-    , mediaGeral: 0
-    , totalNotas: 0
-    , notaMax: 0
-    , turmaCod: ``
-    , inconsistencia: false
-    , criterios: []
-    , grupos: []
-  });
+  public dashboard?: DashboardSessao;
   private sessaoConectada?: number;
   public loading: boolean = true;
 
@@ -60,6 +49,7 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
     private sessaoRealTime: SessaoRealTime,
     private turmaRealTime: TurmaRealTime,
     private authService: AuthService,
+    private alert: AlertService,
     @Inject(PLATFORM_ID) private platformId: Object,
     @Inject(DestroyRef) private destroyRef: DestroyRef,
     @Inject(FRONT_URL) public readonly frontURL: string
@@ -113,6 +103,7 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
       }
 
       this.loading = false;
+
       this.cdr.detectChanges();
     });
   }
@@ -121,25 +112,11 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
     this.sessaoService.dashboardSessao(sessaoId).subscribe({
       next: (res) => {
         this.urlQrCode = `${this.frontURL}/avaliacao/publica/${this.sessaoAtiva?.tokenPublico}`
-        this.dashboard = res;
+        this.dashboard = structuredClone(res);
         this.cdr.detectChanges();
       },
       error: (err) => {
-        Swal.mixin({
-          toast: true,
-          position: "top-end",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          }
-        }).fire({
-          icon: 'error',
-          title: 'Erro',
-          text: err.error?.message ?? `Erro ao buscar dashboard`
-        });
+        this.alert.error(err.error?.message ?? `Erro ao buscar dashboard`);
       }
     });
   }
@@ -176,47 +153,31 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
         next: (res) => {
           podeIniciar = res.podeIniciar;
           if (!podeIniciar) {
-            let texto: string = '<ul class="error-list">';
-            res.mensagens.forEach(m => {
-              texto += `<li>${m.tipo}: ${m.mensagem}. </li>`;
-            })
-            texto += `</ul>`;
-            Swal.fire({
-              icon: 'error',
-              title: 'Erro',
-              html: texto
-            });
+            const texto = AlertHelper.createValidationList(
+              res.mensagens,
+              'error-list'
+            );
+            this.alert.error(texto);
           }
           else if (podeIniciar && res.mensagens.length > 0) {
-            let texto: string = '<ul class="warning-list">';
-            res.mensagens.forEach(m => {
-              texto += `<li>${m.tipo}: ${m.mensagem}. </li>`;
-            })
-            texto += `</ul>`;
-            Swal.fire({
-              icon: 'warning',
-              title: 'Aviso',
-              showDenyButton: true,
-              confirmButtonText: "Iniciar Sessão",
-              denyButtonText: `Cancelar`,
-              html: `${texto}
-                      <br> Deseja seguir com o início da sessão?`
-            }).then((res) => {
-              if (res.isConfirmed)
+            const texto = AlertHelper.createValidationList(
+              res.mensagens,
+              'warning-list'
+            );
+            this.alert.confirmWarning(
+              'Aviso',
+              `${texto}<br>Deseja seguir com o início da sessão?`
+            ).then(result => {
+              if(result.isConfirmed){
                 this.criaSessao();
-              if (res.isDenied)
-                return
+              }
             });
           } else if (podeIniciar && res.mensagens.length == 0) {
             this.criaSessao();
           }
         },
         error: (err) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: err.error?.message ?? `Erro ao criar Período de Avaliação`
-          });
+          this.alert.error(err.error?.message ?? `Erro ao criar Período de Avaliação`);
         }
       })
   }
@@ -232,28 +193,10 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
       ativo: true
     }).subscribe({
       next: () => {
-        Swal.mixin({
-          toast: true,
-          position: "top-end",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          }
-        }).fire({
-          icon: 'success',
-          title: 'Sucesso',
-          text: `Período de Avaliação criado com sucesso!`
-        });
+        this.alert.toastSuccess(`Período de Avaliação criado com sucesso!`);
       },
       error: (err) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Erro',
-          text: err.error?.message ?? `Erro ao criar Período de Avaliação`
-        });
+        this.alert.error(err.error?.message ?? `Erro ao criar Período de Avaliação`);
       }
     });
   }
@@ -263,25 +206,19 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
       this.sessaoService.getFaltamAvaliarSessao(this.sessaoAtiva.id).subscribe({
         next: (res) => {
           if (res.length != 0){
-            let texto: string = '<ul class="warning-list">';
-            res.forEach(a => {
-              texto += `<li>${a.nome}. </li>`;
-            })
-            texto += `</ul>`;
-            Swal.fire({
-              icon: 'warning',
-              title: 'Aviso',
-              showDenyButton: true,
-              confirmButtonText: "Encerrar Sessão",
-              denyButtonText: `Cancelar`,
-              html: `${res.length } alunos sem avaliar.
-                      <br> ${texto}
-                      <br> Deseja seguir com o fim da sessão?`
-            }).then((res) => {
-              if (res.isConfirmed)
+            const texto = AlertHelper.createList(
+              res.map(a => a.nome),
+              'warning-list'
+            );
+            this.alert.confirmWarning(
+              'Aviso',
+              `${res.length } alunos sem avaliar.
+              <br> ${texto}
+              <br> Deseja seguir com o fim da sessão?`
+            ).then(result => {
+              if(result.isConfirmed){
                 this.encerrarSessao();
-              if (res.isDenied)
-                return
+              }
             });
           } else {
             this.encerrarSessao();
@@ -289,11 +226,7 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
 
         },
         error: (err) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: err.error?.message ?? `Erro ao encerrar Período de Avaliação`
-          });
+          this.alert.error(err.error?.message ?? `Erro ao encerrar Período de Avaliação`);
         }
       })
     }
@@ -303,35 +236,16 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
     this.sessaoService.putEncerraSessao(this.sessaoAtiva?.id ?? 0).subscribe({
       next: async (res) => {
         if (!res || res.size === 0){
-          Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.onmouseenter = Swal.stopTimer;
-              toast.onmouseleave = Swal.resumeTimer;
-            }
-          }).fire({
-            icon: 'success',
-            title: 'Sucesso',
-            text: `Período de Avaliação Encerrado!`
-          });
-
+          this.alert.toastSuccess(`Período de Avaliação finalizado com sucesso!`);
           return
         }
 
-        const result = await Swal.fire({
-          icon: 'warning',
-          title: 'Sessão encerrada com inconsistências',
-          text: 'Deseja baixar o relatório de erros?',
-          showCancelButton: true,
-          confirmButtonText: 'Baixar relatório',
-          cancelButtonText: 'Fechar'
-        });
+        const result = await this.alert.confirmDownload(
+          'Sessão encerrada com inconsistências',
+          'Deseja baixar o relatório de erros?'
+        );
 
-        if (result.isConfirmed) {
+        if (result) {
 
           const url = URL.createObjectURL(res);
 
@@ -348,11 +262,7 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
 
       },
       error: (err) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Erro',
-          text: err.error?.message ?? `Erro ao encerrar Período de Avaliação`
-        });
+        this.alert.error(err.error?.message ?? `Erro ao encerrar Período de Avaliação`);
       }
     });
   }
@@ -364,21 +274,7 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        Swal.mixin({
-          toast: true,
-          position: "top-end",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          }
-        }).fire({
-          icon: 'error',
-          title: 'Erro',
-          text: err.error?.message ?? `Erro ao buscar dashboard`
-        });
+        this.alert.error(err.error?.message ?? `Erro ao buscar dashboard`);
       }
     });
   }

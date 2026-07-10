@@ -2,15 +2,16 @@ import { ChangeDetectionStrategy, Component, Input, OnInit, signal } from '@angu
 import { CommonModule } from '@angular/common';
 import { form, FormField, required } from '@angular/forms/signals';
 import { FormsModule } from '@angular/forms';
-import Swal from 'sweetalert2';
+
 import * as jschardet from 'jschardet';
 import Papa from 'papaparse';
+import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 
 import { Turma } from '../../../Models/Turma';
 import { ImportAlunos } from '../../../Models/TurmaImport';
 import { FormsHelper } from '../../../Helpers/formsHelper';
 import { ModalLayoutComponent } from "../../shared/modal/modal.component";
-import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { AlertService } from '../../shared/alert/alert.service';
 
 @Component({
   selector: 'app-turma-criar-modal',
@@ -104,7 +105,9 @@ export class TurmaImportModalComponent implements OnInit {
   constructor(
     public ref: DynamicDialogRef,
     public config: DynamicDialogConfig<Turma>,
-    private formHelper: FormsHelper) {}
+    private formHelper: FormsHelper,
+    private alert: AlertService,
+  ) {}
 
   private get data(): Turma {
     return this.config.data!;
@@ -192,12 +195,7 @@ export class TurmaImportModalComponent implements OnInit {
           }
         },
         error: () => {
-
-          Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: 'Erro ao ler arquivo CSV'
-          });
+          this.alert.toastError(`Erro ao ler arquivo CSV`);
         }
       });
     };
@@ -212,21 +210,7 @@ export class TurmaImportModalComponent implements OnInit {
 
     if (this.importForm().invalid())
     {
-      Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        }
-      }).fire({
-        icon: 'error',
-        title: 'Erro',
-        text: `Verifique os dados de Importação`
-      });
+      this.alert.toastError(`Verifique os dados de Importação`);
       return
     }
 

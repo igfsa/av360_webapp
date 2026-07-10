@@ -66,6 +66,10 @@ thead {
   font-size: 1.4rem;
 }
 
+.swal2-container {
+  z-index: 2000;
+}
+
 .container {
   margin: 10vh auto 15vh;
   padding:  5%;
@@ -172,6 +176,7 @@ p-dialog .p-dialog-title {
   background-color: var(--light);
   padding: 0;
   border: none;
+  width: 20vw;
 
   .p-drawer-header {
     color: var(--dark);

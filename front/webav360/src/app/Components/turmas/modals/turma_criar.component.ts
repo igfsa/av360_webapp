@@ -1,13 +1,14 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { form, FormField, min, max, required, maxLength } from '@angular/forms/signals';
-
 import { FormsModule } from '@angular/forms';
-import { FormsHelper } from '../../../Helpers/formsHelper';
-import Swal from 'sweetalert2';
-import { TurmaCriarModalData } from '../../../Models/ModalData';
+
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
+
+import { FormsHelper } from '../../../Helpers/formsHelper';
+import { TurmaCriarModalData } from '../../../Models/ModalData';
 import { ModalLayoutComponent } from "../../shared/modal/modal.component";
+import { AlertService } from '../../shared/alert/alert.service';
 
 
 @Component({
@@ -75,7 +76,8 @@ export class TurmaCriarModalComponent implements OnInit {
 
   constructor(
     public ref: DynamicDialogRef,
-    private formHelper: FormsHelper
+    private formHelper: FormsHelper,
+    private alert: AlertService
   ) {}
 
   ngOnInit(): void {
@@ -86,21 +88,7 @@ export class TurmaCriarModalComponent implements OnInit {
 
     if (this.turmaForm().invalid())
     {
-      Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        }
-      }).fire({
-        icon: 'error',
-        title: 'Erro',
-        text: `Verifique os dados da Turma`
-      });
+      this.alert.toastError(`Verifique os dados da Turma`);
       return
     }
 

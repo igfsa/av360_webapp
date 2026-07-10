@@ -2,8 +2,6 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ChangeDetectorRef, Component, DestroyRef, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import Swal from 'sweetalert2';
-
 import { AuthService } from '../../auth/auth.service';
 import { Professor } from '../../Models/Professor';
 import { ProfessorService } from '../../Service/Professor.service';
@@ -12,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { ProfessorCriarModalComponent } from './modals/professor_criar.component';
 import { LoadingComponent } from "../shared/loading/loading.component";
 import { ModalService } from '../shared/modal/modal.service';
+import { AlertService } from '../shared/alert/alert.service';
 
 @Component({
   selector: 'app-professores',
@@ -53,6 +52,7 @@ export class ProfessoresComponent implements OnInit {
     private professorRealTime: ProfessorRealTime,
     private authService: AuthService,
     private modal: ModalService,
+    private alert: AlertService,
     @Inject(PLATFORM_ID) private platformId: Object,
     @Inject(DestroyRef) private destroyRef: DestroyRef
   ){}
@@ -100,28 +100,10 @@ export class ProfessoresComponent implements OnInit {
     this.professorService.postProfessor(novoProfessor)
       .subscribe({
         next: professor => {
-          Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.onmouseenter = Swal.stopTimer;
-              toast.onmouseleave = Swal.resumeTimer;
-            }
-          }).fire({
-            icon: 'success',
-            title: 'Sucesso',
-            text: `Professor ${professor.nome} criado com sucesso!`
-          });
+          this.alert.toastSuccess(`Professor ${professor.nome} criado com sucesso!`);
         },
         error: (err) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: err.error?.message ?? `Erro ao criar professor ${novoProfessor.nome}`
-          });
+          this.alert.error(err.error?.message ?? `Erro ao criar professor ${novoProfessor.nome}`);
         }
       });
     });

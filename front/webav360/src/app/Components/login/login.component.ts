@@ -1,11 +1,12 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { form, FormField, required } from '@angular/forms/signals';
-import { AuthService } from '../../auth/auth.service';
-import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
+import { AuthService } from '../../auth/auth.service';
 import { FormsHelper } from '../../Helpers/formsHelper';
+import { AlertService } from '../shared/alert/alert.service';
 
 @Component({
   selector: 'app-login',
@@ -35,7 +36,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private formHekper: FormsHelper
+    private formHekper: FormsHelper,
+    private alert: AlertService,
   ) {}
 
   ngOnInit(): void {
@@ -45,21 +47,7 @@ export class LoginComponent implements OnInit {
     this.formHekper.markAllTouched(this.loginForm);
     if (this.loginForm().invalid())
     {
-      Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        }
-      }).fire({
-        icon: 'error',
-        title: 'Erro',
-        text: `Insira seu usuário e senha`
-      });
+      this.alert.toastError(`Insira seu usuário e senha`);
       return
     }
     this.authService.login(this.loginModel().userName, this.loginModel().senha).subscribe({
@@ -67,13 +55,8 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['']);
       },
       error: err => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Erro',
-          text: err.error?.message ?? `Dados Inválidos`
-        });
+        this.alert.toastError(err.error?.message ?? `Dados Inválidos`);
       }
     });
   }
-
 }

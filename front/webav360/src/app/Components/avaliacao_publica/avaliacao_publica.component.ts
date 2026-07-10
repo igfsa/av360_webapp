@@ -2,7 +2,6 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import Swal from 'sweetalert2';
 
 import { AvaliacaoPublica } from '../../Models/AvaliacaoPublica';
 import { AvaliacaoService } from '../../Service/Avaliacao.service';
@@ -15,6 +14,7 @@ import { AvaliacaoItem } from '../../Models/AvaliacaoItem';
 import { AvaliacaoAgrupada } from '../../Models/AvaliacaoAgrupada';
 import { AvaliacaoEnvio } from '../../Models/AvaliacaoEnvio';
 import { LoadingComponent } from "../shared/loading/loading.component";
+import { AlertService } from '../shared/alert/alert.service';
 
 @Component({
   selector: 'app-avaliacao_publica',
@@ -51,7 +51,8 @@ export class AvaliacaoPublicaComponent implements OnInit {
     private alunoService: AlunoService,
     private deviceService: DeviceService,
     private router: Router,
-    public cdr: ChangeDetectorRef
+    public cdr: ChangeDetectorRef,
+    private alert: AlertService
   ) {}
 
   get atual() {
@@ -74,11 +75,7 @@ export class AvaliacaoPublicaComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        Swal.fire({
-        icon: 'error',
-        title: 'Erro',
-        text: err.error.message ?? 'Ocorreu um erro não identificado'
-      });
+        this.alert.error(err.error.message ?? 'Ocorreu um erro não identificado');
       this.router.navigate(['/avaliacao/encerrada'])}
     });
   }
@@ -97,11 +94,7 @@ export class AvaliacaoPublicaComponent implements OnInit {
         this.carregarAvaliacao();
     },
     error: (err) => {
-      Swal.fire({
-          icon: 'error',
-          title: 'Erro',
-          text: err.error.message ?? 'Ocorreu um erro não identificado'
-        });
+        this.alert.error(err.error.message ?? 'Ocorreu um erro não identificado');
       }
     });
   }
@@ -129,11 +122,7 @@ export class AvaliacaoPublicaComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Erro',
-          text: err.error.message ?? 'Ocorreu um erro não identificado'
-        });
+        this.alert.error(err.error.message ?? 'Ocorreu um erro não identificado');
       }
     });
   }
@@ -141,22 +130,7 @@ export class AvaliacaoPublicaComponent implements OnInit {
 
   public proximo() {
     if (!this.avaliacaoValida(this.atual)) {
-
-      Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        }
-      }).fire({
-        icon: 'error',
-        title: 'Erro',
-        text: `Verifique as notas inseridas`
-      });
+      this.alert.toastError(`Verifique as notas inseridas`);
       return
     }
 
@@ -179,22 +153,16 @@ export class AvaliacaoPublicaComponent implements OnInit {
 
     this.avaliacaoService.postAvaliacao(this.avaliacaoEnvio).subscribe({
       next: (imported) =>{
-      this.step = 5;
-      this.cdr.detectChanges();
-        Swal.fire({
-          icon: 'info',
-          title: 'Sucesso',
-          html: `${imported.total} notas processadas!<br>
-                ${imported.sucesso} importados com sucesso.<br>
-                ${imported.falhas} com falha.`
-        });
+        this.step = 5;
+        this.cdr.detectChanges();
+        this.alert.info(
+          `${imported.total} notas processadas!<br>
+          ${imported.sucesso} importados com sucesso.<br>
+          ${imported.falhas} com falha.`
+        );
       },
       error: (err) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Erro',
-          text: err.error?.message ?? `Erro ao importar Notas!`
-        });
+        this.alert.error(err.error?.message ?? `Erro ao importar Notas!`);
       }
     });
   }

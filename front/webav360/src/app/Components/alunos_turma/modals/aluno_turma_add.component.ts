@@ -1,13 +1,14 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { form, FormField, maxLength, required } from '@angular/forms/signals';
+import { FormsModule } from '@angular/forms';
+
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 
 import { Aluno } from '../../../Models/Aluno';
-import { FormsModule } from '@angular/forms';
-import Swal from 'sweetalert2';
 import { FormsHelper } from '../../../Helpers/formsHelper';
 import { ModalLayoutComponent } from "../../shared/modal/modal.component";
+import { AlertService } from '../../shared/alert/alert.service';
 
 @Component({
   selector: 'app-aluno-turma-add-modal',
@@ -53,7 +54,9 @@ export class AlunoTurmaAddModalComponent implements OnInit {
 
   constructor(
     public ref: DynamicDialogRef,
-    private formHelper: FormsHelper) {}
+    private formHelper: FormsHelper,
+    private alert: AlertService
+  ) {}
 
   ngOnInit(): void {
   }
@@ -63,21 +66,7 @@ export class AlunoTurmaAddModalComponent implements OnInit {
 
     if (this.alunoForm().invalid())
     {
-      Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        }
-      }).fire({
-        icon: 'error',
-        title: 'Erro',
-        text: `Verifique as informações do Aluno`
-      });
+      this.alert.toastError(`Verifique as informações do Aluno`);
       return
     }
 

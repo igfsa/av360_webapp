@@ -7,8 +7,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AccordionModule } from 'primeng/accordion';
 
-import Swal from 'sweetalert2';
-
 import { LoadingComponent } from '../shared/loading/loading.component';
 
 import { AlunoService } from '../../Service/Aluno.service';
@@ -35,6 +33,7 @@ import { AuthService } from '../../auth/auth.service';
 import { AlunoTurmaAddModalComponent } from './modals/aluno_turma_add.component';
 import { ModalService } from '../shared/modal/modal.service';
 import { AlunoGrupoModalData, TurmaCriterioModalData, TurmaGrupoModalData, TurmaGrupoModalOut } from '../../Models/ModalData';
+import { AlertService } from '../shared/alert/alert.service';
 
 @Component({
   selector: 'app-alunos-turma',
@@ -137,6 +136,7 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
     private turmaRealTime: TurmaRealTime,
     private authService: AuthService,
     private modal: ModalService,
+    private alert: AlertService,
     @Inject(PLATFORM_ID) private platformId: Object,
     @Inject(DestroyRef) private destroyRef: DestroyRef
   ){}
@@ -211,18 +211,10 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
       this.turmaService.putTurma(turmaEditada).subscribe({
         next: (t) => {
           this.turma = t;
-          Swal.fire({
-            icon: 'success',
-            title: 'Sucesso',
-            text: `Turma ${turmaEditada.cod} salva com sucesso!`
-          });
+          this.alert.toastSuccess(`Turma ${turmaEditada.cod} salva com sucesso!`);
         },
         error: (err) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: err.error?.message ?? `Erro ao salvar turma ${turmaEditada.cod}`
-          });
+          this.alert.error(err.error?.message ?? `Erro ao salvar turma ${turmaEditada.cod}`);
         }
       });
     });
@@ -243,24 +235,15 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
         { header: `Alterar Critérios` }
         ).subscribe((cts) => {
           if (!cts) return;
-
           this.turmaService.putCriterioTurma({
             turmaId: this.turma.id,
             criterioIds: cts
           }).subscribe(({
             next: () => {
-              Swal.fire({
-                icon: 'success',
-                title: 'Sucesso',
-                text: `Critérios da turma ${this.turma.cod} alterados com sucesso!`
-              });
+              this.alert.toastSuccess(`Critérios da turma ${this.turma.cod} alterados com sucesso!`);
             },
             error: (err) => {
-              Swal.fire({
-                icon: 'error',
-                title: 'Erro',
-                text: err.error?.message ?? `Erro ao alterar critérios da turma ${this.turma.cod}`
-              });
+              this.alert.error(err.error?.message ?? `Erro ao alterar critérios da turma ${this.turma.cod}`);
             }
           }))
       });
@@ -330,15 +313,13 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
         const editOk  = results.filter(r => r.type === 'edit' && r.status === 'ok').length;
         const editErro= results.filter(r => r.type === 'edit' && r.status === 'erro').length;
 
-        Swal.fire({
-          icon: 'info',
-          title: 'Info',
-          html: `
+        this.alert.info(
+          `
             Equipes da turma ${this.turma.cod} processadas.<br><br>
             <b>Adicionadas</b>: ${addOk} sucesso, ${addErro} erro.<br>
             <b>Editadas</b>: ${editOk} sucesso, ${editErro} erro.
           `
-        });
+        );
       });
     });
   }
@@ -364,18 +345,10 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
           alunoIds: alunosGrupo.alunoIds
         }).subscribe(({
           next: () => {
-            Swal.fire({
-              icon: 'success',
-              title: 'Sucesso',
-              text: `Alunos da equipe ${grupo.nome} alterados com sucesso!`
-            });
+            this.alert.toastSuccess(`Alunos da equipe ${grupo.nome} alterados com sucesso!`);
           },
           error: (err) => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Erro',
-              text: err.error?.message ?? `Erro ao alterar alunos da equipe ${grupo.nome}`
-            });
+            this.alert.error(err.error?.message ?? `Erro ao alterar alunos da equipe ${grupo.nome}`);
           }
         }))
       });
@@ -393,20 +366,14 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
     this.turmaService.postImportarAlunos(ImportAlunos)
       .subscribe({
         next: imported => {
-          Swal.fire({
-            icon: 'info',
-            title: 'Sucesso',
-            html: `${imported.total} alunos da turma ${this.turma.cod} processados!<br>
-                  ${imported.sucesso} importados com sucesso.<br>
-                  ${imported.falhas} com falha.`
-          });
+          this.alert.info(
+            `${imported.total} alunos da turma ${this.turma.cod} processados!<br>
+            ${imported.sucesso} importados com sucesso.<br>
+            ${imported.falhas} com falha.`
+          );
         },
         error: (err) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: err.error?.message ?? `Erro ao importar alunos para a turma ${this.turma.cod}`
-          });
+          this.alert.error(err.error?.message ?? `Erro ao importar alunos para a turma ${this.turma.cod}`);
         }
       });
     });
@@ -422,28 +389,10 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
 
       this.criterioService.putCriterio(criterioEditado).subscribe({
         next: (c) => {
-          Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.onmouseenter = Swal.stopTimer;
-              toast.onmouseleave = Swal.resumeTimer;
-            }
-          }).fire({
-            icon: 'success',
-            title: 'Sucesso',
-            text: `Critério ${c.nome} editado com sucesso!`
-          });
+          this.alert.toastSuccess(`Critério ${c.nome} editado com sucesso!`);
         },
         error: (err) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: err.error?.message ?? `Erro ao editar critério ${criterioEditado.nome}`
-          });
+          this.alert.error(err.error?.message ?? `Erro ao editar critério ${criterioEditado.nome}`);
         }
       });
     });
@@ -464,28 +413,10 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
 
       this.alunoService.postAlunoTurma( this.turma.id, aluno).subscribe({
         next: (a) => {
-          Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.onmouseenter = Swal.stopTimer;
-              toast.onmouseleave = Swal.resumeTimer;
-            }
-          }).fire({
-            icon: 'success',
-            title: 'Sucesso',
-            text: `Aluno ${a.nome} adicionado com sucesso!`
-          });
+          this.alert.toastSuccess(`Aluno ${a.nome} adicionado com sucesso!`);
         },
         error: (err) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: err.message ?? `Erro ao adicionar aluno`
-          })
+          this.alert.error(err.message ?? `Erro ao adicionar aluno`);
         }
       })
     });

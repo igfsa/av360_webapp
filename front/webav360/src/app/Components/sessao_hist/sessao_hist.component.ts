@@ -2,7 +2,6 @@ import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, PLATFORM_ID } 
 import { isPlatformBrowser } from '@angular/common'
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
-import Swal from 'sweetalert2';
 
 import { Turma } from '../../Models/Turma';
 import { Sessao } from '../../Models/Sessao';
@@ -13,6 +12,7 @@ import { AuthService } from '../../auth/auth.service';
 import { DashboardSessaoComponent } from "../dashboard_sessao/dashboard_sessao.component";
 import { ResultadoService } from '../../Service/Resultado.service';
 import { LoadingComponent } from "../shared/loading/loading.component";
+import { AlertService } from '../shared/alert/alert.service';
 
 @Component({
   selector: 'app-sessao-hist',
@@ -37,19 +37,7 @@ export class SessaoHistComponent implements OnInit, OnDestroy {
     , ativo: false
   });
   public qrCode: string = '';
-  public dashboard: DashboardSessao = ({
-     sessaoId: 0
-    , totalAlunos: 0
-    , avaliaram: 0
-    , pendentes: 0
-    , mediaGeral: 0
-    , totalNotas: 0
-    , notaMax: 0
-    , turmaCod: ``
-    , inconsistencia: false
-    , criterios: []
-    , grupos: []
-  });
+  public dashboard?: DashboardSessao;
   public loading: boolean = true;
 
   constructor(
@@ -58,6 +46,7 @@ export class SessaoHistComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private authService: AuthService,
+    private alert: AlertService,
     @Inject(PLATFORM_ID) private platformId: Object,
   ){}
 
@@ -89,21 +78,7 @@ export class SessaoHistComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     },
     error: (err) => {
-      Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        }
-      }).fire({
-        icon: 'error',
-        title: 'Erro',
-        text: err.error?.message ?? `Erro ao buscar dashboard`
-      });
+      this.alert.error(err.error?.message ?? `Erro ao buscar dashboard`);
     }}
   )};
 
@@ -117,35 +92,16 @@ export class SessaoHistComponent implements OnInit, OnDestroy {
         this.loadData(this.sessao.id);
 
         if (!res || res.size === 0){
-          Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.onmouseenter = Swal.stopTimer;
-              toast.onmouseleave = Swal.resumeTimer;
-            }
-          }).fire({
-            icon: 'success',
-            title: 'Sucesso',
-            text: `Dados de Avaliação Reprocessados!`
-          });
-
+          this.alert.toastSuccess(`Dados de Avaliação Reprocessados!`);
           return
         }
 
-        const result = await Swal.fire({
-          icon: 'warning',
-          title: 'Sessão reprocessada com inconsistências',
-          text: 'Deseja baixar o relatório de erros?',
-          showCancelButton: true,
-          confirmButtonText: 'Baixar relatório',
-          cancelButtonText: 'Fechar'
-        });
+        const result = await this.alert.confirmDownload(
+          'Sessão reprocessada com inconsistências',
+          'Deseja baixar o relatório de erros?'
+        );
 
-        if (result.isConfirmed) {
+        if (result) {
 
           const url = URL.createObjectURL(res);
 
@@ -162,11 +118,7 @@ export class SessaoHistComponent implements OnInit, OnDestroy {
 
       },
       error: (err) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Erro',
-          text: err.error?.message ?? `Erro ao reprocessar dados`
-        });
+        this.alert.error(err.error?.message ?? `Erro ao reprocessar dados`);
       }
     });
   }

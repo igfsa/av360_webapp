@@ -4,8 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
-import Swal from 'sweetalert2';
-
 import { Turma } from '../../Models/Turma';
 import { TurmaService } from '../../Service/Turma.service';
 import { TurmaCriarModalComponent } from './modals/turma_criar.component';
@@ -16,6 +14,7 @@ import { AuthService } from '../../auth/auth.service';
 import { ModalService } from '../shared/modal/modal.service';
 import { TurmaCriarModalData } from '../../Models/ModalData';
 import { LoadingComponent } from "../shared/loading/loading.component";
+import { AlertService } from '../shared/alert/alert.service';
 
 @Component({
   selector: 'app-turmas',
@@ -62,6 +61,7 @@ export class TurmasComponent implements OnInit, OnDestroy {
     private turmaRealTime: TurmaRealTime,
     private authService: AuthService,
     private modal: ModalService,
+    private alert: AlertService,
     @Inject(PLATFORM_ID) private platformId: Object,
     @Inject(DestroyRef) private destroyRef: DestroyRef
   ) { }
@@ -110,21 +110,12 @@ export class TurmasComponent implements OnInit, OnDestroy {
       this.turmaService.postTurma(turma)
         .subscribe({
           next: turma => {
-            Swal.fire({
-              icon: 'success',
-              title: 'Sucesso',
-              text: `Turma ${turma.cod} criada com sucesso!`
-            }).then(() => {
-              if (res.importarAlunos)
-                this.ImportarAlunos(turma);
-            })
+            this.alert.success(`Turma ${turma.cod} criada cm sucesso`)
+            if (res.importarAlunos)
+              this.ImportarAlunos(turma);
           },
           error: (err) => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Erro',
-              text: err.error?.message ?? `Erro ao criar turma ${turma.cod}`
-            });
+            this.alert.error(err.error?.message ?? `Erro ao criar turma ${turma.cod}`);
           }
         });
     });
@@ -141,20 +132,14 @@ export class TurmasComponent implements OnInit, OnDestroy {
     this.turmaService.postImportarAlunos(ImportAlunos)
       .subscribe({
         next: imported => {
-          Swal.fire({
-            icon: 'info',
-            title: 'Sucesso',
-            html: `${imported.total} alunos da turma ${turma.cod} processados!<br>
-                  ${imported.sucesso} importados com sucesso.<br>
-                  ${imported.falhas} com falha.`
-          });
+          this.alert.info(
+            `${imported.total} alunos da turma ${turma.cod} processados!<br>
+            ${imported.sucesso} importados com sucesso.<br>
+            ${imported.falhas} com falha.`
+          );
         },
         error: (err) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: err.error?.message ?? `Erro ao importar alunos para a turma ${turma.cod}`
-          });
+          this.alert.error(err.error?.message ?? `Erro ao importar alunos para a turma ${turma.cod}`);
         }
       });
     });

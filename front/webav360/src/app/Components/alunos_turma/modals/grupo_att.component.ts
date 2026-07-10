@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
-import Swal from 'sweetalert2';
 
 import { Turma } from '../../../Models/Turma';
 import { Grupo } from '../../../Models/Grupo';
 import { TurmaGrupoModalData } from '../../../Models/ModalData';
 import { ModalLayoutComponent } from "../../shared/modal/modal.component";
+import { AlertService } from '../../shared/alert/alert.service';
 
 @Component({
   selector: 'app-turma-grupo-add-modal',
@@ -74,6 +74,7 @@ export class TurmaGrupoModalComponent implements OnInit {
   constructor(
     public ref: DynamicDialogRef,
     public config: DynamicDialogConfig<TurmaGrupoModalData>,
+    private alert: AlertService,
   ) {}
 
   private get data(): TurmaGrupoModalData {
@@ -124,21 +125,7 @@ export class TurmaGrupoModalComponent implements OnInit {
 
   public addGrupo() {
     if (this.form.invalid){
-      Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        }
-      }).fire({
-        icon: 'error',
-        title: 'Erro',
-        text: `Todas equipes anteriores devem estar com nome para criar uma nova. Verifique novamente.`
-      });
+      this.alert.toastError(`Todas equipes anteriores devem estar com nome para criar uma nova. Verifique novamente.`);
       return
     }
 
@@ -174,21 +161,7 @@ export class TurmaGrupoModalComponent implements OnInit {
     this.form.markAllAsTouched();
 
     if (!this.podeSalvar){
-      Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        }
-      }).fire({
-        icon: 'error',
-        title: 'Erro',
-        text: `Apenas a última nova equipe pode estar em branco.`
-      });
+      this.alert.toastError(`Apenas a última nova equipe pode estar em branco.`);
       return
     }
 

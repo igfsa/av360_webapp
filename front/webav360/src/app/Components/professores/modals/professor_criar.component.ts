@@ -4,11 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { form, FormField, maxLength, minLength, pattern, required, validate } from '@angular/forms/signals';
 
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
-import Swal from 'sweetalert2';
 
 import { Professor } from '../../../Models/Professor';
 import { FormsHelper } from '../../../Helpers/formsHelper';
 import { ModalLayoutComponent } from "../../shared/modal/modal.component";
+import { AlertService } from '../../shared/alert/alert.service';
 
 
 @Component({
@@ -134,7 +134,9 @@ export class ProfessorCriarModalComponent implements OnInit {
 
   constructor(
     public ref: DynamicDialogRef,
-    private formHelper: FormsHelper) {}
+    private formHelper: FormsHelper,
+    private alert: AlertService
+  ) {}
 
   ngOnInit(): void {
   }
@@ -144,21 +146,7 @@ export class ProfessorCriarModalComponent implements OnInit {
 
     if (this.professorForm().invalid())
     {
-      Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        }
-      }).fire({
-        icon: 'error',
-        title: 'Erro',
-        text: `Verifique os dados do Professor`
-      });
+      this.alert.toastError(`Verifique os dados do Professor`);
       return
     }
 

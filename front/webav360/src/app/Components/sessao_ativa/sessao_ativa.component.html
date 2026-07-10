@@ -1,53 +1,52 @@
 <div class="container">
   @if (loading) {
     <app-loading />
-  } @else {
-    @if (!sessaoAtiva || sessaoAtiva === null) {
-      <div class="m-2 w-100 d-flex flex-wrap">
-        <div class="w-50">
-          <h1 class="">Turma: {{turma.cod}}</h1 >
-          <h2 class="">Nota Máxima: {{turma.notaMax}}</h2 >
-        </div>
-        <div class="w-50 p-2 d-flex flex-column justify-content-around">
-          <button id="btn-buscar" class="btn btn-success w-100" (click)="validaInicioSessao();">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-circle-fill" viewBox="0 0 16 16">
-              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814z"/>
-            </svg>
-            Iniciar Avaliação
-          </button>
-        </div>
+  } @else if (!sessaoAtiva || sessaoAtiva === null) {
+    <div class="m-2 w-100 d-flex flex-wrap">
+      <div class="w-50">
+        <h1 class="">Turma: {{turma.cod}}</h1 >
+        <h2 class="">Nota Máxima: {{turma.notaMax}}</h2 >
       </div>
-      }@else {
-      <div class="m-2 w-100 d-flex flex-wrap">
-        <div class="w-50">
-          <h1 class="">Turma: {{dashboard.turmaCod}}</h1 >
-          <h2 class="">Nota Máxima: {{dashboard.notaMax}}</h2 >
-          <a class="figure-caption">{{this.urlQrCode}}</a>
-        </div>
-        <div class="w-50 p-2 d-flex flex-column justify-content-around">
-          <button id="btn-encerrar" class="btn btn-danger w-100 m-1" (click)="validarEncerrarSessao();">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stop-circle-fill" viewBox="0 0 16 16">
-              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.5 5A1.5 1.5 0 0 0 5 6.5v3A1.5 1.5 0 0 0 6.5 11h3A1.5 1.5 0 0 0 11 9.5v-3A1.5 1.5 0 0 0 9.5 5z"/>
-            </svg>
-            Encerrar Avaliação
-          </button>
-          <button id="btn-dashboard" class="btn btn-warning w-100 m-1" (click)="dashboardReset(sessaoAtiva.id);">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
-              <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
-              <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
-            </svg>
-            Recarregar Dashboard
-          </button>
-          <button id="btn-export" class="btn btn-success w-100 m-1" (click)="exportar();">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-arrow-down-fill" viewBox="0 0 16 16">
-              <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1m-1 4v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 11.293V7.5a.5.5 0 0 1 1 0"/>
-            </svg>
-            Exportar XLSX
-          </button>
-        </div>
+      <div class="w-50 p-2 d-flex flex-column justify-content-around">
+        <button id="btn-buscar" class="btn btn-success w-100" (click)="validaInicioSessao();">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-circle-fill" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814z"/>
+          </svg>
+          Iniciar Avaliação
+        </button>
       </div>
-      <app-dashboard_sessao [dashboard]="dashboard"/>
-    }
+    </div>
+  }@else if (dashboard) {
+    <div class="m-2 w-100 d-flex flex-wrap">
+      <div class="w-50">
+        <h1 class="">Turma: {{dashboard.turmaCod}}</h1 >
+        <h2 class="">Nota Máxima: {{dashboard.notaMax}}</h2 >
+        <a class="figure-caption">{{this.urlQrCode}}</a>
+      </div>
+      <div class="w-50 p-2 d-flex flex-column justify-content-around">
+        <button id="btn-encerrar" class="btn btn-danger w-100 m-1" (click)="validarEncerrarSessao();">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stop-circle-fill" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.5 5A1.5 1.5 0 0 0 5 6.5v3A1.5 1.5 0 0 0 6.5 11h3A1.5 1.5 0 0 0 11 9.5v-3A1.5 1.5 0 0 0 9.5 5z"/>
+          </svg>
+          Encerrar Avaliação
+        </button>
+        <button id="btn-dashboard" class="btn btn-warning w-100 m-1" (click)="dashboardReset(sessaoAtiva.id);">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
+            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
+          </svg>
+          Recarregar Dashboard
+        </button>
+        <button id="btn-export" class="btn btn-success w-100 m-1" (click)="exportar();">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-arrow-down-fill" viewBox="0 0 16 16">
+            <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1m-1 4v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 11.293V7.5a.5.5 0 0 1 1 0"/>
+          </svg>
+          Exportar XLSX
+        </button>
+      </div>
+    </div>
+    <app-dashboard_sessao [dashboard]="dashboard"/>
+
     <button class="back-button" [routerLink]="['/alunos-turma', turma.id]" routerLinkActive="active">
       <svg xmlns="http://www.w3.org/2000/svg" width="2rem" height="2rem" fill="#EDE9FE" stroke="#EDE9FE" class="bi bi-arrow-return-left" viewBox="0 0 16 16">
         <path fill-rule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5"/>

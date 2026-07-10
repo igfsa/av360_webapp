@@ -4,11 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { form, FormField, maxLength, required } from '@angular/forms/signals';
 
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
-import Swal from 'sweetalert2';
 
 import { Criterio } from '../../../Models/Criterio';
 import { FormsHelper } from '../../../Helpers/formsHelper';
 import { ModalLayoutComponent } from "../../shared/modal/modal.component";
+import { AlertService } from '../../shared/alert/alert.service';
 
 
 @Component({
@@ -56,7 +56,8 @@ export class CriterioCriarModalComponent implements OnInit {
 
   constructor(
     public ref: DynamicDialogRef,
-    private formHelper: FormsHelper
+    private formHelper: FormsHelper,
+    private alert: AlertService
   ) {}
 
   ngOnInit(): void {
@@ -67,21 +68,7 @@ export class CriterioCriarModalComponent implements OnInit {
 
     if (this.criterioForm().invalid())
     {
-      Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        }
-      }).fire({
-        icon: 'error',
-        title: 'Erro',
-        text: `Verifique os dados do Critério`
-      });
+      this.alert.toastError(`Verifique os dados do Critério`);
       return
     }
 

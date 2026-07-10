@@ -3,8 +3,6 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import Swal from 'sweetalert2';
-
 import { LoadingComponent } from '../shared/loading/loading.component';
 import { AuthService } from '../../auth/auth.service';
 import { CriterioCriarModalComponent } from './modals/criterio_criar.component';
@@ -13,6 +11,7 @@ import { CriterioEditarModalComponent } from './modals/criterio_editar.component
 import { CriterioService } from '../../Service/Criterio.service';
 import { Criterio } from '../../Models/Criterio';
 import { ModalService } from '../shared/modal/modal.service';
+import { AlertService } from '../shared/alert/alert.service';
 
 @Component({
   selector: 'app-criterios',
@@ -57,6 +56,7 @@ export class CriteriosComponent implements OnInit, OnDestroy {
     private criterioRealTime: CriterioRealTime,
     private authService: AuthService,
     private modal: ModalService,
+    private alert: AlertService,
     @Inject(PLATFORM_ID) private platformId: Object,
     @Inject(DestroyRef) private destroyRef: DestroyRef
   ){}
@@ -104,28 +104,10 @@ export class CriteriosComponent implements OnInit, OnDestroy {
     this.criterioService.postCriterio(criterio)
       .subscribe({
         next: criterio => {
-          Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.onmouseenter = Swal.stopTimer;
-              toast.onmouseleave = Swal.resumeTimer;
-            }
-          }).fire({
-            icon: 'success',
-            title: 'Sucesso',
-            text: `Critério ${criterio.nome} criado com sucesso!`
-          });
+          this.alert.toastSuccess(`Critério ${criterio.nome} criado com sucesso!`);
         },
         error: (err) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: err.error?.message ?? `Erro ao criar critério ${criterio.nome}`
-          });
+          this.alert.error(err.error?.message ?? `Erro ao criar critério ${criterio.nome}`);
         }
       });
     });
@@ -142,28 +124,10 @@ export class CriteriosComponent implements OnInit, OnDestroy {
       this.criterioService.putCriterio(criterioEditado).subscribe({
         next: (c) => {
           criterio = c;
-          Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.onmouseenter = Swal.stopTimer;
-              toast.onmouseleave = Swal.resumeTimer;
-            }
-          }).fire({
-            icon: 'success',
-            title: 'Sucesso',
-            text: `Critério ${c.nome} editado com sucesso!`
-          });
+          this.alert.toastSuccess(`Critério ${c.nome} editado com sucesso!`);
         },
         error: (err) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: err.error?.message ?? `Erro ao editar critério ${criterioEditado.nome}`
-          });
+          this.alert.error(err.error?.message ?? `Erro ao editar critério ${criterioEditado.nome}`);
         }
       });
     });

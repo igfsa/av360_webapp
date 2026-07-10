@@ -26,7 +26,7 @@ type GrupoDashboardView = GrupoDashboard & {
     ChartModule,
     CardModule,
     SelectButtonModule,
-    FormsModule
+    FormsModule,
 ],
   templateUrl: './dashboard_sessao.component.html',
   styleUrls: ['./dashboard_sessao.component.scss','../../app.scss']
@@ -322,7 +322,7 @@ export class DashboardSessaoComponent implements OnChanges {
   createRadarGrupoChart(grupo: GrupoDashboard) {
 
     const labels =
-      grupo.alunos[0].criterioAluno.map(
+      grupo.alunos[0]?.criterioAluno.map(
         c => c.nome
       );
 
