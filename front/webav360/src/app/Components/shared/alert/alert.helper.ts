@@ -7,9 +7,9 @@ export class AlertHelper {
     className = 'warning-list'
   ): string {
     return `
-      <ul class="${className}">
-        ${items.map(i => `<li>${i}</li>`).join('')}
-      </ul>
+      <div class="${className}">
+        ${items.map(i => `<br>${i}`).join('')}
+      </div>
     `;
   }
 
@@ -19,11 +19,11 @@ export class AlertHelper {
   ): string {
 
     return `
-      <ul class="${className}">
+      <div class="${className}">
         ${mensagens.map(m =>
-          `<li>${m.tipo}: ${m.mensagem}.</li>`
+          `<br>${m.tipo}: ${m.mensagem}`
         ).join('')}
-      </ul>
+      </div>
     `;
   }
 }

@@ -15,6 +15,7 @@ import { ModalService } from '../shared/modal/modal.service';
 import { TurmaCriarModalData } from '../../Models/ModalData';
 import { LoadingComponent } from "../shared/loading/loading.component";
 import { AlertService } from '../shared/alert/alert.service';
+import { TableModule } from "primeng/table";
 
 @Component({
   selector: 'app-turmas',
@@ -23,7 +24,8 @@ import { AlertService } from '../shared/alert/alert.service';
     CommonModule,
     FormsModule,
     RouterLink,
-    LoadingComponent
+    LoadingComponent,
+    TableModule
 ],
   templateUrl: './turmas.component.html',
   styleUrls: ['./turmas.component.scss', '../../app.scss'],
@@ -31,25 +33,7 @@ import { AlertService } from '../shared/alert/alert.service';
 export class TurmasComponent implements OnInit, OnDestroy {
 
   public turmas: Turma[] = [];
-  public turmasFiltradas : Turma[] = [];
-  private _filtroLista: string = '';
   public loading: boolean = true;
-
-  public get filtroLista() {
-    return this._filtroLista
-  }
-
-  public set filtroLista(value : string) {
-    this._filtroLista = value;
-    this.turmasFiltradas = this.filtroLista ? this.filtrarTurmas(this.filtroLista) : this.turmas;
-  }
-
-  public filtrarTurmas(filtrarPor: string): any {
-    filtrarPor = filtrarPor.toLocaleLowerCase();
-    return this.turmas.filter(
-      (turma: { cod: string; }) => turma.cod.toLocaleLowerCase().indexOf(filtrarPor) !== -1
-    )
-  }
 
   id: string = '';
   cod: string = '';
@@ -92,7 +76,6 @@ export class TurmasComponent implements OnInit, OnDestroy {
   public getTurmas (): void{
     this.turmaService.getTurmas().subscribe((turmas) => {
         this.turmas = turmas;
-        this.turmasFiltradas = this.turmas;
 
         this.loading = false;
         this.cdr.detectChanges();

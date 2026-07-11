@@ -8,6 +8,7 @@ import { Criterio } from '../../../Models/Criterio';
 import { CriterioCheckbox } from '../../../Models/CriterioCheckbox';
 import { TurmaCriterioModalData } from '../../../Models/ModalData';
 import { ModalLayoutComponent } from "../../shared/modal/modal.component";
+import { TableModule } from "primeng/table";
 
 @Component({
   selector: 'app-turma-criterio-add-modal',
@@ -15,14 +16,35 @@ import { ModalLayoutComponent } from "../../shared/modal/modal.component";
   imports: [
     CommonModule,
     FormsModule,
-    ModalLayoutComponent
+    ModalLayoutComponent,
+    TableModule
 ],
   template: `
   <app-modal-layout
     (cancelar) = "ref.close()"
     (confirmar) = "confirmar()">
-    <table class="table table-hover">
-      <thead>
+    <div class="d-flex justify-content-end">
+
+      <input
+        pInputText
+        type="text"
+        placeholder="Buscar"
+        (input)="table.filterGlobal($event.target.value, 'contains')" />
+
+    </div>
+
+
+    <p-table
+      #table
+      [value]="criteriosCheck"
+      dataKey="id"
+      [paginator]=true
+      [rows]=50
+      [globalFilterFields]="['nome']"
+      class="table"
+      >
+
+      <ng-template #header>
         <tr (click)="toggleTodos()"
               style="cursor: pointer">
           <td width="4rem">
@@ -37,23 +59,31 @@ import { ModalLayoutComponent } from "../../shared/modal/modal.component";
             : 'Marcar todos' }}
           </td>
         </tr>
-      </thead>
-      <tbody>
-        @for (criterio of criteriosCheck; track criterio.id){
-          <tr (click)="toggleCriterio(criterio)"
-              style="cursor: pointer">
-            <td width="4rem">
-              <input type="checkbox" class="form-check-input"
-                    [(ngModel)]="criterio.selecionado"
-                    (click)="$event.stopPropagation()" />
-            </td>
-            <td>
-              {{ criterio.nome }}
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
+      </ng-template>
+
+      <ng-template #body let-criterio>
+        <tr (click)="toggleCriterio(criterio)"
+            style="cursor: pointer">
+          <td width="4rem">
+            <input type="checkbox" class="form-check-input"
+                  [(ngModel)]="criterio.selecionado"
+                  (click)="$event.stopPropagation()" />
+          </td>
+          <td>
+            {{ criterio.nome }}
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="8" class="text-center">
+            <h4>Nenhum Critério encontrado!</h4>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
   </app-modal-layout>
   `
 })

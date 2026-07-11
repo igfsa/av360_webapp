@@ -22,15 +22,16 @@
       </div>
     </div>
 
-    <p-accordion [value]="['0']" [multiple]="true">
+    <p-accordion value="0">
       <p-accordion-panel value="0">
         <p-accordion-header>
           <h2>Alunos</h2>
         </p-accordion-header>
         <p-accordion-content>
           <div class="m-2 w-100 d-flex flex-wrap">
-            <div class="w-50 d-flex align-items-center">
-              <input type="text" class="form-control " style = "font-size: 1.6rem;" placeholder="Buscar Alunos" [(ngModel)]="filtroAlunos">
+            <div class="w-50 d-flex flex-column-reverse justify-content-around">
+              <input pInputText type="text" placeholder="Buscar Aluno" class="w-100"
+                (input)="table_alunos.filterGlobal($event.target.value, 'contains')" />
             </div>
             <div class="w-50 p-2 d-flex flex-column justify-content-around">
               <button type="button" class="btn btn-primary w-100 m-1" (click)="importAlunos();" [disabled]="sessaoAtiva">
@@ -48,37 +49,47 @@
               </button>
             </div>
           </div>
-          <div class="tabela-wrapper">
-            <table id="main-table" class="table table-striped text-center table-hover">
-              <thead class="table-dark">
-                <tr>
-                  <th style = 'width: 10%; text-align: center;'>#</th>
-                  <th>Nome</th>
-                  <th style = 'width: 20%; text-align: center;'>Equipe Atual</th>
-                </tr>
-              </thead>
-              <tbody>
-                @if (alunosFiltrados && alunosFiltrados.length){
-                  @for (aluno of alunosFiltrados; track aluno.id){
-                    <tr>
-                      <td style= 'text-align: center'>{{aluno.id}}</td>
-                      <td>{{aluno.nome}}</td>
-                      <td style= 'text-align: center'>{{buscaAlunoGrupoId(aluno.id)}}</td>
-                    </tr>
-                  }
-                }
-              </tbody>
-              <tfoot >
-                @if (!alunosFiltrados.length){
-                  <tr>
-                    <td colspan="8" class="text-center">
-                      <h4>Nenhum Aluno encontrado!</h4>
-                    </td>
-                  </tr>
-                }
-              </tfoot>
-            </table>
-          </div>
+          <p-table
+            #table_alunos
+            [value]="alunos"
+            dataKey="id"
+            [paginator]=true
+            [rows]=50
+            [globalFilterFields]="['nome']"
+            removableSort
+            class="table"
+            >
+
+            <ng-template #header>
+              <tr>
+                <th pSortableColumn="id" style = 'width: 10%; text-align: center;'>
+                  #
+                  <p-sortIcon field="id"/>
+                </th>
+                <th pSortableColumn="nome">
+                  Nome
+                  <p-sortIcon field="nome"/>
+                </th>
+                <th style = 'width: 20%; text-align: center;'>Equipe Atual</th>
+              </tr>
+            </ng-template>
+
+            <ng-template #body let-aluno>
+              <tr>
+                <td style= 'text-align: center'>{{aluno.id}}</td>
+                <td>{{aluno.nome}}</td>
+                <td style= 'text-align: center'>{{buscaAlunoGrupoId(aluno.id)}}</td>
+              </tr>
+            </ng-template>
+
+            <ng-template #emptymessage>
+              <tr>
+                <td colspan="8" class="text-center">
+                  <h4>Nenhum Aluno encontrado!</h4>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
         </p-accordion-content>
       </p-accordion-panel>
       <p-accordion-panel value="1">
@@ -89,7 +100,7 @@
           <div class="m-2 w-100 d-flex flex-wrap">
             <div class="w-50 d-flex flex-column justify-content-around">
               <span class=" ">Nota Máxima: {{turma.notaMax}}</span >
-              <input type="text" class="form-control " style = "font-size: 1.6rem;" placeholder="Buscar Equipes Critérios" [(ngModel)]="filtroCriterios">
+              <input pInputText type="text" placeholder="Buscar Critério" (input)="table_criterios.filterGlobal($event.target.value, 'contains')" />
             </div>
             <div class="w-50 p-2 d-flex flex-column justify-content-around">
               <button type="button" class="btn btn-primary w-100 m-1" (click)="alterarCriterioTurma();" [disabled]="sessaoAtiva">
@@ -107,42 +118,55 @@
               </button>
             </div>
           </div>
-          <table id="main-table" class="table table-striped text-center table-hover">
-            <thead class="table-dark">
+
+          <p-table
+            #table_criterios
+            [value]="criterios"
+            dataKey="id"
+            [paginator]=true
+            [rows]=50
+            [globalFilterFields]="['nome']"
+            removableSort
+            class="table"
+            >
+
+            <ng-template #header>
               <tr>
-                <th style = 'width: 10%; text-align: center;'>#</th>
-                <th>Nome</th>
+                <th pSortableColumn="id" style = 'width: 10%; text-align: center;'>
+                  #
+                  <p-sortIcon field="id"/>
+                </th>
+                <th pSortableColumn="nome" >
+                  Nome
+                  <p-sortIcon field="nome"/>
+                </th>
                 <th style = 'width: 20%; text-align: center;'>Ações</th>
               </tr>
-            </thead>
-            <tbody>
-              @if (criteriosFiltrados && criteriosFiltrados.length){
-                @for (criterio of criteriosFiltrados; track criterio.id){
-                  <tr>
-                    <td style= 'text-align: center'>{{criterio.id}}</td>
-                    <td>{{criterio.nome}}</td>
-                    <td style= 'text-align: center'>
-                      <button type="button" class="btn btn-primary btn-sm mr-2 " (click)="editarCriterio(criterio)" [disabled]="sessaoAtiva">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="1.6rem" height="1.6rem" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
-                          <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
-                        </svg>
-                        Editar
-                      </button>
-                    </td>
-                  </tr>
-                }
-              }
-            </tbody>
-            <tfoot >
-              @if (!criteriosFiltrados.length){
-                <tr>
-                  <td colspan="8" class="text-center">
-                    <h4>Nenhum Criterio encontrado!</h4>
-                  </td>
-                </tr>
-              }
-            </tfoot>
-          </table>
+            </ng-template>
+
+            <ng-template #body let-criterio>
+              <tr>
+                <td style= 'text-align: center'>{{criterio.id}}</td>
+                <td>{{criterio.nome}}</td>
+                <td style= 'text-align: center'>
+                  <button type="button" class="btn btn-primary btn-sm mr-2 " (click)="editarCriterio(criterio)" [disabled]="sessaoAtiva">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1.6rem" height="1.6rem" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                      <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
+                    </svg>
+                    Editar
+                  </button>
+                </td>
+              </tr>
+            </ng-template>
+
+            <ng-template #emptymessage>
+              <tr>
+                <td colspan="8" class="text-center">
+                  <h4>Nenhum Critério encontrado!</h4>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
         </p-accordion-content>
       </p-accordion-panel>
       <p-accordion-panel value="2">
@@ -151,9 +175,10 @@
         </p-accordion-header>
         <p-accordion-content>
           <div class="m-2 w-100 d-flex flex-wrap">
-            <div class="w-50 d-flex align-items-center">
-              <input type="text" class="form-control " style = "font-size: 1.6rem;" placeholder="Buscar Equipes" [(ngModel)]="filtroGrupos">
-            </div >
+            <div class="w-50 d-flex flex-column-reverse justify-content-around">
+              <input pInputText type="text" placeholder="Buscar Equipe" class="w-100"
+                (input)="table_grupos.filterGlobal($event.target.value, 'contains')" />
+            </div>
             <div class="p-2 w-50 d-flex align-items-center">
               <button type="button" class="btn btn-primary w-100 m-1" (click)="alterarGruposTurma();" [disabled]="sessaoAtiva">
                 <svg xmlns="http://www.w3.org/2000/svg" width="1.6rem" height="1.6rem" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
@@ -164,44 +189,56 @@
             </div>
           </div>
 
-          <table id="main-table" class="table table-striped text-center table-hover">
-            <thead class="table-dark">
+          <p-table
+            #table_grupos
+            [value]="grupos"
+            dataKey="id"
+            [paginator]=true
+            [rows]=50
+            [globalFilterFields]="['nome']"
+            removableSort
+            class="table"
+            >
+
+            <ng-template #header>
               <tr>
-                <th style = 'width: 10%; text-align: center;'>#</th>
-                <th>Nome</th>
-                <th style = 'width: 20%;'>Alunos</th>
-                <th style = 'width: 20%; text-align: center;'>Ações</th>
+                <th pSortableColumn="id" style = 'width: 10%; text-align: center;'>
+                    #
+                    <p-sortIcon field="id"/>
+                </th>
+                <th pSortableColumn="nome" >
+                  Nome
+                  <p-sortIcon field="nome"/>
+                </th>
+                <th style = 'width: 10%;'>Alunos</th>
+                <th style = 'width: 30%; text-align: center;'>Ações</th>
               </tr>
-            </thead>
-            <tbody>
-              @if (gruposFiltrados && gruposFiltrados.length){
-                @for (grupo of gruposFiltrados; track grupo.id){
-                  <tr>
-                    <td style= 'text-align: center'>{{grupo.id}}</td>
-                    <td>{{grupo.nome}}</td>
-                    <td>{{quantidadeAlunosGrupo(grupo.id)}}</td>
-                    <td style= 'text-align: center'>
-                      <button type="button" class="btn btn-primary btn-sm mr-2 "  (click)="alterarAlunosGrupo(grupo);" [disabled]="sessaoAtiva">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="1.6rem" height="1.6rem" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
-                          <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
-                        </svg>
-                        Inserir integrantes
-                      </button>
-                    </td>
-                  </tr>
-                }
-              }
-            </tbody>
-            <tfoot >
-              @if (!gruposFiltrados.length){
-                <tr>
+            </ng-template>
+
+            <ng-template #body let-grupo>
+              <tr>
+                <td style= 'text-align: center'>{{grupo.id}}</td>
+                <td>{{grupo.nome}}</td>
+                <td>{{quantidadeAlunosGrupo(grupo.id)}}</td>
+                <td style= 'text-align: center'>
+                  <button type="button" class="btn btn-primary btn-sm mr-2 "  (click)="alterarAlunosGrupo(grupo);" [disabled]="sessaoAtiva">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1.6rem" height="1.6rem" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                      <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
+                    </svg>
+                    Inserir integrantes
+                  </button>
+                </td>
+              </tr>
+            </ng-template>
+
+            <ng-template #emptymessage>
+              <tr>
                   <td colspan="8" class="text-center">
                     <h4>Nenhuma Equipe encontrada!</h4>
                   </td>
-                </tr>
-              }
-            </tfoot>
-          </table>
+              </tr>
+            </ng-template>
+          </p-table>
         </p-accordion-content>
       </p-accordion-panel>
       <p-accordion-panel value="3">
@@ -209,71 +246,83 @@
           <h2>Sessões</h2>
         </p-accordion-header>
         <p-accordion-content>
-          <table id="main-table" class="table table-striped text-center table-hover">
-            <thead class="table-dark">
+          <p-table
+            #table_sessoes
+            [value]="sessoes"
+            dataKey="id"
+            [paginator]=true
+            [rows]=50
+            removableSort
+            class="table"
+            >
+
+            <ng-template #header>
               <tr>
-                <th style = 'width: 10%; text-align: center;'>#</th>
-                <th style = 'width: 25%;'>Inicio</th>
-                <th style = 'width: 25%;'>Fim</th>
+                <th pSortableColumn="id" style = 'width: 10%; text-align: center;'>
+                  #
+                  <p-sortIcon field="id"/>
+                </th>
+                <th pSortableColumn="dataInicio" style = 'width: 25%;'>
+                  Inicio
+                  <p-sortIcon field="dataInicio"/>
+                </th>
+                <th pSortableColumn="dataFim" style = 'width: 25%;'>
+                  Fim
+                  <p-sortIcon field="dataFim"/>
+                </th>
                 <th style = 'width: 20%; text-align: center;'>Finalizada</th>
                 <th style = 'width: 20%; text-align: center;'>Acessar Sessão</th>
               </tr>
-            </thead>
-            <tbody>
-              @if (sessoes){
-                @for (sessao of sessoes; track sessao.id){
-                  <tr>
-                    <td style= 'text-align: center'>{{sessao.id}}</td>
-                    <td>{{sessao.dataInicio | date:'dd/MM/yyyy HH:mm' }}</td>
-                    <td>{{sessao.dataFim | date:'dd/MM/yyyy HH:mm' }}</td>
-                    @if (!sessao.ativo) {
-                      <td style="text-align: center;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-circle" viewBox="0 0 16 16">
-                          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                          <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>
-                        </svg>
-                      </td>
-                      <td style= 'text-align: center'>
-                        <button type="button" class="btn btn-primary btn-sm mr-2 "  [routerLink]="['/sessao-hist', sessao.id]">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
-                            <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
-                            <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
-                          </svg>
-                          Ver Sessão
-                        </button>
-                      </td>
-                    } @else {
-                      <td style="text-align: center;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#dc3545" class="bi bi-x-circle" viewBox="0 0 16 16">
-                          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                          <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
-                        </svg>
-                      </td>
-                      <td style= 'text-align: center'>
-                        <button type="button" class="btn btn-primary btn-sm mr-2 "  [routerLink]="['/sessao-ativa', turma.id]">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
-                            <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
-                            <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
-                          </svg>
-                          Ver Sessão
-                        </button>
-                      </td>
-                    }
-                  </tr>
+            </ng-template>
+            <ng-template #body let-sessao>
+              <tr>
+                <td style= 'text-align: center'>{{sessao.id}}</td>
+                <td>{{sessao.dataInicio | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td>{{sessao.dataFim | date:'dd/MM/yyyy HH:mm' }}</td>
+                @if (!sessao.ativo) {
+                  <td style="text-align: center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-circle" viewBox="0 0 16 16">
+                      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                      <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>
+                    </svg>
+                  </td>
+                  <td style= 'text-align: center'>
+                    <button type="button" class="btn btn-primary btn-sm mr-2 "  [routerLink]="['/sessao-hist', sessao.id]">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                        <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+                        <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+                      </svg>
+                      Ver Sessão
+                    </button>
+                  </td>
+                } @else {
+                  <td style="text-align: center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#dc3545" class="bi bi-x-circle" viewBox="0 0 16 16">
+                      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                      <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                    </svg>
+                  </td>
+                  <td style= 'text-align: center'>
+                    <button type="button" class="btn btn-primary btn-sm mr-2 "  [routerLink]="['/sessao-ativa', turma.id]">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                        <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+                        <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+                      </svg>
+                      Ver Sessão
+                    </button>
+                  </td>
                 }
-              }
-            </tbody>
-            <tfoot >
-              @if (!sessoes.length){
+              </tr>
+            </ng-template>
+
+            <ng-template #emptymessage>
                 <tr>
                   <td colspan="8" class="text-center">
                     <h4>Nenhuma Sessão encontrada!</h4>
                   </td>
                 </tr>
-              }
-            </tfoot>
-          </table>
-
+            </ng-template>
+          </p-table>
         </p-accordion-content>
       </p-accordion-panel>
     </p-accordion>

@@ -76,7 +76,11 @@ thead {
 }
 
 .table th {
-  background-color: var(--secondary);
+  background-color: var(--secondary) !important;
+}
+
+.table tr.table-gray{
+  background-color: lightgray !important;
 }
 
 .tabela-wrapper{

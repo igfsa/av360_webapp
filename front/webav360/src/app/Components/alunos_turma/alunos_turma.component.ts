@@ -34,6 +34,7 @@ import { AlunoTurmaAddModalComponent } from './modals/aluno_turma_add.component'
 import { ModalService } from '../shared/modal/modal.service';
 import { AlunoGrupoModalData, TurmaCriterioModalData, TurmaGrupoModalData, TurmaGrupoModalOut } from '../../Models/ModalData';
 import { AlertService } from '../shared/alert/alert.service';
+import { TableModule } from "primeng/table";
 
 @Component({
   selector: 'app-alunos-turma',
@@ -44,8 +45,8 @@ import { AlertService } from '../shared/alert/alert.service';
     RouterLink,
     AccordionModule,
     LoadingComponent,
-
-  ],
+    TableModule
+],
   providers: [],
   templateUrl: './alunos_turma.component.html',
   styleUrls: ['./alunos_turma.component.scss', '../../app.scss'],
@@ -55,68 +56,14 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
   @Input() turmaEditar!: Turma;
 
   public alunos: Aluno[]  = [];
-  public alunosFiltrados : Aluno[] = [];
   public criterios: Criterio[]  = [];
-  public criteriosFiltrados : Criterio[] = [];
   public grupos: Grupo[]  = [];
-  public gruposFiltrados: Grupo[]  = [];
   public sessoes: Sessao[]  = [];
-  private _filtroAlunos: string = '';
-  private _filtroCriterios: string = '';
-  private _filtroGrupos: string = '';
   public criterioIds: number[] = [];
   public turma: Turma = ({id: 0, cod: '', notaMax: 0});
   public sessaoAtiva?: Sessao;
   public alunoGrupo: AlunoGrupoNomes[] = [];
   public loading: boolean = true;
-
-  public get filtroAlunos() {
-    return this._filtroAlunos
-  }
-
-  public set filtroAlunos(value : string) {
-    this._filtroAlunos = value;
-    this.alunosFiltrados = this.filtroAlunos ? this.filtrarAlunos(this.filtroAlunos) : this.alunos;
-  }
-
-  public get filtroCriterios() {
-    return this._filtroCriterios
-  }
-
-  public set filtroCriterios(value : string) {
-    this._filtroCriterios = value;
-    this.criteriosFiltrados = this.filtroCriterios ? this.filtrarCriterios(this.filtroCriterios) : this.criterios;
-  }
-
-  public get filtroGrupos() {
-    return this._filtroGrupos
-  }
-
-  public set filtroGrupos(value : string) {
-    this._filtroGrupos = value;
-    this.gruposFiltrados = this.filtroGrupos ? this.filtrarGrupos(this.filtroGrupos) : this.grupos;
-  }
-
-  public filtrarAlunos(filtrarPor: string): Aluno[] {
-    filtrarPor = filtrarPor.toLocaleLowerCase();
-    return this.alunos.filter(
-      (aluno: { nome: string; }) => aluno.nome.toLocaleLowerCase().indexOf(filtrarPor) !== -1
-    )
-  }
-
-  public filtrarCriterios(filtrarPor: string): Criterio[] {
-    filtrarPor = filtrarPor.toLocaleLowerCase();
-    return this.criterios.filter(
-      (criterio: { nome: string; }) => criterio.nome.toLocaleLowerCase().indexOf(filtrarPor) !== -1
-    )
-  }
-
-  public filtrarGrupos(filtrarPor: string): Grupo[] {
-    filtrarPor = filtrarPor.toLocaleLowerCase();
-    return this.grupos.filter(
-      (grupo: { nome: string; }) => grupo.nome.toLocaleLowerCase().indexOf(filtrarPor) !== -1
-    )
-  }
 
   public quantidadeAlunosGrupo(grupo : number): number{
     return this.alunoGrupo.filter(q => q.grupoId == grupo).length;
@@ -179,13 +126,10 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
       this.turma = turma;
 
       this.alunos = alunos;
-      this.alunosFiltrados = alunos;
 
       this.criterios = criterios;
-      this.criteriosFiltrados = criterios;
 
       this.grupos = grupos;
-      this.gruposFiltrados = grupos;
 
       this.sessoes = sessoes.sort((a, b) => b.id - a.id);
 

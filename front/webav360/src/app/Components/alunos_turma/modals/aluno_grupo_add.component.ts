@@ -9,32 +9,49 @@ import { AlunoGrupoCheckbox } from '../../../Models/AlunoGrupoCheckbox';
 import { AlunoGrupo } from '../../../Models/AlunoGrupo';
 import { AlunoGrupoModalData } from '../../../Models/ModalData';
 import { ModalLayoutComponent } from "../../shared/modal/modal.component";
+import { TableModule } from "primeng/table";
 
 @Component({
   selector: 'app-aluno-grupo-add-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, ModalLayoutComponent],
+  imports: [CommonModule, FormsModule, ModalLayoutComponent, TableModule],
   template: `
     <app-modal-layout
     (cancelar) = "ref.close()"
     (confirmar) = "confirmar()">
-      <table id="main-table" class="table table-striped text-center table-hover">
-        <thead class="table-dark">
+
+    <div class="d-flex justify-content-end">
+
+      <input
+        pInputText
+        type="text"
+        placeholder="Buscar"
+        (input)="table.filterGlobal($event.target.value, 'contains')" />
+
+    </div>
+
+    <p-table
+      #table
+      [value]="alunosCheck"
+      dataKey="id"
+      [paginator]=true
+      [rows]=50
+      [globalFilterFields]="['nome']"
+      class="table"
+      >
+
+      <ng-template #header>
           <tr>
             <th></th>
-            <th>
-              Aluno
-            </th>
-            <th>
-              Equipe Atual
-            </th>
+            <th>Aluno</th>
+            <th>Equipe Atual</th>
           </tr>
-        </thead>
-        <tbody>
-          @for (aluno of alunosCheck; track aluno.alunoId){
+      </ng-template>
+
+      <ng-template #body let-aluno>
             <tr (click)="!aluno.desabilitado && toggleAluno(aluno)"
-                [class.table-secondary]="aluno.desabilitado"
                 style="cursor: pointer"
+                [class]="aluno.desabilitado ? 'table-gray' : ''"
                 >
               <td width="4rem">
                 <input type="checkbox" class="form-check-input"
@@ -54,10 +71,17 @@ import { ModalLayoutComponent } from "../../shared/modal/modal.component";
                 }
               </td>
             </tr>
-          }
-        </tbody>
-      </table>
-    </app-modal-layout>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="8" class="text-center">
+            <h4>Nenhuma Aluno encontrado!</h4>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </app-modal-layout>
   `
 })
 export class AlunoGrupoModalComponent implements OnInit {
