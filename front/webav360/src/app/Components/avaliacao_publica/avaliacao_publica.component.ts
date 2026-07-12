@@ -15,6 +15,7 @@ import { AvaliacaoAgrupada } from '../../Models/AvaliacaoAgrupada';
 import { AvaliacaoEnvio } from '../../Models/AvaliacaoEnvio';
 import { LoadingComponent } from "../shared/loading/loading.component";
 import { AlertService } from '../shared/alert/alert.service';
+import { TableModule } from "primeng/table";
 
 @Component({
   selector: 'app-avaliacao_publica',
@@ -22,7 +23,8 @@ import { AlertService } from '../shared/alert/alert.service';
   imports: [
     CommonModule,
     FormsModule,
-    LoadingComponent
+    LoadingComponent,
+    TableModule
 ],
   templateUrl: './avaliacao_publica.component.html',
   styleUrls: ['./avaliacao_publica.component.scss']
@@ -41,7 +43,7 @@ export class AvaliacaoPublicaComponent implements OnInit {
   avaliacoes: AvaliacaoAgrupada[] = [];
   avaliacaoEnvio!: AvaliacaoEnvio;
   indiceAtual = 0;
-  carregandoDados: boolean = true;
+  loading: boolean = true;
   carregandoAvaliacao: boolean = true;
   editarNotas: boolean = false;
 
@@ -70,7 +72,7 @@ export class AvaliacaoPublicaComponent implements OnInit {
         this.dados = dto,
         this.grupos = [...dto.grupos].sort((a, b) => a.id - b.id);
         this.criterios = [...dto.criterios].sort((a, b) => a.id - b.id);
-        this.carregandoDados = false;
+        this.loading = false;
 
         this.cdr.detectChanges();
       },

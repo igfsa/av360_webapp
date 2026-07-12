@@ -143,7 +143,7 @@ public class DashboardSessaoService(
             gruposDto.Add(new GrupoDashboardDTO
             {
                 GrupoId = 0,
-                Nome = "Sem Grupo",
+                Nome = "Sem Equipe",
                 Media = 0,
                 TotalNotas = 0,
                 Avaliaram = 0,
@@ -311,7 +311,7 @@ public class DashboardSessaoService(
                 gruposDto.Add(new GrupoDashboardDTO
                 {
                     GrupoId = 0,
-                    Nome = "Sem Grupo",
+                    Nome = "Sem Equipe",
                     Media = 0,
                     TotalNotas = 0,
                     Avaliaram = 0,

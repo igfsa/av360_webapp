@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, DestroyRef, Inject, OnDestroy, OnInit, PL
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TableModule } from "primeng/table";
 
 import { LoadingComponent } from '../shared/loading/loading.component';
 import { AuthService } from '../../auth/auth.service';
@@ -19,7 +20,8 @@ import { AlertService } from '../shared/alert/alert.service';
   imports: [
     CommonModule,
     FormsModule,
-    LoadingComponent
+    LoadingComponent,
+    TableModule
 ],
   templateUrl: './criterios.component.html',
   styleUrls: ['./criterios.component.scss', '../../app.scss'],
@@ -27,25 +29,7 @@ import { AlertService } from '../shared/alert/alert.service';
 export class CriteriosComponent implements OnInit, OnDestroy {
 
   public criterios: Criterio[]  = [];
-  public criteriosFiltrados : Criterio[] = [];
-  private _filtroLista: string = '';
   public loading: boolean = true;
-
-  public get filtroLista() {
-    return this._filtroLista
-  }
-
-  public set filtroLista(value : string) {
-    this._filtroLista = value;
-    this.criteriosFiltrados = this.filtroLista ? this.filtrarCriterios(this.filtroLista) : this.criterios;
-  }
-
-  public filtrarCriterios(filtrarPor: string): any {
-    filtrarPor = filtrarPor.toLocaleLowerCase();
-    return this.criterios.filter(
-      (criterio: { nome: string; }) => criterio.nome.toLocaleLowerCase().indexOf(filtrarPor) !== -1
-    )
-  }
 
   Id: string = '';
   Nome: string = '';
@@ -86,8 +70,6 @@ export class CriteriosComponent implements OnInit, OnDestroy {
   public getCriterios (): void{
     this.criterioService.getCriterios().subscribe((criterios) => {
         this.criterios = criterios;
-        this.criteriosFiltrados = this.criterios;
-
         this.loading = false;
         this.cdr.detectChanges();
       })

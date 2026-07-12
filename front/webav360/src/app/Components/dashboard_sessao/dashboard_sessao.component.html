@@ -40,46 +40,57 @@
     </div>
   </div>
 
-  <div class="tabela-wrapper">
-    <table class="table table-striped text-center table-hover">
+  <p-table
+    #table_criterios
+    [value]="dashboard.criterios"
+    dataKey="id"
+    [paginator]=true
+    [rows]=50
+    removableSort
+    class="table"
+    >
 
-      <thead class="table-dark">
-        <tr class="first-row">
+    <ng-template #header>
+      <tr>
+        <th style="width: 70%;" pSortableColumn="nome">
+          Critério
+          <p-sortIcon field="nome" />
+        </th>
+        <th style="width: 15%;" pSortableColumn="media">
+          Média Global
+          <p-sortIcon field="media" />
+        </th>
+        <th style="width: 15%;">
+          Total de notas
+        </th>
+      </tr>
+    </ng-template>
 
-          <th>
-            Critério
-          </th>
-          <th>
-            Média Global
-          </th>
-          <th>
-            Total de notas
-          </th>
+    <ng-template #body let-criterio>
+      <tr>
+        <td>
+          {{criterio.nome}}
+        </td>
 
-        </tr>
-      </thead>
+        <td>
+          {{criterio.mediaGlobal | number:'1.0-1'}}
+        </td>
 
-      <tbody>
-        @for (criterio of dashboard.criterios; track criterio.criterioId) {
-          <tr>
+        <td>
+          {{criterio.totalNotas}}
+        </td>
+      </tr>
+    </ng-template>
 
-            <td style="width: 70%;">
-              {{criterio.nome}}
-            </td>
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="8" class="text-center">
+          <h4>Nenhum Critério encontrado!</h4>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
 
-            <td style="width: 15%;">
-              {{criterio.mediaGlobal | number:'1.0-1'}}
-            </td>
-
-            <td style="width: 15%;">
-              {{criterio.totalNotas}}
-            </td>
-          </tr>
-        }
-      </tbody>
-
-    </table>
-  </div>
 
 
   <p-accordion [multiple]="true" class="w-full max-w-md">
@@ -124,38 +135,58 @@
             </div>
           </div>
 
-          <div class="tabela-wrapper">
-            <table class="table table-striped text-center table-hover">
-              <thead class="table-dark">
-                <tr>
-                  <th>Nome</th>
-                  <th>Avaliou</th>
-                  <th>Média</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (aluno of grupo.alunos; track aluno.alunoId){
-                    <tr>
-                      <td style="width: 70%;">{{aluno.nome}}</td>
-                      <td style="width: 15%;">
-                        @if (aluno.avaliou) {
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-circle" viewBox="0 0 16 16">
-                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                            <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>
-                          </svg>
-                        } @else {
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#dc3545" class="bi bi-x-circle" viewBox="0 0 16 16">
-                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
-                          </svg>
-                        }
-                      </td>
-                      <td style="width: 15%;">{{aluno.media | number:'1.0-1'}}</td>
-                    </tr>
-                }
-              </tbody>
-            </table>
-          </div>
+          <p-table
+            #table
+            [value]="grupo.alunos"
+            dataKey="id"
+            [paginator]=true
+            [rows]=50
+            removableSort
+            class="table"
+            >
+
+            <ng-template #header>
+              <tr>
+                <th style="width: 70%;" pSortableColumn="nome" >
+                  Nome
+                  <p-sortIcon field="nome"/>
+                </th>
+                <th style="width: 15%;">Avaliou</th>
+                <th style="width: 15%;" pSortableColumn="media" >
+                  Nota
+                  <p-sortIcon field="media"/>
+                </th>
+              </tr>
+            </ng-template>
+
+            <ng-template #body let-aluno>
+              <tr>
+                <td>{{aluno.nome}}</td>
+                <td>
+                  @if (aluno.avaliou) {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-circle" viewBox="0 0 16 16">
+                      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                      <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>
+                    </svg>
+                  } @else {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#dc3545" class="bi bi-x-circle" viewBox="0 0 16 16">
+                      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                      <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                    </svg>
+                  }
+                </td>
+                <td>{{aluno.media | number:'1.0-1'}}</td>
+              </tr>
+            </ng-template>
+
+            <ng-template #emptymessage>
+              <tr>
+                  <td colspan="8" class="text-center">
+                    <h4>Alunos não encontrados!</h4>
+                  </td>
+              </tr>
+            </ng-template>
+          </p-table>
         </p-accordion-content>
       </p-accordion-panel>
     }

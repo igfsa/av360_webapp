@@ -10,6 +10,7 @@ import { DashboardSessao } from '../../Models/Dashboard/DashboardSessao';
 import { GrupoDashboard } from '../../Models/Dashboard/GrupoDashboard';
 import { FormsModule } from '@angular/forms';
 import { DashboardViewMode } from '../../Models/Dashboard/DashboardViewMode.enum';
+import { TableModule } from "primeng/table";
 
 type GrupoDashboardView = GrupoDashboard & {
   chartMedia?: any;
@@ -27,6 +28,7 @@ type GrupoDashboardView = GrupoDashboard & {
     CardModule,
     SelectButtonModule,
     FormsModule,
+    TableModule
 ],
   templateUrl: './dashboard_sessao.component.html',
   styleUrls: ['./dashboard_sessao.component.scss','../../app.scss']

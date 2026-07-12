@@ -14,38 +14,56 @@
       </button>
     </div>
 
-    <input type="text" class="form-control w-100 h-100 m-2" style = "font-size: 1.6rem;" placeholder="Filtrar" [(ngModel)]="filtroLista">
+    <div class="d-flex justify-content-end">
 
-    <div class="tabela-wrapper">
-      <table id="main-table" class="table table-striped text-center table-hover">
-        <thead class="table-dark">
-          <tr>
-            <th style = 'width: 10%; text-align: center;'>#</th>
-            <th>Nome</th>
-            <th style = 'width: 20%; text-align: center;'>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          @if (professoresFiltrados && professores.length){
-            @for (professor of professoresFiltrados; track professor.id){
-              <tr>
+      <input
+        pInputText
+        type="text"
+        placeholder="Buscar"
+        (input)="table.filterGlobal($event.target.value, 'contains')" />
+
+    </div>
+
+    <p-table
+      #table
+      [value]="professores"
+      dataKey="id"
+      [paginator]=true
+      [rows]=50
+      [globalFilterFields]="['nome']"
+      removableSort
+      class="table"
+      >
+
+
+      <ng-template #header>
+        <tr>
+          <th style = 'width: 10%; text-align: center;' pSortableColumn="id">
+            #
+            <p-sortIcon field="id"/>
+          <th pSortableColumn="nome">
+            Nome
+            <p-sortIcon field="nome"/>
+          </th>
+          <th style = 'width: 40%;'>Usuário</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-professor>
+        <tr>
                 <td style= 'text-align: center'>{{professor.id}}</td>
                 <td>{{professor.nome}}</td>
                 <td>{{professor.userName}}</td>
-              </tr>
-            }
-          }
-        </tbody>
-        <tfoot >
-          @if (!professoresFiltrados.length){
-            <tr>
-              <td colspan="8" class="text-center">
-                <h4>Nenhum professor encontrado!</h4>
-              </td>
-            </tr>
-          }
-        </tfoot>
-      </table>
-    </div>
+        </tr>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="8" class="text-center">
+            <h4>Nenhum Professor encontrado!</h4>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
   }
 </div>

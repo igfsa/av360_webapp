@@ -1,6 +1,8 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ChangeDetectorRef, Component, DestroyRef, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TableModule } from "primeng/table";
+
 
 import { AuthService } from '../../auth/auth.service';
 import { Professor } from '../../Models/Professor';
@@ -18,7 +20,8 @@ import { AlertService } from '../shared/alert/alert.service';
   imports: [
     CommonModule,
     FormsModule,
-    LoadingComponent
+    LoadingComponent,
+    TableModule
 ],
   templateUrl: './professores.component.html',
   styleUrls: ['./professores.component.scss']
@@ -26,25 +29,7 @@ import { AlertService } from '../shared/alert/alert.service';
 export class ProfessoresComponent implements OnInit {
 
   public professores: Professor[]  = [];
-  public professoresFiltrados : Professor[] = [];
-  private _filtroLista: string = '';
   public loading: boolean = true;
-
-  public get filtroLista() {
-    return this._filtroLista
-  }
-
-  public set filtroLista(value : string) {
-    this._filtroLista = value;
-    this.professoresFiltrados = this.filtroLista ? this.filtrarProfessores(this.filtroLista) : this.professores;
-  }
-
-  public filtrarProfessores(filtrarPor: string): any {
-    filtrarPor = filtrarPor.toLocaleLowerCase();
-    return this.professores.filter(
-      (professor: { nome: string; }) => professor.nome.toLocaleLowerCase().indexOf(filtrarPor) !== -1
-    )
-  }
 
   constructor(
     private professorService: ProfessorService,
@@ -82,8 +67,6 @@ export class ProfessoresComponent implements OnInit {
   public getProfessores (): void{
     this.professorService.getProfessores().subscribe((professores) => {
         this.professores = professores;
-        this.professoresFiltrados = this.professores;
-
         this.loading = false;
         this.cdr.detectChanges();
       })

@@ -1,5 +1,5 @@
 <div class="container">
-  @if(carregandoDados){
+  @if(loading){
     <app-loading />
   } @else {
     <div class="d-flex justify-content-between">
@@ -34,7 +34,9 @@
         <h2>Nota Máxima: {{ dados.turma.notaMax }}</h2>
       </div>
       <div>
-      @if (!carregandoAvaliacao) {
+      @if (carregandoAvaliacao) {
+        <app-loading />
+      } @else {
         <h3>Olá {{alunoLogado.nome}}! </h3>
         <h3>Você está avaliando {{ atual.avaliado.nome }}
           <br> Estudante {{indiceAtual + 1}} de {{avaliacoes.length}} </h3>
@@ -53,8 +55,6 @@
           }
 
           <button class="btn btn-primary" (click)="proximo()">Próximo</button>
-      }@else {
-        <span>Buscando Dados de Avaliação...</span>
       }
      </div>
     }
@@ -65,11 +65,18 @@
         <h2>Resumo</h2>
         <div class="avaliacao-container">
 
-          <div class="tabela-wrapper">
-            <table class="tabela-avaliacao table text-center table-hover">
+          <p-table
+            #table
+            [value]="avaliacoes"
+            dataKey="avaliadoId"
+            [paginator]=true
+            [rows]=50
+            removableSort
+            class="table"
+            >
 
-              <thead class="table-dark">
-                <tr class="first-row">
+            <ng-template #header >
+               <tr class="first-row">
                   <th class="sticky-col nome-col">Aluno</th>
 
                   @for (criterio of criterios; track criterio.id) {
@@ -80,33 +87,36 @@
 
                   <th class="acao-col">Ação</th>
                 </tr>
-              </thead>
+            </ng-template>
 
-              <tbody>
-                @for (avaliacao of avaliacoes; track avaliacao.avaliadoId; let a = $index) {
-                  <tr>
+            <ng-template #body let-avaliacao let-rowIndex="rowIndex">
+              <tr>
 
-                    <td class="sticky-col nome-col">
-                      {{ avaliacao.avaliado.nome }}
-                    </td>
+                <td class="sticky-col nome-col">
+                  {{ avaliacao.avaliado.nome }}
+                </td>
 
-                    @for (criterio of avaliacao.criterios; track criterio.criterioId) {
-                      <td class="nota-col">
-                        {{criterio.nota}}
-                      </td>
-                    }
-
-                    <td class="acao-col">
-                      <button class="btn-editar" (click)="editar(a)">Editar</button>
-                    </td>
-
-                  </tr>
+                @for (criterio of avaliacao.criterios; track criterio.criterioId) {
+                  <td class="nota-col">
+                    {{criterio.nota}}
+                  </td>
                 }
-              </tbody>
 
-            </table>
-          </div>
+                <td class="acao-col">
+                  <button class="btn-editar" (click)="editar(rowIndex)">Editar</button>
+                </td>
 
+              </tr>
+            </ng-template>
+
+            <ng-template #emptymessage>
+              <tr>
+                <td colspan="8" class="text-center">
+                  <h4>Nenhum dado encontrado!</h4>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
         </div>
 
         <button class="btn btn-primary" (click)="enviar()">Enviar avaliação</button>
@@ -118,5 +128,5 @@
       </div>
     } @else {
       <p>Ocorreu um erro</p>
-    }} 
+    }}
 </div>
