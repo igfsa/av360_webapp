@@ -14,9 +14,7 @@ export interface ModalOptions {
   modal?: boolean;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 
 export class ModalService {
 

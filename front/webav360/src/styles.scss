@@ -182,6 +182,10 @@ p-dialog .p-dialog-title {
   border: none;
   width: 20vw;
 
+  .p-drawer-content {
+    padding: 0 !important
+  }
+
   .p-drawer-header {
     color: var(--dark);
     background-color: var(--primary);

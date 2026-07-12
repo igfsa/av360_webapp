@@ -6,6 +6,7 @@ import { catchError, forkJoin, map, ObservableInput, of  } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AccordionModule } from 'primeng/accordion';
+import { TableModule } from "primeng/table";
 
 import { LoadingComponent } from '../shared/loading/loading.component';
 
@@ -34,7 +35,6 @@ import { AlunoTurmaAddModalComponent } from './modals/aluno_turma_add.component'
 import { ModalService } from '../shared/modal/modal.service';
 import { AlunoGrupoModalData, TurmaCriterioModalData, TurmaGrupoModalData, TurmaGrupoModalOut } from '../../Models/ModalData';
 import { AlertService } from '../shared/alert/alert.service';
-import { TableModule } from "primeng/table";
 
 @Component({
   selector: 'app-alunos-turma',

@@ -33,7 +33,11 @@
       </p>
     </div>
 
-    <app-dashboard_sessao [dashboard]="dashboard"/>
+    @defer (when dashboard) {
+      <app-dashboard_sessao [dashboard]="dashboard"/>
+    } @placeholder {
+      <app-loading />
+    }
 
     <button class="back-button" [routerLink]="['/alunos-turma', sessao.turmaId]" routerLinkActive="active">
       <svg xmlns="http://www.w3.org/2000/svg" width="2rem" height="2rem" fill="#EDE9FE" stroke="#EDE9FE" class="bi bi-arrow-return-left" viewBox="0 0 16 16">

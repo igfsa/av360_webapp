@@ -45,7 +45,11 @@
         </button>
       </div>
     </div>
-    <app-dashboard_sessao [dashboard]="dashboard"/>
+    @defer (when dashboard) {
+      <app-dashboard_sessao [dashboard]="dashboard"/>
+    } @placeholder {
+      <app-loading />
+    }
   }
 
   <button class="back-button" [routerLink]="['/alunos-turma', turma.id]" routerLinkActive="active">
