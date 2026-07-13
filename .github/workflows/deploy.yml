@@ -1,0 +1,22 @@
+name: Deploy Pipeline
+
+on:
+  push:
+    branches: [ main, staging ] 
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+        
+      - name: Deploy to Staging
+        if: github.ref == 'refs/heads/staging'
+        run: fly deploy --app meu-back-staging 
+
+      - name: Deploy to Production
+        if: github.ref == 'refs/heads/main'
+        run: fly deploy --app meu-back-prod 
