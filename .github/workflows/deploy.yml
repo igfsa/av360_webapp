@@ -2,29 +2,40 @@ name: Deploy Pipeline
 
 on:
   push:
-    branches: [ main, homolog ]
+    branches:
+      - main
+      - homolog
+
+permissions:
+  contents: read
 
 jobs:
   deploy-backend:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Setup Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
 
-      - name: Deploy to Homolog
+      - name: Deploy Backend - Homolog
         if: github.ref == 'refs/heads/homolog'
         working-directory: ./back
         run: |
-          /home/runner/.fly/bin/flyctl deploy --app webav-360-homolog --config fly.toml
+          flyctl deploy \
+            --app webav-360-homolog \
+            --config fly.toml
         env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_HOMOLOG }}
 
-      - name: Deploy to Production
+      - name: Deploy Backend - Production
         if: github.ref == 'refs/heads/main'
         working-directory: ./back
         run: |
-          /home/runner/.fly/bin/flyctl deploy --app webav-360 --config fly.toml
+          flyctl deploy \
+            --app webav-360 \
+            --config fly.toml
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
