@@ -233,7 +233,7 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseCors("ProductionPolicy");
+    app.UseCors("ProductionPolicy, HomologPolicy");
 }
 
 app.UseRouting();
