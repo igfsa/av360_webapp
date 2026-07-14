@@ -13,10 +13,10 @@ jobs:
       - name: Setup Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
         
-      - name: Deploy to Staging
-        if: github.ref == 'refs/heads/staging'
-        run: fly deploy --app meu-back-staging 
+      - name: Deploy to Homolog
+        if: github.ref == 'refs/heads/homolog'
+        run: fly deploy --app webav-360-homolog
 
       - name: Deploy to Production
         if: github.ref == 'refs/heads/main'
-        run: fly deploy --app meu-back-prod 
+        run: fly deploy --app webav-360
