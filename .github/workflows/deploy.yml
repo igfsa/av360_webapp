@@ -15,8 +15,10 @@ jobs:
         
       - name: Deploy to Homolog
         if: github.ref == 'refs/heads/homolog'
-        run: fly deploy --app webav-360-homolog
+        working-directory: ./back
+        run: fly deploy --app webav-360-homolog --token ${{ secrets.FLY_API_TOKEN }}
 
       - name: Deploy to Production
         if: github.ref == 'refs/heads/main'
-        run: fly deploy --app webav-360
+        working-directory: ./back
+        run: fly deploy --app webav-360 --token ${{ secrets.FLY_API_TOKEN }}
