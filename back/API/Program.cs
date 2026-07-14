@@ -220,9 +220,9 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 
 app.UseHttpsRedirection();
 
-app.UseCors("DefaultCorsPolicy");
-
 app.UseRouting();
+
+app.UseCors("DefaultCorsPolicy");
 
 app.UseAuthentication();
 
@@ -266,7 +266,10 @@ app.Use(async (context, next) =>
         "img-src 'self' data:; " +
         "script-src 'self'; " +
         "style-src 'self' 'unsafe-inline';" +
-        "connect-src 'self' https://webav360.riss.com.br http://localhost:4000 https://av360-webapp-homolog.vercel.app;";
+        "connect-src 'self' https://webav360.riss.com.br " 
+        + "http://localhost:4000 " 
+        + "https://av360-webapp-homolog.vercel.app "
+        + "https://webav-360-homolog.fly.dev;";
 
     await next();
 });
