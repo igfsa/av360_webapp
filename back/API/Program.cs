@@ -39,25 +39,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog();
 
+var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() 
+                     ?? ["https://webav360.riss.com.br"];
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("DevelopmentPolicy", policy =>
-        policy.WithOrigins("http://localhost:4000")
-              .AllowAnyHeader()
+options.AddPolicy("DefaultCorsPolicy", policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyMethod()
-              .AllowCredentials());
-
-    options.AddPolicy("ProductionPolicy", policy =>
-        policy.WithOrigins("https://webav360.riss.com.br", "https://av360-webapp.vercel.app")
               .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials());
-
-    options.AddPolicy("HomologPolicy", policy =>
-        policy.WithOrigins("https://av360-webapp-homolog.vercel.app")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials());
+              .AllowCredentials(); 
+    });
 });
 
 // Add services to the container.
@@ -215,7 +208,7 @@ if (args.Contains("--seed"))
 }
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 {
     _ = app.MapOpenApi();
 
@@ -227,14 +220,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseCors("DevelopmentPolicy");
-}
-else
-{
-    app.UseCors("ProductionPolicy, HomologPolicy");
-}
+app.UseCors("DefaultCorsPolicy");
 
 app.UseRouting();
 
