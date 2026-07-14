@@ -10,7 +10,7 @@ primary_region = 'gru'
   dockerfile = 'Dockerfile'
 
 [env]
-  DOTNET_ENVIRONMENT = 'Production'
+  ASPNETCORE_ENVIRONMENT = 'Production'
   ASPNETCORE_URLS = 'http://+:8080'
 
 [http_service]
