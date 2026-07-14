@@ -54,7 +54,7 @@ builder.Services.AddCors(options =>
               .AllowCredentials());
 
     options.AddPolicy("HomologPolicy", policy =>
-        policy.WithOrigins("https://av360-webapp-homolog.vercel.app/")
+        policy.WithOrigins("https://av360-webapp-homolog.vercel.app")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials());
