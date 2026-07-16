@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 namespace Application.Services;
 
 public class AvaliacaoService(IGeralPersist geralPersist,
-                    ISessaoService sessaoService,
                     ISessaoPersist sessaoPersist,
                     IAlunoService alunoService,
                     IAlunoPersist alunoPersist,
@@ -22,7 +21,6 @@ public class AvaliacaoService(IGeralPersist geralPersist,
                     ) : IAvaliacaoService
 {
     private readonly IGeralPersist _geralPersist = geralPersist;
-    private readonly ISessaoService _sessaoService = sessaoService;
     private readonly ISessaoPersist _sessaoPersist = sessaoPersist;
     private readonly IAlunoService _alunoService = alunoService;
     private readonly IAlunoPersist _alunoPersist = alunoPersist;
@@ -114,7 +112,8 @@ public class AvaliacaoService(IGeralPersist geralPersist,
                 grupo: await _grupoPersist.GetGrupoIdAsync(model.GrupoId)
                     ?? throw new NotFoundException("Grupo não encontrado"),
                 deviceHash: model.DeviceHash,
-                dataEnvio: DateTime.UtcNow
+                dataEnvio: DateTime.UtcNow,
+                comentarioAluno: model.ComentarioAluno
             );
             
             _ = await _geralPersist.SaveChangesAsync();
@@ -169,7 +168,7 @@ public class AvaliacaoService(IGeralPersist geralPersist,
                         grupoId: model.GrupoId,
                         nota: np.Nota
                     );
-            await _dashboardCache.AtualizarAlunoAsync(model.SessaoId, model.AvaliadorId, model.GrupoId);
+            await _dashboardCache.AtualizarAlunoAsync(model.SessaoId, model.AvaliadorId, model.GrupoId, model.ComentarioAluno);
             
             return resultado;
         }

@@ -15,7 +15,8 @@ public class ResultadoNotaFinal
         AvaliadorNome = avaliador.Nome;
         GrupoResId = grupo.Id;
         GrupoNome = grupo.Nome;
-        DataEnvio = nFinal.DataEnvio;        
+        DataEnvio = nFinal.DataEnvio;
+        ComentarioAluno = nFinal.ComentarioAluno;
     }
     public int Id { get;  private set; }
     public int NotaFinalId { get; private set; }
@@ -26,6 +27,7 @@ public class ResultadoNotaFinal
     public int GrupoResId { get; private set; }
     public string GrupoNome { get; private set; } = null!;
     public DateTime DataEnvio { get; private set; }
+    public string? ComentarioAluno { get; set; }
     private readonly List<ResultadoNotaParcial> _notasParciais = [];
     public IReadOnlyCollection<ResultadoNotaParcial> NotasParciais => _notasParciais;
 

@@ -9,4 +9,5 @@ public class AlunoDashboardDTO
     public List<CriterioAlunoDashboardDTO> CriterioAluno { get; set; } = [];
     public bool Avaliou { get; set; }
     public int TotalNotas { get; set; }
+    public string? Comentario { get; set; }
 }

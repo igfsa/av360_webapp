@@ -8,4 +8,5 @@ public class AvaliacaoConsolidadaExportDTO
     [Column(TypeName = "decimal(5,2)")]
     public decimal Nota { get; set; }
     public bool Avaliou { get; set; } = false;
+    public string? Comentario { get; set; }
 }

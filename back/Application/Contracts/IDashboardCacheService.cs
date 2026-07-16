@@ -8,5 +8,5 @@ public interface IDashboardCacheService
     Task SetAsync(int sessaoId, DashboardSessaoDTO dto);
     Task RemoveAsync(int sessaoId);
     Task AtualizarNotaAsync(int sessaoId, int alunoId, int criterioId, int grupoId, decimal nota);
-    Task AtualizarAlunoAsync(int sessaoId, int alunoId, int grupoId);
+    Task AtualizarAlunoAsync(int sessaoId, int alunoId, int grupoId, string? comentario);
 }

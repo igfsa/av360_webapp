@@ -5,7 +5,7 @@ namespace Domain.Entities;
 public class NotaFinal
 {
     private NotaFinal() { }
-    public NotaFinal(Sessao sessao, Aluno avaliador, Grupo grupo, string deviceHash, DateTime dataEnvio)
+    public NotaFinal(Sessao sessao, Aluno avaliador, Grupo grupo, string deviceHash, DateTime dataEnvio, string? comentarioAluno)
     {
         Sessao = sessao
             ?? throw new BusinessException("Sessão é obrigatória");
@@ -21,6 +21,7 @@ public class NotaFinal
         
         DeviceHash = deviceHash;
         DataEnvio = dataEnvio;
+        ComentarioAluno = comentarioAluno;
     }
     public int Id { get; private set; }
     public int SessaoId { get; private set; }
@@ -31,6 +32,7 @@ public class NotaFinal
     public Grupo Grupo { get; private set; } = null!;
     public string DeviceHash { get; private set; } = null!;
     public DateTime DataEnvio { get; private set; }
+    public string? ComentarioAluno { get; private set; }
     private readonly List<NotaParcial> _notasParcial = [];
     public IReadOnlyCollection<NotaParcial> NotasParcial => _notasParcial;
 
@@ -41,7 +43,6 @@ public class NotaFinal
         if (nota < 1 || nota > Sessao.Turma.NotaMax)
             throw new BusinessException($"Nota deve estar entre 1 e {Sessao.Turma.NotaMax}");
         var np = new NotaParcial(this, avaliado, criterio, nota);
-            Console.WriteLine(np);
         _notasParcial.Add(np);
     }
 }

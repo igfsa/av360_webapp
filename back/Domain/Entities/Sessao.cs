@@ -25,12 +25,11 @@ public class Sessao
     private readonly List<NotaFinal> _notasFinais = [];
     public IReadOnlyCollection<NotaFinal> Notasfinais => _notasFinais;
 
-    public NotaFinal AdicionarNotaFinal(Aluno avaliador, Grupo grupo, string deviceHash, DateTime dataEnvio)
+    public NotaFinal AdicionarNotaFinal(Aluno avaliador, Grupo grupo, string deviceHash, DateTime dataEnvio, string? comentarioAluno)
     {
         if (_notasFinais.Any(nf => nf.AvaliadorId == avaliador.Id || nf.DeviceHash == deviceHash))
             throw new BusinessException($"Avaliador ou dispositivo já registrados nessa sessão.");
-        var nf = new NotaFinal(this, avaliador, grupo, deviceHash, dataEnvio);
-            Console.WriteLine(nf);
+        var nf = new NotaFinal(this, avaliador, grupo, deviceHash, dataEnvio, comentarioAluno);
         _notasFinais.Add(nf);
         
         return nf;
@@ -40,11 +39,6 @@ public class Sessao
     {
         if (_notasFinais.Any(nf => nf.Avaliador == avaliador))
             throw new BusinessException("Aluno já avaliou nesta sessão");
-            
-        Console.WriteLine(deviceHash);
-        Console.WriteLine(_notasFinais.FirstOrDefault(nf => nf.DeviceHash == deviceHash));
-        Console.WriteLine(_notasFinais.Any(nf => nf.DeviceHash == deviceHash));
-        Console.WriteLine(_notasFinais.Count);
         
         if (_notasFinais.FirstOrDefault(nf => nf.DeviceHash == deviceHash) != null)
             throw new BusinessException("Dispositivo já usado nesta sessão");

@@ -3,6 +3,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
+import { TableModule } from "primeng/table";
+import { TextareaModule } from 'primeng/textarea';
+
 import { AvaliacaoPublica } from '../../Models/AvaliacaoPublica';
 import { AvaliacaoService } from '../../Service/Avaliacao.service';
 import { Grupo } from '../../Models/Grupo';
@@ -15,7 +18,6 @@ import { AvaliacaoAgrupada } from '../../Models/AvaliacaoAgrupada';
 import { AvaliacaoEnvio } from '../../Models/AvaliacaoEnvio';
 import { LoadingComponent } from "../shared/loading/loading.component";
 import { AlertService } from '../shared/alert/alert.service';
-import { TableModule } from "primeng/table";
 
 @Component({
   selector: 'app-avaliacao_publica',
@@ -24,7 +26,8 @@ import { TableModule } from "primeng/table";
     CommonModule,
     FormsModule,
     LoadingComponent,
-    TableModule
+    TableModule,
+    TextareaModule,
 ],
   templateUrl: './avaliacao_publica.component.html',
   styleUrls: ['./avaliacao_publica.component.scss']
@@ -148,6 +151,10 @@ export class AvaliacaoPublicaComponent implements OnInit {
     }
   }
 
+  public confirmarNotas() {
+    this.step = 5;
+  }
+
   public enviar() {
     const itens = this.desagruparAvaliacao(this.avaliacoes);
 
@@ -155,7 +162,7 @@ export class AvaliacaoPublicaComponent implements OnInit {
 
     this.avaliacaoService.postAvaliacao(this.avaliacaoEnvio).subscribe({
       next: (imported) =>{
-        this.step = 5;
+        this.step = 6;
         this.cdr.detectChanges();
         this.alert.info(
           `${imported.total} notas processadas!<br>

@@ -147,22 +147,23 @@
 
             <ng-template #header>
               <tr>
-                <th style="width: 70%;" pSortableColumn="nome" >
+                <th pSortableColumn="nome" >
                   Nome
                   <p-sortIcon field="nome"/>
                 </th>
-                <th style="width: 15%;">Avaliou</th>
-                <th style="width: 15%;" pSortableColumn="media" >
+                <th style="width: 15%; text-align: center;">Avaliou</th>
+                <th style="width: 15%; text-align: center;" pSortableColumn="media" >
                   Nota
                   <p-sortIcon field="media"/>
                 </th>
+                <th style="width: 15%; text-align: center;">Ações</th>
               </tr>
             </ng-template>
 
             <ng-template #body let-aluno>
               <tr>
                 <td>{{aluno.nome}}</td>
-                <td>
+                <td style="text-align: center;">
                   @if (aluno.avaliou) {
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#198754" class="bi bi-check-circle" viewBox="0 0 16 16">
                       <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
@@ -175,7 +176,16 @@
                     </svg>
                   }
                 </td>
-                <td>{{aluno.media | number:'1.0-1'}}</td>
+                <td style="text-align: center;">{{aluno.media | number:'1.0-1'}}</td>
+                <td style="text-align: center;">
+                  @if (aluno.comentario){
+                    <button type="button" class="btn btn-primary m-1" (click)="verComentario(aluno);">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" fill="currentColor" class="bi bi-chat-left-text-fill" viewBox="0 0 16 16">
+                        <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4.414a1 1 0 0 0-.707.293L.854 15.146A.5.5 0 0 1 0 14.793zm3.5 1a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1zm0 2.5a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1zm0 2.5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1z"/>
+                      </svg>
+                    </button>
+                  }
+                </td>
               </tr>
             </ng-template>
 

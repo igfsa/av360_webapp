@@ -4,6 +4,7 @@ using StackExchange.Redis;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Formatting.Compact;
+using Serilog.Events;
 
 using API.Hubs;
 using API.Notifier;
@@ -15,7 +16,6 @@ using Domain.Entities;
 using Persistence;
 using Persistence.Context;
 using Persistence.Contracts;
-using Serilog.Events;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -186,6 +186,15 @@ builder.Services.AddAuthentication("Bearer")
                 {
                     context.Token = token;
                 }
+                else
+                {
+                    string authorization = context.Request.Headers["Authorization"];
+
+                    if (!string.IsNullOrEmpty(authorization) && authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                    {
+                        context.Token = authorization.Substring("Bearer ".Length).Trim();
+                    }
+                }
 
                 return Task.CompletedTask;
             }
@@ -266,7 +275,7 @@ app.Use(async (context, next) =>
         "img-src 'self' data:; " +
         "script-src 'self'; " +
         "style-src 'self' 'unsafe-inline';" +
-        "connect-src 'self' https://webav360.riss.com.br http://localhost:4000 https://av360-webapp-homolog.vercel.app https://webav-360-homolog.fly.dev;";
+        "connect-src 'self' https://webav360.riss.com.br http://localhost:4000 http://localhost:5074 https://av360-webapp-homolog.vercel.app https://webav-360-homolog.fly.dev;";
 
     await next();
 });

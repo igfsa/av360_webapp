@@ -11,6 +11,7 @@ public class ResultadoNotaFinalDTO
     public int GrupoResId { get;  set; }
     public string GrupoNome { get;  set; } = null!;
     public DateTime DataEnvio { get; set; }
+    public string? ComentarioAluno { get; set; }
     private readonly List<ResultadoNotaParcialDTO> _notasParciais = [];
     public IReadOnlyCollection<ResultadoNotaParcialDTO> NotasParciais => _notasParciais;
 }

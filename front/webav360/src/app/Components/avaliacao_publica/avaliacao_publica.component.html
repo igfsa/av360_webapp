@@ -72,12 +72,13 @@
             [paginator]=true
             [rows]=50
             removableSort
+            [scrollable]="true"
             class="table"
             >
 
             <ng-template #header >
                <tr class="first-row">
-                  <th class="sticky-col nome-col">Aluno</th>
+                  <th class="sticky-col nome-col" pFrozenColumn>Aluno</th>
 
                   @for (criterio of criterios; track criterio.id) {
                     <th class="criterio-col">
@@ -92,7 +93,7 @@
             <ng-template #body let-avaliacao let-rowIndex="rowIndex">
               <tr>
 
-                <td class="sticky-col nome-col">
+                <td class="sticky-col nome-col" pFrozenColumn>
                   {{ avaliacao.avaliado.nome }}
                 </td>
 
@@ -119,9 +120,21 @@
           </p-table>
         </div>
 
-        <button class="btn btn-primary" (click)="enviar()">Enviar avaliação</button>
+        <button class="btn btn-primary" (click)="confirmarNotas()">Confirmar</button>
       </div>
     }  @else if(step == 5){
+      <div>
+        <h2>Equipe: {{grupoSelecionado.nome}}</h2>
+        <h3>Olá {{alunoLogado.nome}}! </h3>
+        <div>
+          <h2>Comentários</h2>
+          <label>Mensagem:
+              <textarea rows="5" cols="30" pTextarea [(ngModel)]="avaliacaoEnvio.comentarioAluno" fluid></textarea>
+          </label>
+        <button class="btn btn-primary" (click)="enviar()">Enviar avaliação</button>
+      </div>
+      </div>
+    }  @else if(step == 6){
       <div>
         <h3>Avaliação enviada com sucesso!</h3>
         <p>Obrigado por participar.</p>

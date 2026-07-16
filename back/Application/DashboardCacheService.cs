@@ -92,7 +92,7 @@ public class DashboardCacheService(IConnectionMultiplexer connection) : IDashboa
         await SetAsync(sessaoId, dto);
     }
 
-    public async Task AtualizarAlunoAsync(int sessaoId, int alunoId, int grupoId)
+    public async Task AtualizarAlunoAsync(int sessaoId, int alunoId, int grupoId, string? comentario)
     {
         var dto = await GetAsync(sessaoId);
         if (dto == null)
@@ -110,6 +110,7 @@ public class DashboardCacheService(IConnectionMultiplexer connection) : IDashboa
             return;
 
         aluno.Avaliou = true;
+        aluno.Comentario = comentario;
 
         var avaliaramGrupo = grupo.Alunos.Count(a => a.Avaliou);
 

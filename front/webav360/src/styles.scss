@@ -198,3 +198,13 @@ p-dialog .p-dialog-title {
     color: var(--dark);
   }
 }
+
+p-scrolltop .top-button {
+  background: var(--secondary);
+  border-color: transparent;
+}
+
+p-scrolltop .top-button :hover{
+  background: var(--primary);
+  border-color: transparent;
+}

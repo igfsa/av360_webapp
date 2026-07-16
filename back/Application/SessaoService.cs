@@ -104,7 +104,8 @@ public class SessaoService(IGeralPersist geralPersist,
                             Nota = notas.Any()
                                 ? notas.Average(c => c.Nota)
                                 : 0,
-                            Avaliou = notasFinais.Any(nf => nf.AvaliadorId == a.Id)
+                            Avaliou = notasFinais.Any(nf => nf.AvaliadorId == a.Id),
+                            Comentario = notasFinais.FirstOrDefault(nf => nf.AvaliadorId == a.Id)?.ComentarioAluno
                         };
                     })
                     .OrderBy(an => an.Aluno)];
@@ -112,7 +113,7 @@ public class SessaoService(IGeralPersist geralPersist,
                 var sessaoRes = await _resultadoPersist.GetResultadoSessaoIdAsync(sessaoId)
                     ?? throw new NotFoundException("Resultado Sessão não encontrado");
                 var notasParciais = await _resultadoPersist.GetNotaParcialResultadoSessaoIdAsync(sessaoRes.Id);
-                var notasFinais = await _notaFinalPersist.GetNotasFinalSessaoIdAsync(sessaoId);
+                var notasFinais = await _resultadoPersist.GetNotasFinalResultadoSessaoIdAsync(sessaoRes.Id);
                 var alunos = await _resultadoPersist.GetAlunosResultadoSessaoIdAsync(sessaoRes.Id);
 
                 alunoNota = [.. alunos
@@ -125,7 +126,8 @@ public class SessaoService(IGeralPersist geralPersist,
                             Nota = notas.Any()
                                 ? notas.Average(c => c.Nota)
                                 : 0,
-                            Avaliou = notasFinais.Any(nf => nf.AvaliadorId == a.Id)
+                            Avaliou = notasFinais.Any(nf => nf.AvaliadorResId == a.Id),
+                            Comentario = notasFinais.FirstOrDefault(nf => nf.AvaliadorResId == a.Id)?.ComentarioAluno
                         };
                     })
                     .OrderBy(an => an.Aluno)];

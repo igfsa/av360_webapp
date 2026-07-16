@@ -8,4 +8,5 @@ public class AvaliacaoEnvioDTO
     public AlunoDTO Avaliador { get; set; } = null!;
     public string DeviceHash { get; set; } = "";
     public IEnumerable<AvaliacaoItemDTO>? Itens { get; set; }
+    public string? ComentarioAluno { get; set; }
 }

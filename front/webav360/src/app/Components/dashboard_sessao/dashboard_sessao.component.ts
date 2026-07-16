@@ -11,6 +11,9 @@ import { GrupoDashboard } from '../../Models/Dashboard/GrupoDashboard';
 import { FormsModule } from '@angular/forms';
 import { DashboardViewMode } from '../../Models/Dashboard/DashboardViewMode.enum';
 import { TableModule } from "primeng/table";
+import { AlunoDashboard } from '../../Models/Dashboard/AlunoDashboard';
+import { ModalService } from '../shared/modal/modal.service';
+import { ComentarioAcessarModalComponent } from './modals/comentario_acessar.component';
 
 type GrupoDashboardView = GrupoDashboard & {
   chartMedia?: any;
@@ -75,7 +78,9 @@ export class DashboardSessaoComponent implements OnChanges {
     '#8D6E63'
   ];
 
-  constructor() { }
+  constructor(
+    private modal: ModalService,
+  ) { }
 
   ngOnChanges(): void {
     if (!this.dashboard) return;
@@ -350,6 +355,14 @@ export class DashboardSessaoComponent implements OnChanges {
       labels,
       datasets
     };
+  }
+
+  public verComentario (aluno: AlunoDashboard) {
+        this.modal.open<AlunoDashboard, null>(
+          ComentarioAcessarModalComponent,
+          aluno,
+          { header: `Comentário` }
+        )
   }
 
   hexToRgba(hex: string, alpha: number = 1): string {

@@ -10,5 +10,6 @@ public class NotaFinalDTO
     public int GrupoId { get; set; }
     public string DeviceHash { get; set; } = "";
     public DateTime DataEnvio { get; set; }
+    public string? ComentarioAluno { get; set; }
     public IEnumerable<NotaParcialDTO>? NotasParciais { get; set; }
 }

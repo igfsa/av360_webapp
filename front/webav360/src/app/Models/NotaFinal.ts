@@ -4,5 +4,6 @@ export interface NotaFinal{
   avaliadorId: number,
   grupoId: number,
   deviceHash: string,
-  dataEnvio: Date
+  dataEnvio: Date,
+  comentarioAluno?: string
 }

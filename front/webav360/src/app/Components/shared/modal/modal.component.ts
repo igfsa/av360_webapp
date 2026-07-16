@@ -14,23 +14,29 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 
     <div class="modal-footer">
 
-      <button
-        class="btn btn-danger"
-        type="button"
-        (click)="cancelar.emit()">
+      @if (showCancel || showConfirm ) {
+        @if (showCancel) {
+          <button
+            class="btn btn-danger"
+            type="button"
+            (click)="cancelar.emit()">
 
-        {{ cancelarTexto }}
+            {{ cancelarTexto }}
 
-      </button>
+          </button>
+        }
 
-      <button
-        class="btn btn-success"
-        type="button"
-        (click)="confirmar.emit()">
+        @if (showConfirm) {
+          <button
+            class="btn btn-success"
+            type="button"
+            (click)="confirmar.emit()">
 
-        {{ confirmarTexto }}
+            {{ confirmarTexto }}
 
-      </button>
+          </button>
+        }
+      }
 
     </div>
 
@@ -74,6 +80,9 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   `,
 })
 export class ModalLayoutComponent {
+  @Input() showConfirm = true;
+  @Input() showCancel = true;
+
   @Input() confirmarTexto = 'Confirmar';
   @Input() cancelarTexto = 'Cancelar';
 

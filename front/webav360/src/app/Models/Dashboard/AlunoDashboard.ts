@@ -10,4 +10,5 @@ export interface AlunoDashboard {
 
   avaliou: boolean;
   totalNotas: number;
+  comentario?: string
 }

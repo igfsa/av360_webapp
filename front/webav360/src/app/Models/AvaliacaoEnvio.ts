@@ -7,5 +7,6 @@ export interface AvaliacaoEnvio {
   avaliadorId: number,
   avaliador: Aluno;
   deviceHash: string,
+  comentarioAluno?: string,
   itens: AvaliacaoItem[]
 }

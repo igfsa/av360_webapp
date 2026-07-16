@@ -95,7 +95,8 @@ public class DashboardSessaoService(
                 Media = totalNotas > 0 ? notasAluno.Average(n => n.Nota) : 0,
                 GrupoId = alunosGrupo.FirstOrDefault(ag => ag.AlunoId == a.Id)?.GrupoId,
                 Avaliou = notasFinais.Any(nf => nf.AvaliadorId == a.Id),
-                CriterioAluno = mediasCriterios
+                CriterioAluno = mediasCriterios,
+                Comentario = notasFinais.FirstOrDefault(nf => nf.AvaliadorId == a.Id)?.ComentarioAluno
             };
         }).ToList();
 
@@ -263,7 +264,8 @@ public class DashboardSessaoService(
                     Media = totalNotas > 0 ? notasAluno.Average(n => n.Nota) : 0,
                     GrupoId = a.ResultadoGrupoId,
                     Avaliou = notasFinais.Any(nf => nf.AvaliadorResId == a.Id),
-                    CriterioAluno = mediasCriterios
+                    CriterioAluno = mediasCriterios,
+                    Comentario = notasFinais.FirstOrDefault(nf => nf.AvaliadorResId == a.Id)?.ComentarioAluno
                 };
             }).ToList();
 

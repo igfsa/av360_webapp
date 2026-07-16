@@ -1,6 +1,8 @@
 import { Component, HostListener, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
+import { ScrollTopModule } from 'primeng/scrolltop';
+
 import { NavComponent } from './Components/nav/nav.component';
 import { AuthService } from './auth/auth.service';
 
@@ -10,6 +12,7 @@ import { AuthService } from './auth/auth.service';
   imports: [
     RouterOutlet,
     NavComponent,
+    ScrollTopModule,
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.scss']
