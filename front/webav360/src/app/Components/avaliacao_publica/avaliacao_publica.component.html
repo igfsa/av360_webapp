@@ -40,21 +40,23 @@
         <h3>Olá {{alunoLogado.nome}}! </h3>
         <h3>Você está avaliando {{ atual.avaliado.nome }}
           <br> Estudante {{indiceAtual + 1}} de {{avaliacoes.length}} </h3>
-          @for (criterio of atual.criterios; track criterio.criterioId) {
-            <label>{{ criterio.criterioNome }}</label>
-            <input type="number"
-              class="form-control"
-              [(ngModel)]="criterio.nota"
-              #notaModel="ngModel"
-              placeholder="Nota" />
-            @if (notaModel.touched && (criterio.nota < 1 || criterio.nota > dados.turma.notaMax)) {
-              <ul class="error-list">
-                  <li class="text-danger">Nota do critério deve estar entre 1 e {{dados.turma.notaMax}}</li>
-              </ul>
+          <form #meuForm="ngForm">
+            @for (criterio of atual.criterios; track criterio.criterioId) {
+              <label>{{ criterio.criterioNome }}</label>
+              <input type="number"
+                class="form-control"
+                [name]="'nota-' + criterio.criterioId"
+                [(ngModel)]="criterio.nota"
+                #notaModel="ngModel"
+                placeholder="Nota" />
+              @if (notaModel.touched && (criterio.nota < 1 || criterio.nota > dados.turma.notaMax)) {
+                <ul class="error-list">
+                    <li class="text-danger">Nota do critério deve estar entre 1 e {{dados.turma.notaMax}}</li>
+                </ul>
+              }
             }
-          }
-
-          <button class="btn btn-primary" (click)="proximo()">Próximo</button>
+        </form>
+        <button class="btn btn-primary" (click)="proximo(meuForm)">Próximo</button>
       }
      </div>
     }

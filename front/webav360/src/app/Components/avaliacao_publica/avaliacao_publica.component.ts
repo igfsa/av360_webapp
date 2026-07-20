@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 import { TableModule } from "primeng/table";
@@ -133,7 +133,7 @@ export class AvaliacaoPublicaComponent implements OnInit {
   }
 
 
-  public proximo() {
+  public proximo(form: NgForm) {
     if (!this.avaliacaoValida(this.atual)) {
       this.alert.toastError(`Verifique as notas inseridas`);
       return
@@ -149,6 +149,12 @@ export class AvaliacaoPublicaComponent implements OnInit {
       this.editarNotas = true;
       this.step = 4;
     }
+
+    if (form) {
+      form.control.markAsUntouched();
+      form.control.markAsPristine();
+    }
+
   }
 
   public confirmarNotas() {
