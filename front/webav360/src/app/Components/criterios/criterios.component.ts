@@ -99,7 +99,7 @@ export class CriteriosComponent implements OnInit, OnDestroy {
     this.modal.open<Criterio, Criterio>(
       CriterioEditarModalComponent,
       criterio ,
-      { header: `Adicionar Critério` }
+      { header: `Editar Critério` }
     ).subscribe((criterioEditado) => {
       if (!criterioEditado) return;
 

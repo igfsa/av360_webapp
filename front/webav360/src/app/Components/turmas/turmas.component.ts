@@ -86,7 +86,7 @@ export class TurmasComponent implements OnInit, OnDestroy {
     this.modal.open<null, TurmaCriarModalData>(
       TurmaCriarModalComponent,
       null ,
-      { header: `Adicionar Aluno` }
+      { header: `Adicionar Turma` }
     ).subscribe((res) => {
       const turma = res?.turma
       if (!turma) return;

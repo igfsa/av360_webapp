@@ -200,7 +200,7 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
         turma: this.turma,
         gruposOrig: this.grupos,
       },
-      { header: `Alterar Grupos` }
+      { header: `Alterar Equipes` }
     ).subscribe((resultado) => {
       if (!resultado) return;
 
@@ -280,7 +280,7 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
           alunosCheck: res.alunoGrupoCheckbox,
           gruposTurma: this.grupos
         },
-        { header: `Modificar Grupo` }
+        { header: `Modificar Equipe` }
       ).subscribe((alunosGrupo) => {
         if (!alunosGrupo) return;
         this.grupoService.putAtualizarGrupo({
