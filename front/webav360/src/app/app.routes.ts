@@ -24,6 +24,10 @@ export const routes: Routes = [
     providers: [DialogService, DynamicDialogConfig, ModalService],
     children: [
       {
+        path: 'home',
+        loadComponent: () => import('./Components/home/home.component').then(m => m.HomeComponent)
+      },
+      {
         path: 'turmas',
         loadComponent: () => import('./Components/turmas/turmas.component').then(m => m.TurmasComponent)
       },
@@ -53,7 +57,7 @@ export const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: 'turmas',
+        redirectTo: 'home',
         pathMatch: 'full'
       },
     ]
