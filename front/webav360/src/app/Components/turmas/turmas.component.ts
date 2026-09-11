@@ -93,7 +93,7 @@ export class TurmasComponent implements OnInit, OnDestroy {
       this.turmaService.postTurma(turma)
         .subscribe({
           next: turma => {
-            this.alert.success(`Turma ${turma.cod} criada cm sucesso`)
+            this.alert.success(`Turma ${turma.cod} criada com sucesso`)
             if (res.importarAlunos)
               this.ImportarAlunos(turma);
           },

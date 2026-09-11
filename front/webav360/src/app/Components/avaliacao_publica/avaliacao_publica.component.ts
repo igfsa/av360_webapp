@@ -172,7 +172,7 @@ export class AvaliacaoPublicaComponent implements OnInit {
         this.cdr.detectChanges();
         this.alert.info(
           `${imported.total} notas processadas!<br>
-          ${imported.sucesso} importados com sucesso.<br>
+          ${imported.sucesso} importadas com sucesso.<br>
           ${imported.falhas} com falha.`
         );
       },
