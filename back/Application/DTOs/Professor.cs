@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+using Domain.Entities;
 
 namespace Application.DTOs;
 
@@ -18,5 +20,7 @@ public class ProfessorDTO
         ErrorMessage = "A senha deve possuir pelo menos 8 caracteres, incluindo letra maiúscula, minúscula, número e caractere especial."
     )]
     [Length(8, 50)]
-    public string SenhaHash { get; set; } = null!;    
+    public string SenhaHash { get; set; } = null!; 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public Perfil Perfil { get; set; }
 }

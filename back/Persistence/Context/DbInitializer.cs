@@ -22,18 +22,25 @@ public static class DbInitializer
         if (string.IsNullOrEmpty(senha))
             throw new InvalidOperationException("Others__Admin_Pwd não configurada");
 
-        if(await context.Professores.AnyAsync(p => p.UserName == "admin01"))
+        var admin = await context.Professores.FirstOrDefaultAsync(p => p.UserName == "admin01");
+
+        if(admin is null )
         {
-            Console.WriteLine("[SEED] Admin já existe.");
-            return;
+            var senhaHash = BCrypt.Net.BCrypt.HashPassword(senha);
+            context.Professores.Add(new Professor("admin01", senhaHash, "Administrador", Perfil.Admin));
+            await context.SaveChangesAsync();
+
+            Console.WriteLine("[SEED] Admin criado com sucesso!");
+        } else if (!admin.IsAdmin)
+        {
+            admin.AlterarPerfil(Perfil.Admin);
+            await context.SaveChangesAsync();
+
+            Console.WriteLine("[SEED] Admin alterado com sucesso!");            
         }
-
-        var senhaHash = BCrypt.Net.BCrypt.HashPassword(senha);
-        var professor = new Professor("admin01", senhaHash, "Administrador");
-
-        context.Professores.Add(professor);
-        await context.SaveChangesAsync();
-
-        Console.WriteLine("[SEED] Admin criado com sucesso!");
+        else
+        {
+            Console.WriteLine("[SEED] Admin já existe com perfil Admin.");
+        }
     }
 }

@@ -5,7 +5,7 @@ import { TableModule } from "primeng/table";
 
 
 import { AuthService } from '../../auth/auth.service';
-import { Professor } from '../../Models/Professor';
+import { Professor, convertProfessor } from '../../Models/Professor';
 import { ProfessorService } from '../../Service/Professor.service';
 import { ProfessorRealTime } from '../../Service/ProfessorRealTime.service';
 import { FormsModule } from '@angular/forms';
@@ -13,6 +13,7 @@ import { ProfessorCriarModalComponent } from './modals/professor_criar.component
 import { LoadingComponent } from "../shared/loading/loading.component";
 import { ModalService } from '../shared/modal/modal.service';
 import { AlertService } from '../shared/alert/alert.service';
+import { PERFIS } from '../../Models/Perfil';
 
 @Component({
   selector: 'app-professores',
@@ -28,6 +29,8 @@ import { AlertService } from '../shared/alert/alert.service';
 })
 export class ProfessoresComponent implements OnInit {
 
+  perfis = PERFIS
+  protected readonly asProfessor = convertProfessor;
   public professores: Professor[]  = [];
   public loading: boolean = true;
 
@@ -69,6 +72,7 @@ export class ProfessoresComponent implements OnInit {
         this.professores = professores;
         this.loading = false;
         this.cdr.detectChanges();
+        console.log(this.professores)
       })
   }
 

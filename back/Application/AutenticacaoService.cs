@@ -43,7 +43,7 @@ public class AutenticacaoService(IGeralPersist geralPersist,
 
             _geralPersist.Add(refreshToken);
 
-            var novoAccessToken = _jwtToken.GenerateJWTToken();
+            var novoAccessToken = _jwtToken.GenerateJWTToken(professor);
 
             await _geralPersist.SaveChangesAsync();
 
@@ -103,7 +103,7 @@ public class AutenticacaoService(IGeralPersist geralPersist,
 
             _geralPersist.Add(novoRefresh);
 
-            var novoAccessToken = _jwtToken.GenerateJWTToken();
+            var novoAccessToken = _jwtToken.GenerateJWTToken(refreshToken.Professor);
 
             await _geralPersist.SaveChangesAsync();
 

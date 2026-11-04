@@ -55,6 +55,11 @@ public class APIContext(DbContextOptions<APIContext> options) : DbContext(option
             .Property(p => p.SenhaHash)
             .IsRequired();
 
+        _ = modelBuilder.Entity<Professor>()
+            .Property(p => p.Perfil)
+            .HasConversion<string>()
+            .HasMaxLength(20);
+
         _ = modelBuilder.Entity<AlunoGrupo>()
             .HasKey(ag => new { ag.AlunoId, ag.GrupoId });
 

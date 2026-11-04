@@ -9,6 +9,7 @@ import { Professor } from '../../../Models/Professor';
 import { FormsHelper } from '../../../Helpers/formsHelper';
 import { ModalLayoutComponent } from "../../shared/modal/modal.component";
 import { AlertService } from '../../shared/alert/alert.service';
+import { PERFIS } from '../../../Models/Perfil';
 
 
 @Component({
@@ -52,6 +53,17 @@ import { AlertService } from '../../shared/alert/alert.service';
           </ul>
         }
 
+        <label>Perfil:</label>
+        @for (perfil of perfis; track perfil) {
+          <input
+            type="radio"
+            class="radio"
+            [formField]="professorForm.perfil"
+            [value]="perfil"
+          />
+          {{ perfil }}
+        }
+
         <label>Senha:</label>
         <input [type]="ocultarSenha() ? 'password' : 'text'"
           class="form-control"
@@ -91,11 +103,13 @@ import { AlertService } from '../../shared/alert/alert.service';
   `
 })
 export class ProfessorCriarModalComponent implements OnInit {
+  readonly perfis = PERFIS;
 
   professorModel = signal<Professor & {confirmarSenha: string}>({
     id: 0,
     nome: ``,
     userName: ``,
+    perfil: 'Professor',
     senhaHash: ``,
     confirmarSenha: ``
   })

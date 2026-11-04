@@ -317,6 +317,12 @@ namespace Persistence.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("nome");
 
+                    b.Property<string>("Perfil")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("perfil");
+
                     b.Property<string>("SenhaHash")
                         .IsRequired()
                         .HasColumnType("text")

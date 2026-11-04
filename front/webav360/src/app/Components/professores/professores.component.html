@@ -45,15 +45,21 @@
             Nome
             <p-sortIcon field="nome"/>
           </th>
-          <th style = 'width: 40%;'>Usuário</th>
+          <th style = 'width: 30%;'>Usuário</th>
+          <th pSortableColumn="perfil" style = 'width: 20%;'>
+            Perfil
+            <p-sortIcon field="perfil"/>
+          </th>
         </tr>
       </ng-template>
 
-      <ng-template #body let-professor>
+      <ng-template #body let-professorUntiped>
+        @let professor = asProfessor(professorUntiped);
         <tr>
-                <td style= 'text-align: center'>{{professor.id}}</td>
-                <td>{{professor.nome}}</td>
-                <td>{{professor.userName}}</td>
+          <td style= 'text-align: center'>{{professor.id}}</td>
+          <td>{{professor.nome}}</td>
+          <td>{{professor.userName}}</td>
+          <td>{{professor.perfil}}</td>
         </tr>
       </ng-template>
 
