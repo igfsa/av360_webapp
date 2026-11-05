@@ -13,7 +13,7 @@ public class ProfessorController(
 {
     private readonly IProfessorService _professorService = professorService;
 
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     [ActionName("GetAllProfessores")]
     public async Task<ActionResult<IEnumerable<ProfessorDTO>>> Get()

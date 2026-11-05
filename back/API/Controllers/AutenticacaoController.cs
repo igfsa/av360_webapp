@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 
 using Application.Contracts;
 using Application.DTOs;
+using System.Security.Claims;
 
 namespace API.Controllers;
 
@@ -14,6 +15,7 @@ public class AutenticacaoController(IAutenticacaoService autenticacaoService,
     private readonly IAutenticacaoService _autenticacaoService = autenticacaoService;
     private readonly IProfessorNotifier _professorNotifier = professorNotifier;
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult> Register(ProfessorDTO model)
     {
@@ -79,6 +81,12 @@ public class AutenticacaoController(IAutenticacaoService autenticacaoService,
     [HttpGet]
     public IActionResult Me()
     {
-        return Ok( new {autenticado = true});
+        return Ok( new {
+            autenticado = true,
+            id = User.FindFirstValue(ClaimTypes.NameIdentifier),
+            nome = User.FindFirstValue("name"),
+            perfil = User.FindFirstValue(ClaimTypes.Role)
+
+        });
     }
 }

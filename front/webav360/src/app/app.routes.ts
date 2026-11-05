@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { DialogService, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { AuthGuard } from './auth/auth.guard';
 import { ModalService } from './Components/shared/modal/modal.service';
+import { AdminGuard } from './auth/admin.guard';
 
 export const routes: Routes = [
   {
@@ -16,6 +17,13 @@ export const routes: Routes = [
   {
     path: 'avaliacao/encerrada',
     loadComponent: () => import('./Components/avaliacao_publica/aux/avaliacao_encerrada.component').then(m => m.AvaliacaoEncerradaComponent)
+  },
+
+  {
+    path: 'professores',
+    canActivate: [AdminGuard],
+    providers: [DialogService, DynamicDialogConfig, ModalService],
+    loadComponent: () => import('./Components/professores/professores.component').then(m => m.ProfessoresComponent)
   },
 
   {
@@ -50,10 +58,6 @@ export const routes: Routes = [
       {
         path: 'sessao-hist/:id',
         loadComponent: () => import('./Components/sessao_hist/sessao_hist.component').then(m => m.SessaoHistComponent)
-      },
-      {
-        path: 'professores',
-        loadComponent: () => import('./Components/professores/professores.component').then(m => m.ProfessoresComponent)
       },
       {
         path: '',
