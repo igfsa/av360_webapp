@@ -1,6 +1,7 @@
 import { AlunoGrupoCheckbox } from "./AlunoGrupoCheckbox";
 import { Criterio } from "./Criterio";
 import { Grupo } from "./Grupo";
+import { Professor } from "./Professor";
 import { Turma } from "./Turma";
 
 export interface AlunoGrupoModalData {
@@ -16,8 +17,8 @@ export interface TurmaGrupoModalData {
 }
 
 export interface TurmaGrupoModalOut {
-  add: Grupo[],
-  edit: Grupo[]
+  add: Grupo[];
+  edit: Grupo[];
 }
 export interface TurmaCriterioModalData {
   turma: Turma;
@@ -26,6 +27,13 @@ export interface TurmaCriterioModalData {
 }
 
 export interface TurmaCriarModalData {
-  turma: Turma
-  importarAlunos: boolean
+  turma: Turma;
+  importarAlunos: boolean;
+}
+
+
+export interface TurmaProfessorModalData {
+  turma: Turma;
+  professor: Professor | null;
+  professores: Professor[];
 }

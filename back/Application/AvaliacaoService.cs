@@ -1,6 +1,5 @@
 using Application.Contracts;
 using Application.DTOs;
-using Domain.Entities;
 using Persistence.Contracts;
 using Domain.Exceptions;
 using Microsoft.Extensions.Logging;

@@ -1,5 +1,3 @@
-using AutoMapper;
-
 using Application.Contracts;
 using Application.DTOs;
 using Domain.Entities;

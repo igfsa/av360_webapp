@@ -20,10 +20,19 @@ export const routes: Routes = [
   },
 
   {
-    path: 'professores',
+    path: 'admin',
     canActivate: [AdminGuard],
     providers: [DialogService, DynamicDialogConfig, ModalService],
-    loadComponent: () => import('./Components/professores/professores.component').then(m => m.ProfessoresComponent)
+    children: [
+      {
+        path: 'professores',
+        loadComponent: () => import('./Components/professores/professores.component').then(m => m.ProfessoresComponent),
+      },
+      {
+        path: 'turmas',
+        loadComponent: () => import('./Components/turmas-adm/turmas_adm.component').then(m => m.TurmasAdmComponent),
+      }
+    ]
   },
 
   {

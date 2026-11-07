@@ -1,5 +1,5 @@
 namespace Domain.Exceptions;
 
-public class UnauthorizedException(string message = "Unauthorized") : Exception(message)
+public class UnauthorizedException(string message) : Exception(message)
 {
 }

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 
 using Application.Contracts;
 using Application.DTOs;
-using API.Notifier;
 
 namespace API.Controllers;
 

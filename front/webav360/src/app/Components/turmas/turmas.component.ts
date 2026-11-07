@@ -51,7 +51,7 @@ export class TurmasComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    if (this.authService.isLogged())
+    if (this.authService.usuario())
     {
       this.getTurmas();
 
@@ -74,7 +74,7 @@ export class TurmasComponent implements OnInit, OnDestroy {
   }
 
   public getTurmas (): void{
-    this.turmaService.getTurmas().subscribe((turmas) => {
+    this.turmaService.getTurmasProfessorId(this.authService.usuario()?.id ?? 0).subscribe((turmas) => {
         this.turmas = turmas;
 
         this.loading = false;
@@ -90,6 +90,7 @@ export class TurmasComponent implements OnInit, OnDestroy {
     ).subscribe((res) => {
       const turma = res?.turma
       if (!turma) return;
+      turma.professorId = this.authService.usuario()?.id ?? 0;
       this.turmaService.postTurma(turma)
         .subscribe({
           next: turma => {

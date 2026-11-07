@@ -14,6 +14,7 @@ import { LoadingComponent } from "../shared/loading/loading.component";
 import { ModalService } from '../shared/modal/modal.service';
 import { AlertService } from '../shared/alert/alert.service';
 import { PERFIS } from '../../Models/Perfil';
+import { ProfessorEditarModalComponent } from './modals/professor_editar.component';
 
 @Component({
   selector: 'app-professores',
@@ -46,7 +47,7 @@ export class ProfessoresComponent implements OnInit {
   ){}
 
   ngOnInit() {
-    if (this.authService.isLogged())
+    if (this.authService.usuario())
     {
       this.getProfessores();
 
@@ -72,7 +73,6 @@ export class ProfessoresComponent implements OnInit {
         this.professores = professores;
         this.loading = false;
         this.cdr.detectChanges();
-        console.log(this.professores)
       })
   }
 
@@ -91,6 +91,25 @@ export class ProfessoresComponent implements OnInit {
         },
         error: (err) => {
           this.alert.error(err.error?.message ?? `Erro ao criar professor ${novoProfessor.nome}`);
+        }
+      });
+    });
+  }
+
+  public editarProfessor (professor: Professor) {
+    this.modal.open<Professor, Professor>(
+      ProfessorEditarModalComponent,
+        professor,
+      { header: `Editar Professor` }
+    ).subscribe((res) => {
+      if (!res) return;
+
+      this.professorService.putProfessor(res).subscribe({
+        next: (p) => {
+          this.alert.toastSuccess(`Professor ${p.nome} salvo com sucesso!`);
+        },
+        error: (err) => {
+          this.alert.error(err.error?.message ?? `Erro ao salvar professor ${res.nome}`);
         }
       });
     });

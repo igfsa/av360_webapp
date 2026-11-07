@@ -5,7 +5,7 @@ import { form, FormField, maxLength, minLength, pattern, required, validate } fr
 
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 
-import { Professor } from '../../../Models/Professor';
+import { ProfessorRegister } from '../../../Models/ProfessorRegister';
 import { FormsHelper } from '../../../Helpers/formsHelper';
 import { ModalLayoutComponent } from "../../shared/modal/modal.component";
 import { AlertService } from '../../shared/alert/alert.service';
@@ -105,7 +105,7 @@ import { PERFIS } from '../../../Models/Perfil';
 export class ProfessorCriarModalComponent implements OnInit {
   readonly perfis = PERFIS;
 
-  professorModel = signal<Professor & {confirmarSenha: string}>({
+  professorModel = signal<ProfessorRegister & {confirmarSenha: string}>({
     id: 0,
     nome: ``,
     userName: ``,

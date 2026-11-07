@@ -60,7 +60,7 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
   public grupos: Grupo[]  = [];
   public sessoes: Sessao[]  = [];
   public criterioIds: number[] = [];
-  public turma: Turma = ({id: 0, cod: '', notaMax: 0});
+  public turma: Turma = ({id: 0, cod: '', notaMax: 0,professorId: 0});
   public sessaoAtiva?: Sessao;
   public alunoGrupo: AlunoGrupoNomes[] = [];
   public loading: boolean = true;
@@ -91,7 +91,7 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const turmaId = Number(this.route.snapshot.paramMap.get('id'));
 
-    if (this.authService.isLogged()){
+    if (this.authService.usuario()){
       this.loadData(turmaId);
 
       if (isPlatformBrowser(this.platformId)) {

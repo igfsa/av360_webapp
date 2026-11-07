@@ -13,6 +13,7 @@ namespace Application.Services;
 
 public class AutenticacaoService(IGeralPersist geralPersist,
                     IProfessorPersist professorPersist,
+                    ICurrentUser user,
                     IRefreshTokenPersist refreshTokenPersist,
                     IMapper mapper,
                     JWTToken jwtToken,
@@ -20,6 +21,7 @@ public class AutenticacaoService(IGeralPersist geralPersist,
 {
     private readonly IGeralPersist _geralPersist = geralPersist;
     private readonly IProfessorPersist _professorPersist = professorPersist;
+    private readonly ICurrentUser _user = user;
     private readonly IRefreshTokenPersist _refreshTokenPersist = refreshTokenPersist;
     private readonly IMapper _mapper = mapper;
     private readonly JWTToken _jwtToken = jwtToken;
@@ -55,9 +57,23 @@ public class AutenticacaoService(IGeralPersist geralPersist,
             throw;
         }
     }
+
+    public async Task<MeDTO> Me()
+    {
+        var professor = await _professorPersist.GetProfessorIdAsync(_user.ProfessorId)
+            ?? throw new UnauthorizedException("Usuário não encontrado");
+
+        return new MeDTO
+        {
+            Id = professor.Id,
+            UserName = professor.UserName,
+            Nome = professor.Nome,
+            Perfil = professor.Perfil.ToString()
+        };
+    }
     #endregion
     #region add
-    public async Task<ProfessorDTO> Add(ProfessorDTO model)
+    public async Task<ProfessorDTO> Add(ProfessorRegisterDTO model)
     {
         try
         {

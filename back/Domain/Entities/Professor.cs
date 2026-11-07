@@ -26,7 +26,28 @@ public class Professor
     public bool IsAdmin => Perfil == Perfil.Admin;
     private readonly List<RefreshToken> _refreshToken = [];
     public IReadOnlyCollection<RefreshToken> RefreshTokens => _refreshToken;
-
+    private readonly List<Turma> _turmas = [];
+    public IReadOnlyCollection<Turma> Turmas => _turmas;
     public void AlterarPerfil(Perfil perfil) => Perfil = perfil;
+
+    public void AdicionarTurma(Turma turma)
+    {
+        if (_turmas.Any(a => a.Id == turma.Id))
+            throw new BusinessException("Turma já matriculado.");
+        _turmas.Add(turma);
+    }
+
+    public void RemoverTurma(int turmaId)
+    {
+        var turma = _turmas.FirstOrDefault(a => a.Id == turmaId) 
+            ?? throw new BusinessException("Turma não encontrado.");
+        _ = _turmas.Remove(turma);
+    }
+
+    public void AtualizarProfessor(string nome, Perfil perfil)
+    {
+        Nome = nome;
+        Perfil = perfil;
+    }
     
 }

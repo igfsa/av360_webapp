@@ -23,7 +23,7 @@ export class HomeComponent {
   ) {}
 
   ngOnInit(): void {
-    if (this.authService.isLogged()){
+    if (this.authService.usuario()){
       this.loading = false;
     }
   }

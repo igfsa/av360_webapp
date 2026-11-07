@@ -6,4 +6,5 @@ public interface ITurmaPersist
 {
     Task<Turma[]> GetAllTurmasAsync();
     Task<Turma?> GetTurmaIdAsync(int turmaId);
+    Task<Turma[]> GetTurmasProfessorIdAsync(int professorId);
 }

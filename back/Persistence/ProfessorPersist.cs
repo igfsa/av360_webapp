@@ -21,4 +21,9 @@ public class ProfessorPersist(APIContext context) : IProfessorPersist
         return await _context.Professores
             .FirstOrDefaultAsync(p => p.UserName == userName);
     }
+    public async Task<Professor?> GetProfessorIdAsync(int ProfessorId)
+    {
+    return await _context.Professores
+            .FirstOrDefaultAsync(p => p.Id == ProfessorId);
+    }
 }

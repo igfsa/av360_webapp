@@ -6,6 +6,7 @@ import { TurmaCriterio } from '../Models/TurmaCriterio';
 import { ImportAlunos } from '../Models/TurmaImport';
 import { ImportAlunosResult } from '../Models/TurmaImportResult';
 import { API_URL } from '../app.config';
+import { TurmaAdm } from '../Models/TurmaAdm';
 
 @Injectable({
   providedIn: 'root'
@@ -14,12 +15,16 @@ export class TurmaService {
 
   constructor(private http :HttpClient, @Inject(API_URL) public readonly baseURL: string) { }
 
-  public getTurmas (): Observable<Turma[]>{
-    return this.http.get<Turma[]>(`${this.baseURL}/api/Turma/GetAllTurmas`);
+  public getTurmasAdm (): Observable<TurmaAdm[]>{
+    return this.http.get<TurmaAdm[]>(`${this.baseURL}/api/Turma/GetAllTurmasAdm`);
   }
 
   public getTurmaId(id: number): Observable<Turma> {
     return this.http.get<Turma>(`${this.baseURL}/api/Turma/GetTurmaById/${id}`);
+  }
+
+  public getTurmasProfessorId(id: number): Observable<Turma[]> {
+    return this.http.get<Turma[]>(`${this.baseURL}/api/Turma/GetTurmasProfessorId/${id}`);
   }
 
   public postTurma (turma: Turma): Observable<Turma>{
@@ -32,6 +37,14 @@ export class TurmaService {
 
   public putCriterioTurma (turmaCriterio: TurmaCriterio): Observable<Turma>{
     return this.http.put<Turma>(`${this.baseURL}/api/Turma/PutCriterioTurma`, turmaCriterio);
+  }
+
+  public putAlterarProfessor (turmaId: number, professorId: number): Observable<TurmaAdm>{
+    return this.http.put<TurmaAdm>(`${this.baseURL}/api/Turma/AlterarProfessor/${turmaId}?professorId=${professorId}`, {});
+  }
+
+  public putRemoverProfessor (turmaId: number): Observable<Turma>{
+    return this.http.put<Turma>(`${this.baseURL}/api/Turma/RemoverProfessor/${turmaId}`, {});
   }
 
   public postImportarAlunos (importAlunos: ImportAlunos): Observable<ImportAlunosResult>{

@@ -13,6 +13,7 @@ public class TurmaPersist(APIContext context) : ITurmaPersist
     public async Task<Turma[]> GetAllTurmasAsync()
     {
         return await _context.Turmas
+            .Include(t => t.Professor)
             .AsNoTracking()
             .OrderBy(a => a.Cod)
             .ToArrayAsync();
@@ -23,6 +24,15 @@ public class TurmaPersist(APIContext context) : ITurmaPersist
             .Include(t => t.Alunos)
             .Include(t => t.Criterios)
             .Include(t => t.Grupos)
+            .Include(t => t.Professor)
             .FirstOrDefaultAsync(t => t.Id == TurmaId);
+    }
+    public async Task<Turma[]> GetTurmasProfessorIdAsync(int professorId)
+    {
+        var professor = await _context.Professores
+            .Include(p => p.Turmas)
+            .FirstOrDefaultAsync(p => p.Id == professorId);
+
+        return [.. professor?.Turmas ?? []];
     }
 }

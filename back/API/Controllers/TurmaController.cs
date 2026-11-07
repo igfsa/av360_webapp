@@ -9,17 +9,29 @@ namespace API.Controllers;
 [ApiController]
 [Route("api/[controller]/[action]")]
 public class TurmaController(ITurmaService turmaService,
-                    ITurmaNotifier turmaNotifier) : ControllerBase
+                    ITurmaNotifier turmaNotifier,
+                    IAcessoService acessoService
+                    ) : ControllerBase
 {
     private readonly ITurmaService _turmaService = turmaService;
+    private readonly IAcessoService _acessoService = acessoService;
     private readonly ITurmaNotifier _turmaNotifier = turmaNotifier;
 
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpGet]
-    [ActionName("GetAllTurmas")]
-    public async Task<ActionResult<IEnumerable<TurmaDTO>>> Get()
+    [ActionName("GetAllTurmasAdm")]
+    public async Task<ActionResult<IEnumerable<TurmaAdmDTO>>> Get()
     {
-        var turmas = await _turmaService.GetTurmas();
+        var turmas = await _turmaService.GetTurmasAdm();
+        return Ok(turmas);
+    }
+
+    [Authorize]
+    [HttpGet("{professorId:int}")]
+    [ActionName("GetTurmasProfessorId")]
+    public async Task<ActionResult<IEnumerable<TurmaDTO>>> GetTurmasProfessorId(int professorId)
+    {
+        var turmas = await _turmaService.GetTurmasProfessorId(professorId);
         return Ok(turmas);
     }
 
@@ -28,6 +40,7 @@ public class TurmaController(ITurmaService turmaService,
     [ActionName("GetTurmaById")]
     public async Task<ActionResult<TurmaDTO>> GetTurmaById(int id)
     {
+        await _acessoService.GarantirTurmaAsync(id);
         var turma = await _turmaService.GetTurmaById(id);
         return Ok(turma);
     }
@@ -48,6 +61,8 @@ public class TurmaController(ITurmaService turmaService,
     [ActionName("PostImportAlunosTurma")]
     public async Task<ActionResult<CsvImportResultDTO>> ImportAlunosTurma([FromForm] CsvImportRequestDTO dto)
     {
+        await _acessoService.GarantirTurmaAsync(dto.TurmaId);
+
         var result = await _turmaService.ImportarAlunosAsync(dto.TurmaId, dto);
         
         await _turmaNotifier.TurmaAtualizada(dto.TurmaId);
@@ -59,6 +74,7 @@ public class TurmaController(ITurmaService turmaService,
     [ActionName("PutCriterioTurma")]
     public async Task<ActionResult<TurmaDTO>> PutCriterioTurma(TurmaCriterioDTO model)
     {
+        await _acessoService.GarantirTurmaAsync(model.TurmaId);
         var turma = await _turmaService.AddTurmaCriterio(model);
 
         await _turmaNotifier.TurmaAtualizada(model.TurmaId);
@@ -70,9 +86,34 @@ public class TurmaController(ITurmaService turmaService,
     [ActionName("PutTurma")]
     public async Task<ActionResult> Put(int id, TurmaDTO model)
     {
+        await _acessoService.GarantirTurmaAsync(id);
         var turma = await _turmaService.Update(id, model);
 
         await _turmaNotifier.TurmaAtualizada(model.Id);
+        return Ok(turma);
+    }
+
+    [Authorize]
+    [HttpPut("{turmaId:int}")]
+    [ActionName("RemoverProfessor")]
+    public async Task<ActionResult> RemoverProfessor(int turmaId)
+    {
+        await _acessoService.GarantirTurmaAsync(turmaId);
+        var turma = await _turmaService.RemoverProfessor(turmaId);
+
+        await _turmaNotifier.TurmaAtualizada(turmaId);
+        return Ok(turma);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [Authorize]
+    [HttpPut("{turmaId:int}")]
+    [ActionName("AlterarProfessor")]
+    public async Task<ActionResult> AlterarProfessor(int turmaId, [FromQuery] int professorId)
+    {
+        var turma = await _turmaService.AlterarProfessor(turmaId, professorId);
+
+        await _turmaNotifier.TurmaAtualizada(turmaId);
         return Ok(turma);
     }
 

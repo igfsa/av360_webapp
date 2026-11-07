@@ -17,7 +17,7 @@ public class AutenticacaoController(IAutenticacaoService autenticacaoService,
 
     [Authorize(Roles = "Admin")]
     [HttpPost]
-    public async Task<ActionResult> Register(ProfessorDTO model)
+    public async Task<ActionResult> Register(ProfessorRegisterDTO model)
     {
         try
         {
@@ -79,14 +79,9 @@ public class AutenticacaoController(IAutenticacaoService autenticacaoService,
 
     [Authorize]
     [HttpGet]
-    public IActionResult Me()
+    public async Task<ActionResult<MeDTO>> Me()
     {
-        return Ok( new {
-            autenticado = true,
-            id = User.FindFirstValue(ClaimTypes.NameIdentifier),
-            nome = User.FindFirstValue("name"),
-            perfil = User.FindFirstValue(ClaimTypes.Role)
-
-        });
+        var me = await _autenticacaoService.Me();
+        return Ok(me);
     }
 }

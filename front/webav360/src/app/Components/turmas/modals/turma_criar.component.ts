@@ -60,7 +60,8 @@ export class TurmaCriarModalComponent implements OnInit {
     turma: {
       id: 0,
       cod: '',
-      notaMax: 0
+      notaMax: 0,
+      professorId: 0
     },
     importarAlunos: true
   })

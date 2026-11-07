@@ -19,4 +19,7 @@ export class ProfessorService {
     return this.http.post<Professor>(`${this.baseURL}/api/Autenticacao/Register`, professor);
   }
 
+  public putProfessor (professor: Professor): Observable<Professor>{
+    return this.http.put<Professor>(`${this.baseURL}/api/Professor/PutProfessor/${professor.id}`, professor);
+  }
 }
