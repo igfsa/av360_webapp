@@ -27,11 +27,11 @@ public class TurmaController(ITurmaService turmaService,
     }
 
     [Authorize]
-    [HttpGet("{professorId:int}")]
+    [HttpGet]
     [ActionName("GetTurmasProfessorId")]
-    public async Task<ActionResult<IEnumerable<TurmaDTO>>> GetTurmasProfessorId(int professorId)
+    public async Task<ActionResult<IEnumerable<TurmaDTO>>> GetTurmasProfessorId()
     {
-        var turmas = await _turmaService.GetTurmasProfessorId(professorId);
+        var turmas = await _turmaService.GetTurmasProfessorId();
         return Ok(turmas);
     }
 

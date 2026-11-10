@@ -10,7 +10,7 @@ import { CriterioCriarModalComponent } from './modals/criterio_criar.component';
 import { CriterioRealTime } from '../../Service/CriterioRealTime.service';
 import { CriterioEditarModalComponent } from './modals/criterio_editar.component';
 import { CriterioService } from '../../Service/Criterio.service';
-import { Criterio } from '../../Models/Criterio';
+import { convertCriterio, Criterio } from '../../Models/Criterio';
 import { ModalService } from '../shared/modal/modal.service';
 import { AlertService } from '../shared/alert/alert.service';
 
@@ -27,6 +27,8 @@ import { AlertService } from '../shared/alert/alert.service';
   styleUrls: ['./criterios.component.scss', '../../app.scss'],
 })
 export class CriteriosComponent implements OnInit, OnDestroy {
+
+  protected readonly asCriterio = convertCriterio;
 
   public criterios: Criterio[]  = [];
   public loading: boolean = true;
@@ -68,7 +70,7 @@ export class CriteriosComponent implements OnInit, OnDestroy {
   }
 
   public getCriterios (): void{
-    this.criterioService.getCriterios().subscribe((criterios) => {
+    this.criterioService.getCriteriosProfessor().subscribe((criterios) => {
         this.criterios = criterios;
         this.loading = false;
         this.cdr.detectChanges();
@@ -76,23 +78,25 @@ export class CriteriosComponent implements OnInit, OnDestroy {
   }
 
   public adicionarCriterio (): void{
-    this.modal.open<null, Criterio>(
-      CriterioCriarModalComponent,
-      null ,
-      { header: `Adicionar Critério` }
-    ).subscribe((criterio) => {
-      if (!criterio) return;
+    this.criterioService.getCriteriosSugestoes().subscribe((res) => {
+      this.modal.open<string[], Criterio>(
+        CriterioCriarModalComponent,
+        res ,
+        { header: `Adicionar Critério` }
+      ).subscribe((criterio) => {
+        if (!criterio) return;
 
-    this.criterioService.postCriterio(criterio)
-      .subscribe({
-        next: criterio => {
-          this.alert.toastSuccess(`Critério ${criterio.nome} criado com sucesso!`);
-        },
-        error: (err) => {
-          this.alert.error(err.error?.message ?? `Erro ao criar critério ${criterio.nome}`);
-        }
+      this.criterioService.postCriterio(criterio)
+        .subscribe({
+          next: criterio => {
+            this.alert.toastSuccess(`Critério ${criterio.nome} criado com sucesso!`);
+          },
+          error: (err) => {
+            this.alert.error(err.error?.message ?? `Erro ao criar critério ${criterio.nome}`);
+          }
+        });
       });
-    });
+    })
   }
 
   public editarCriterio (criterio: Criterio): void{

@@ -166,7 +166,7 @@ export class AlunoTurmaComponent implements OnInit, OnDestroy {
 
   public alterarCriterioTurma (): void{
     forkJoin({
-      criterios: this.criterioService.getCriterios(),
+      criterios: this.criterioService.getCriteriosProfessor(),
     }).subscribe(res => {
 
       this.modal.open<TurmaCriterioModalData, number[]>(

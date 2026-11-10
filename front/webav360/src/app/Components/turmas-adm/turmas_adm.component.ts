@@ -104,7 +104,7 @@ export class TurmasAdmComponent implements OnInit, OnDestroy {
             professores: res,
             turma: turma
           },
-          { header: `Editar Turma` }
+          { header: `Alterar Professor Turma ${turma.cod}` }
         ).subscribe((novoProfessor) => {
           if (novoProfessor === null)
           {

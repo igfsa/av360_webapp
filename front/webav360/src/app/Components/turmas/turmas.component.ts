@@ -74,7 +74,7 @@ export class TurmasComponent implements OnInit, OnDestroy {
   }
 
   public getTurmas (): void{
-    this.turmaService.getTurmasProfessorId(this.authService.usuario()?.id ?? 0).subscribe((turmas) => {
+    this.turmaService.getTurmasProfessorId().subscribe((turmas) => {
         this.turmas = turmas;
 
         this.loading = false;

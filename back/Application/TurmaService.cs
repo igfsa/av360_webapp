@@ -17,6 +17,7 @@ public class TurmaService(IGeralPersist geralPersist,
                     ITurmaPersist turmaPersist,
                     ICriterioPersist criterioPersist,
                     IProfessorPersist professorPersist,
+                    ICurrentUser user,
                     IMapper mapper,
                     ILogger<TurmaService> logger) : ITurmaService
 {
@@ -24,6 +25,7 @@ public class TurmaService(IGeralPersist geralPersist,
     private readonly ITurmaPersist _turmaPersist = turmaPersist;
     private readonly ICriterioPersist _criterioPersist = criterioPersist;
     private readonly IProfessorPersist _professorPersist = professorPersist;
+    private readonly ICurrentUser _user = user;
     private readonly IMapper _mapper = mapper;
     private readonly ILogger _logger = logger;
 
@@ -69,11 +71,11 @@ public class TurmaService(IGeralPersist geralPersist,
             throw;
         }
     }
-    public async Task<IEnumerable<TurmaDTO>> GetTurmasProfessorId(int professorId)
+    public async Task<IEnumerable<TurmaDTO>> GetTurmasProfessorId()
     {
         try
         {
-            var turmas = await _turmaPersist.GetTurmasProfessorIdAsync(professorId)
+            var turmas = await _turmaPersist.GetTurmasProfessorIdAsync(_user.ProfessorId)
                 ?? throw new NotFoundException("Nenhum turma encontrado");
             return _mapper.Map<IEnumerable<TurmaDTO>>(turmas);
         }
@@ -88,7 +90,7 @@ public class TurmaService(IGeralPersist geralPersist,
     {
         try
         {
-            var professor = await _professorPersist.GetProfessorIdAsync(model.ProfessorId ?? 0)
+            var professor = await _professorPersist.GetProfessorIdAsync(_user.ProfessorId)
                 ?? throw new NotFoundException("Professor não encontrado");
 
             var turma = new Turma(cod: model.Cod, notaMax: model.NotaMax, professor: professor);
@@ -217,8 +219,6 @@ public class TurmaService(IGeralPersist geralPersist,
     {
         try
         {
-            Console.WriteLine(turmaId);
-            Console.WriteLine(professorId);
             var turma = await _turmaPersist.GetTurmaIdAsync(turmaId)
                 ?? throw new NotFoundException("Turma não encontrada");
             var professor = await _professorPersist.GetProfessorIdAsync(professorId)
