@@ -16,6 +16,13 @@ public class CriterioPersist(APIContext context) : ICriterioPersist
             .OrderBy(a => a.Nome)
             .ToArrayAsync();
     }
+    public async Task<Criterio[]> GetCriteriosProfessorAsync(int professorId)
+    {
+        return await _context.Criterios
+            .OrderBy(c => c.Nome)
+            .Where(c => c.Professor == null || c.ProfessorId == professorId)
+            .ToArrayAsync();
+    }
     public async Task<Criterio?> GetCriterioIdAsync(int criterioId)
     {
         return await _context.Criterios
@@ -23,6 +30,14 @@ public class CriterioPersist(APIContext context) : ICriterioPersist
     }
     public async Task<Criterio[]> GetCriteriosPadrao()
     {
-        return await _context.Criterios.Where(c => c.Id >= 1 && c.Id <= 9).ToArrayAsync();
+        return await _context.Criterios
+            .Where(c => c.Id >= 1 && c.Id <= 9)
+            .ToArrayAsync();
+    }
+    public async Task<Criterio[]> GetCriteriosSugestaoAsync(int professorId)
+    {
+        return await _context.Criterios
+            .Where(c => c.Id > 9 && c.ProfessorId != professorId)
+            .ToArrayAsync();
     }
 }

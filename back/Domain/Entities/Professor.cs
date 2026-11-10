@@ -28,6 +28,8 @@ public class Professor
     public IReadOnlyCollection<RefreshToken> RefreshTokens => _refreshToken;
     private readonly List<Turma> _turmas = [];
     public IReadOnlyCollection<Turma> Turmas => _turmas;
+    private readonly List<Criterio> _criterios = [];
+    public IReadOnlyCollection<Criterio> Criterios => _criterios;
     public void AlterarPerfil(Perfil perfil) => Perfil = perfil;
 
     public void AdicionarTurma(Turma turma)
@@ -46,6 +48,8 @@ public class Professor
 
     public void AtualizarProfessor(string nome, Perfil perfil)
     {
+        if (UserName == "admin01")
+            throw new BusinessException("Usuário admin01 não pode ser alterado");
         Nome = nome;
         Perfil = perfil;
     }

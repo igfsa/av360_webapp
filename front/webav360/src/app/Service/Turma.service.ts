@@ -23,8 +23,8 @@ export class TurmaService {
     return this.http.get<Turma>(`${this.baseURL}/api/Turma/GetTurmaById/${id}`);
   }
 
-  public getTurmasProfessorId(id: number): Observable<Turma[]> {
-    return this.http.get<Turma[]>(`${this.baseURL}/api/Turma/GetTurmasProfessorId/${id}`);
+  public getTurmasProfessorId(): Observable<Turma[]> {
+    return this.http.get<Turma[]>(`${this.baseURL}/api/Turma/GetTurmasProfessorId/`);
   }
 
   public postTurma (turma: Turma): Observable<Turma>{

@@ -54,7 +54,8 @@ export class CriterioEditarModalComponent implements OnInit {
 
   criterioModel = signal<Criterio>({
     id: 0,
-    nome: ''
+    nome: '',
+    nativo: false
   })
 
   criterioForm = form(this.criterioModel, (schemaPath) => {

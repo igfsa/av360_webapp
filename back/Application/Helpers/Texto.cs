@@ -1,11 +1,14 @@
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 using Ude;
 
 namespace Application.Helpers;
 
-public class Texto
+public partial class Texto
 {
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex MyRegex();
 
     public static string Normalizar(string texto)
     {
@@ -27,7 +30,7 @@ public class Texto
         }
 
         return sb.ToString()
-                        .Normalize(NormalizationForm.FormC);
+            .Normalize(NormalizationForm.FormC);
     }
 
     public static Encoding EncodingDetector(Stream stream)
@@ -43,4 +46,19 @@ public class Texto
         }
         return Encoding.GetEncoding("1252");
     }
+
+    public static string ChaveComparacao(string texto)
+    {
+
+        var semAcento = Normalizar(texto);
+        var sb = new StringBuilder();
+        foreach (var c in semAcento)
+            if (char.IsLetterOrDigit(c) || char.IsWhiteSpace(c))
+                sb.Append(c);
+        return MyRegex().Replace(sb.ToString(), " ").Trim();
+    }
+
+    public static string LimparParaExibicao(string texto) =>
+        MyRegex().Replace(texto.Trim(), " ");
+
 }
