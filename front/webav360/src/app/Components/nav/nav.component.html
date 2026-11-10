@@ -1,22 +1,25 @@
 <header>
   <nav class="menu fixed-top d-flex align-items-center justify-content-between bg-gradient-x">
     @if (!authService.loading()) {
-      @if (authService.isLogged()) {
+      @if (authService.usuario()) {
         <button type="button" class="btn" (click)="visible = true">
           <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="ico bi bi-list" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
           </svg>
         </button>
     }}
-    <a class="navbar-brand" routerLink="" routerLinkActive="active">
+    <a class="navbar-brand" routerLink="/home" routerLinkActive="active">
       <h1 class = "titulo display-3" >av360web</h1>
     </a>
   </nav>
   <p-drawer [(visible)]="visible" header="Menu" styleClass="menu-drawer">
     <div class="d-flex h-100">
       <ul class="navbar-nav flex-column vw-100 list-unstyled">
+        <li class="nav-item">
+          <h2>Olá {{authService.usuario()?.nome}}</h2>
+        </li>
         <li class="nav-item nav-link">
-            <button class="nav-link active" (click)="visible = false" routerLink="/turmas" routerLinkActive="active" >Turmas</button>
+            <button class="nav-link active" (click)="visible = false" routerLink="/turmas" routerLinkActive="active" >Minhas Turmas</button>
         </li>
         <li class="nav-item nav-link">
             <button class="nav-link active" (click)="visible = false" routerLink="/criterios" routerLinkActive="active" >Critérios</button>
@@ -24,7 +27,10 @@
 
         @if (authService.isAdmin()){
           <li class="nav-item nav-link">
-              <button class="nav-link active" (click)="visible = false" routerLink="/professores" routerLinkActive="active" >Professores</button>
+              <button class="nav-link active" (click)="visible = false" routerLink="/admin/turmas" routerLinkActive="active" >Gerenciar Turmas</button>
+          </li>
+          <li class="nav-item nav-link">
+              <button class="nav-link active" (click)="visible = false" routerLink="/admin/professores" routerLinkActive="active" >Professores</button>
           </li>
         }
 

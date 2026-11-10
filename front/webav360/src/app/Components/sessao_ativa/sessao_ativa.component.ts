@@ -33,7 +33,7 @@ import { AlertHelper } from '../shared/alert/alert.helper';
 })
 export class SessaoAtivaComponent implements OnInit, OnDestroy {
 
-  public turma: Turma = ({id: 0, cod: '', notaMax: 0});
+  public turma: Turma = ({id: 0, cod: '', notaMax: 0, professorId: 0});
   public sessaoAtiva?: Sessao;
   public urlQrCode: string = '';
   public dashboard?: DashboardSessao;
@@ -56,7 +56,7 @@ export class SessaoAtivaComponent implements OnInit, OnDestroy {
   ){}
 
   ngOnInit() {
-    if (this.authService.isLogged()){
+    if (this.authService.usuario()){
       const turmaId = Number(this.route.snapshot.paramMap.get('id'));
 
       if (isPlatformBrowser(this.platformId)) {

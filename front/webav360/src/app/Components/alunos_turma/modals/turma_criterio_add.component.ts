@@ -2,13 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { TableModule } from "primeng/table";
 
 import { Turma } from '../../../Models/Turma';
 import { Criterio } from '../../../Models/Criterio';
 import { CriterioCheckbox } from '../../../Models/CriterioCheckbox';
 import { TurmaCriterioModalData } from '../../../Models/ModalData';
 import { ModalLayoutComponent } from "../../shared/modal/modal.component";
-import { TableModule } from "primeng/table";
 
 @Component({
   selector: 'app-turma-criterio-add-modal',

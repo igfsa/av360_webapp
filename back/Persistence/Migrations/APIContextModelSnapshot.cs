@@ -707,8 +707,15 @@ namespace Persistence.Migrations
                         .HasColumnType("numeric(5,2)")
                         .HasColumnName("nota_max");
 
+                    b.Property<int?>("ProfessorId")
+                        .HasColumnType("integer")
+                        .HasColumnName("professor_id");
+
                     b.HasKey("Id")
                         .HasName("pk_turmas");
+
+                    b.HasIndex("ProfessorId")
+                        .HasDatabaseName("ix_turmas_professor_id");
 
                     b.ToTable("turmas", (string)null);
                 });
@@ -923,6 +930,17 @@ namespace Persistence.Migrations
                     b.Navigation("Turma");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Turma", b =>
+                {
+                    b.HasOne("Domain.Entities.Professor", "Professor")
+                        .WithMany("Turmas")
+                        .HasForeignKey("ProfessorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_turmas_professores_professor_id");
+
+                    b.Navigation("Professor");
+                });
+
             modelBuilder.Entity("Domain.Entities.NotaFinal", b =>
                 {
                     b.Navigation("NotasParcial");
@@ -931,6 +949,8 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Domain.Entities.Professor", b =>
                 {
                     b.Navigation("RefreshTokens");
+
+                    b.Navigation("Turmas");
                 });
 
             modelBuilder.Entity("Domain.Entities.ResultadoGrupo", b =>

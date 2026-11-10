@@ -2,7 +2,6 @@ using AutoMapper;
 
 using Application.Contracts;
 using Application.DTOs;
-using Domain.Entities;
 using Persistence.Contracts;
 using Domain.Exceptions;
 using Microsoft.Extensions.Logging;
@@ -31,6 +30,25 @@ public class ProfessorService(IGeralPersist geralPersist,
         }
         catch
         {
+            throw;
+        }
+    }
+    #endregion
+    #region update
+    public async Task<ProfessorDTO> Update(int professorId, ProfessorDTO model)
+    {
+        try
+        {
+            var professor = await _professorPersist.GetProfessorIdAsync(professorId)
+                ?? throw new NotFoundException("Professor não encontrada");
+            professor.AtualizarProfessor(model.Nome, model.Perfil);
+            await _geralPersist.SaveChangesAsync();
+            var ProfessorRetorno = await _professorPersist.GetProfessorIdAsync(professorId);
+            return _mapper.Map<ProfessorDTO>(ProfessorRetorno);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao atualizar professor: {professorId}", professorId);
             throw;
         }
     }

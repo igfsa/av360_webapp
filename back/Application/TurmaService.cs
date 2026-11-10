@@ -16,23 +16,40 @@ namespace Application.Services;
 public class TurmaService(IGeralPersist geralPersist,
                     ITurmaPersist turmaPersist,
                     ICriterioPersist criterioPersist,
+                    IProfessorPersist professorPersist,
                     IMapper mapper,
                     ILogger<TurmaService> logger) : ITurmaService
 {
     private readonly IGeralPersist _geralPersist = geralPersist;
     private readonly ITurmaPersist _turmaPersist = turmaPersist;
     private readonly ICriterioPersist _criterioPersist = criterioPersist;
+    private readonly IProfessorPersist _professorPersist = professorPersist;
     private readonly IMapper _mapper = mapper;
     private readonly ILogger _logger = logger;
 
     #region get
-    public async Task<IEnumerable<TurmaDTO>> GetTurmas()
+    public async Task<IEnumerable<TurmaAdmDTO>> GetTurmasAdm()
     {
         try
         {
             var turmas = await _turmaPersist.GetAllTurmasAsync()
                 ?? throw new NotFoundException("Nenhuma turma encontrada");
-            return _mapper.Map<IEnumerable<TurmaDTO>>(turmas);
+
+            List<TurmaAdmDTO> turmasAdm;
+
+            turmasAdm = [.. turmas
+                .Select(t => {
+                    return new TurmaAdmDTO
+                    {
+                        Id = t.Id,
+                        Cod = t.Cod,
+                        NotaMax = t.NotaMax,
+                        ProfessorId = t.ProfessorId,
+                        ProfessorNome = t.Professor?.Nome
+                    };
+                })
+                .OrderBy(t => t.Cod)];
+            return turmasAdm;
         }
         catch
         {
@@ -52,13 +69,29 @@ public class TurmaService(IGeralPersist geralPersist,
             throw;
         }
     }
+    public async Task<IEnumerable<TurmaDTO>> GetTurmasProfessorId(int professorId)
+    {
+        try
+        {
+            var turmas = await _turmaPersist.GetTurmasProfessorIdAsync(professorId)
+                ?? throw new NotFoundException("Nenhum turma encontrado");
+            return _mapper.Map<IEnumerable<TurmaDTO>>(turmas);
+        }
+        catch
+        {
+            throw;
+        }
+    }
     #endregion
     #region add
     public async Task<TurmaDTO> Add(TurmaDTO model)
     {
         try
         {
-            var turma = new Turma(cod: model.Cod, notaMax: model.NotaMax);
+            var professor = await _professorPersist.GetProfessorIdAsync(model.ProfessorId ?? 0)
+                ?? throw new NotFoundException("Professor não encontrado");
+
+            var turma = new Turma(cod: model.Cod, notaMax: model.NotaMax, professor: professor);
             _geralPersist.Add(turma);
             await _geralPersist.SaveChangesAsync();
 
@@ -173,6 +206,61 @@ public class TurmaService(IGeralPersist geralPersist,
             await _geralPersist.SaveChangesAsync();
             var TurmaRetorno = await _turmaPersist.GetTurmaIdAsync(turmaId);
             return _mapper.Map<TurmaDTO>(TurmaRetorno);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao atualizar turma: {turmaId}", turmaId);
+            throw;
+        }
+    }
+    public async Task<TurmaAdmDTO> AlterarProfessor(int turmaId, int professorId)
+    {
+        try
+        {
+            Console.WriteLine(turmaId);
+            Console.WriteLine(professorId);
+            var turma = await _turmaPersist.GetTurmaIdAsync(turmaId)
+                ?? throw new NotFoundException("Turma não encontrada");
+            var professor = await _professorPersist.GetProfessorIdAsync(professorId)
+                ?? throw new NotFoundException("Professor não encontrado");
+            turma.AtualizarProfessor(professor);
+            await _geralPersist.SaveChangesAsync();
+            var turmaRetorno = await _turmaPersist.GetTurmaIdAsync(turmaId)
+                ?? throw new Exception();
+            return new TurmaAdmDTO
+                {
+                    Id = turmaRetorno.Id,
+                    Cod = turmaRetorno.Cod,
+                    NotaMax = turmaRetorno.NotaMax,
+                    ProfessorId = turmaRetorno.ProfessorId,
+                    ProfessorNome = turmaRetorno.Professor?.Nome
+                };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao atualizar turma: {turmaId}", turmaId);
+            throw;
+        }
+    }
+
+    public async Task<TurmaAdmDTO> RemoverProfessor(int turmaId)
+    {
+        try
+        {
+            var turma = await _turmaPersist.GetTurmaIdAsync(turmaId)
+                ?? throw new NotFoundException("Turma não encontrada");
+            turma.RemoverProfessor();
+            await _geralPersist.SaveChangesAsync();
+            var turmaRetorno = await _turmaPersist.GetTurmaIdAsync(turmaId)
+                ?? throw new Exception();;
+            return new TurmaAdmDTO
+                {
+                    Id = turmaRetorno.Id,
+                    Cod = turmaRetorno.Cod,
+                    NotaMax = turmaRetorno.NotaMax,
+                    ProfessorId = turmaRetorno.ProfessorId,
+                    ProfessorNome = turmaRetorno.Professor?.Nome
+                };
         }
         catch (Exception ex)
         {

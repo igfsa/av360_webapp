@@ -5,17 +5,21 @@ namespace Domain.Entities;
 public class Turma
 {
     private Turma() { }
-    public Turma(string cod, decimal notaMax)
+    public Turma(string cod, decimal notaMax, Professor professor)
     {
         if (string.IsNullOrWhiteSpace(cod))
             throw new BusinessException("Cod é obrigatório");
 
         Cod = cod;
         NotaMax = notaMax;
+        Professor = professor;
+        ProfessorId = professor.Id;
     }
     public int Id { get; private set; }
     public string Cod { get; private set; } = null!;
     public decimal NotaMax { get; private set; }
+    public Professor? Professor { get; private set; }
+    public int? ProfessorId { get; private set; }
     private readonly List<Aluno> _alunos = [];
     public IReadOnlyCollection<Aluno> Alunos => _alunos;
     private readonly List<Criterio> _criterios = [];
@@ -30,6 +34,16 @@ public class Turma
 
         Cod = cod;
         NotaMax = notaMax;
+    }
+    public void AtualizarProfessor(Professor professor)
+    {
+        Professor = professor;
+        ProfessorId = professor.Id;
+    }
+    public void RemoverProfessor()
+    {
+        Professor = null;
+        ProfessorId = null;
     }
 
     public void AdicionarAluno(Aluno aluno)

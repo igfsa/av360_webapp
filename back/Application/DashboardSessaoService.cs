@@ -4,7 +4,6 @@ using Application.Contracts;
 using Application.DTOs;
 using Persistence.Contracts;
 using Domain.Exceptions;
-using Domain.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services;

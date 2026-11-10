@@ -56,7 +56,8 @@ export class TurmaEditarModalComponent implements OnInit {
   turmaModel = signal<Turma>({
     id: 0,
     cod: '',
-    notaMax: 0
+    notaMax: 0,
+    professorId: 0
   });
 
   turmaForm = form(this.turmaModel, schemaPath => {

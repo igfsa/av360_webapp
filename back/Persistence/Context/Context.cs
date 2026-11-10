@@ -111,6 +111,12 @@ public class APIContext(DbContextOptions<APIContext> options) : DbContext(option
             .HasMany(t => t.Criterios)
             .WithMany(c => c.Turmas)
             .UsingEntity(j => j.ToTable("criterio_turma"));
+            
+        _ = modelBuilder.Entity<Turma>()
+            .HasOne(t => t.Professor)
+            .WithMany(p => p.Turmas)
+            .HasForeignKey(t => t.ProfessorId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         _ = modelBuilder.Entity<Sessao>()
             .Property(s => s.TokenPublico)

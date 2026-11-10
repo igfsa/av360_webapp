@@ -26,7 +26,7 @@ import { AlertService } from '../shared/alert/alert.service';
 })
 export class SessaoHistComponent implements OnInit, OnDestroy {
 
-  public turma: Turma = ({id: 0, cod: '', notaMax: 0});
+  public turma: Turma = ({id: 0, cod: '', notaMax: 0, professorId: 0});
   public sessao: Sessao = ({
     id: 0
     , turmaId: 0
@@ -51,7 +51,7 @@ export class SessaoHistComponent implements OnInit, OnDestroy {
   ){}
 
   ngOnInit() {
-    if (this.authService.isLogged()){
+    if (this.authService.usuario()){
       const sessaoId = Number(this.route.snapshot.paramMap.get('id'));
 
       if (isPlatformBrowser(this.platformId)) {

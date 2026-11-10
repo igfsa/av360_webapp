@@ -46,7 +46,7 @@ export class CriteriosComponent implements OnInit, OnDestroy {
   ){}
 
   ngOnInit() {
-    if (this.authService.isLogged())
+    if (this.authService.usuario())
     {
       this.getCriterios();
 

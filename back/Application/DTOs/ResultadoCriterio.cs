@@ -1,5 +1,3 @@
-using Domain.Exceptions;
-
 namespace Domain.Entities;
 
 public class ResultadoCriterioDTO

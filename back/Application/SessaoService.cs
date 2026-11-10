@@ -227,6 +227,7 @@ public class SessaoService(IGeralPersist geralPersist,
     {
         try
         {
+            Console.WriteLine(model);
             var turma = await _turmaPersist.GetTurmaIdAsync(model.TurmaId)
                 ?? throw new NotFoundException("Turma não encontrada");
             if(await _sessaoPersist.GetSessaoAtivaTurmaIdAsync(model.TurmaId) != null)

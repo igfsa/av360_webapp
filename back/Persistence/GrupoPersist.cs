@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
 using Persistence.Contracts;
 using Persistence.Context;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Persistence;
 

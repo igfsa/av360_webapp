@@ -54,7 +54,7 @@ export class SessaoQrCodeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    if (this.authService.isLogged()){
+    if (this.authService.usuario()){
       const sessaoId = Number(this.route.snapshot.paramMap.get('id'));
 
       this.loadData(sessaoId);

@@ -98,8 +98,9 @@ var mapper_config = builder.Services.AddAutoMapper(cfg =>
     _ = cfg.CreateMap<Grupo, GrupoDTO>().ReverseMap();
     _ = cfg.CreateMap<NotaFinal, NotaFinalDTO>().ReverseMap();
     _ = cfg.CreateMap<NotaParcial, NotaParcialDTO>().ReverseMap();
-    _ = cfg.CreateMap<Professor, ProfessorDTO>().ForMember(dest => dest.SenhaHash, opt => opt.Ignore());
-    _ = cfg.CreateMap<ProfessorDTO, Professor>();
+    _ = cfg.CreateMap<Professor, ProfessorDTO>().ReverseMap();
+    _ = cfg.CreateMap<Professor, ProfessorRegisterDTO>().ForMember(dest => dest.SenhaHash, opt => opt.Ignore());
+    _ = cfg.CreateMap<ProfessorRegisterDTO, Professor>();
     _ = cfg.CreateMap<Sessao, SessaoDTO>().ReverseMap();
     _ = cfg.CreateMap<Turma, TurmaDTO>().ReverseMap();
     _ = cfg.CreateMap<RefreshToken, RefreshTokenDTO>().ReverseMap();
@@ -152,9 +153,16 @@ builder.Services.AddScoped<IProfessorService, ProfessorService>();
 builder.Services.AddScoped<IProfessorPersist, ProfessorPersist>();
 builder.Services.AddScoped<IProfessorNotifier, ProfessorNotifier>();
 
-builder.Services.AddScoped<IRefreshTokenPersist, RefreshTokenPersist>();
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddScoped<IAutenticacaoService, AutenticacaoService>();
+
+builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+
+builder.Services.AddScoped<IAcessoService, AcessoService>();
+
+builder.Services.AddScoped<IRefreshTokenPersist, RefreshTokenPersist>();
 
 builder.Services.AddScoped<IExportService, ExportService>();
 
