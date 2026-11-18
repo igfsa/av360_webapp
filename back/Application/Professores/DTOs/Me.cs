@@ -1,3 +1,5 @@
+namespace Application.DTOs;
+
 public class MeDTO
 {
     public int Id { get; set; }
