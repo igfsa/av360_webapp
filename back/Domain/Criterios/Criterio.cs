@@ -1,7 +1,4 @@
-using System.Runtime.CompilerServices;
 using Domain.Exceptions;
-
-[assembly: InternalsVisibleTo("Persistence")]
 
 namespace Domain.Entities;
 

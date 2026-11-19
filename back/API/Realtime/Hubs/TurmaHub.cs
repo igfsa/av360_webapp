@@ -1,3 +1,4 @@
+using API.Realtime;
 using Microsoft.AspNetCore.SignalR;
 
 namespace API.Hubs;
@@ -12,6 +13,6 @@ public class TurmaHub : Hub
     [HubMethodName("AcessarTurma")]
     public async Task AcessarTurma(int turmaId)
     {
-        await Groups.AddToGroupAsync(Context.ConnectionId, $"Turma-{turmaId}");
+        await Groups.AddToGroupAsync(Context.ConnectionId, RealtimeGroups.Turma(turmaId));
     }
 }

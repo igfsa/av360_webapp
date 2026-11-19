@@ -1,3 +1,4 @@
+using API.Realtime;
 using Microsoft.AspNetCore.SignalR;
 
 namespace API.Hubs;
@@ -16,6 +17,6 @@ public class SessaoHub : Hub
     [HubMethodName("AcessarSessao")]
     public async Task AcessarTurmaSessao(int sessaoId)
     {
-        await Groups.AddToGroupAsync(Context.ConnectionId, $"Sessao-{sessaoId}");
+        await Groups.AddToGroupAsync(Context.ConnectionId, RealtimeGroups.Sessao(sessaoId));
     }
 }
