@@ -1,0 +1,229 @@
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule, NgForm } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+
+import { TableModule } from 'primeng/table';
+import { TextareaModule } from 'primeng/textarea';
+
+import { AvaliacaoPublica } from './models/AvaliacaoPublica';
+import { AvaliacaoService } from './Avaliacao.service';
+import { Grupo } from '@shared/models/Grupo';
+import { Criterio } from '@shared/models/Criterio';
+import { AlunoService } from '@app/shared/services/Aluno.service';
+import { Aluno } from '@shared/models/Aluno';
+import { DeviceService } from '@app/shared/helpers/hashGen';
+import { AvaliacaoItem } from './models/AvaliacaoItem';
+import { AvaliacaoAgrupada } from './models/AvaliacaoAgrupada';
+import { AvaliacaoEnvio } from './models/AvaliacaoEnvio';
+import { LoadingComponent } from '@shared/components/loading/loading.component';
+import { AlertService } from '@shared/components/alert/alert.service';
+
+@Component({
+  selector: 'app-avaliacao_publica',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    LoadingComponent,
+    TableModule,
+    TextareaModule,
+],
+  templateUrl: './avaliacao_publica.component.html',
+  styleUrls: ['./avaliacao_publica.component.scss']
+})
+
+export class AvaliacaoPublicaComponent implements OnInit {
+  step = 1;
+  token!: string;
+  dados!: AvaliacaoPublica;
+  grupos: Grupo[] = [];
+  alunosGrupo: Aluno[] = [];
+  criterios: Criterio[] = [];
+  grupoSelecionado!: Grupo;
+  nomeAluno = '';
+  alunoLogado!: Aluno;
+  avaliacoes: AvaliacaoAgrupada[] = [];
+  avaliacaoEnvio!: AvaliacaoEnvio;
+  indiceAtual = 0;
+  loading: boolean = true;
+  carregandoAvaliacao: boolean = true;
+  editarNotas: boolean = false;
+
+  constructor(
+    private route: ActivatedRoute,
+    private avaliacaoService: AvaliacaoService,
+    private alunoService: AlunoService,
+    private deviceService: DeviceService,
+    private router: Router,
+    public cdr: ChangeDetectorRef,
+    private alert: AlertService
+  ) {}
+
+  get atual() {
+    return this.avaliacoes[this.indiceAtual];
+  }
+
+  ngOnInit(): void {
+    this.token = this.route.snapshot.paramMap.get('token')!;
+    this.carregarSessao();
+  }
+
+  public carregarSessao() {
+    this.avaliacaoService.getValidaSessaoChavePub(this.token).subscribe({
+      next: (dto) => {
+        this.dados = dto,
+        this.grupos = [...dto.grupos].sort((a, b) => a.id - b.id);
+        this.criterios = [...dto.criterios].sort((a, b) => a.id - b.id);
+        this.loading = false;
+
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.alert.error(err.error.message ?? 'Ocorreu um erro não identificado');
+      this.router.navigate(['/avaliacao/encerrada'])}
+    });
+  }
+
+  public selecionarGrupo(grupo: any) {
+    this.grupoSelecionado = grupo;
+    this.step = 2;
+  }
+
+  public validarAluno(){
+    if (!this.grupoSelecionado)
+      return;
+    this.alunoService.getAlunoNomeIdGrupo(this.grupoSelecionado.id, this.nomeAluno).subscribe({
+      next: (aluno) => {
+        this.alunoLogado = aluno;
+        this.carregarAvaliacao();
+    },
+    error: (err) => {
+        this.alert.error(err.error.message ?? 'Ocorreu um erro não identificado');
+      }
+    });
+  }
+
+  public async carregarAvaliacao() {
+    this.avaliacaoService.getNovaAvaliacaoEnvio(
+      this.dados.sessaoId,
+      this.grupoSelecionado.id,
+      this.alunoLogado.id,
+      await this.deviceService.getDeviceHash()
+    ).subscribe({
+      next: (data) => {
+        this.avaliacoes =  this.agruparAvaliacao(data.itens);
+        this.avaliacaoEnvio = {
+          avaliadorId: data.avaliadorId,
+          avaliador: data.avaliador,
+          deviceHash: data.deviceHash,
+          grupoId: data.grupoId,
+          itens: [],
+          sessaoId: data.sessaoId
+        }
+        this.indiceAtual = 0;
+        this.step = 3;
+        this.carregandoAvaliacao = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.alert.error(err.error.message ?? 'Ocorreu um erro não identificado');
+      }
+    });
+  }
+
+
+  public proximo(form: NgForm) {
+    if (!this.avaliacaoValida(this.atual)) {
+      this.alert.toastError(`Verifique as notas inseridas`);
+      return
+    }
+
+    if(this.editarNotas) {
+      this.step = 4;
+      return
+    }
+
+    this.indiceAtual++;
+    if (this.indiceAtual === this.avaliacoes.length) {
+      this.editarNotas = true;
+      this.step = 4;
+    }
+
+    if (form) {
+      form.control.markAsUntouched();
+      form.control.markAsPristine();
+    }
+
+  }
+
+  public confirmarNotas() {
+    this.step = 5;
+  }
+
+  public enviar() {
+    const itens = this.desagruparAvaliacao(this.avaliacoes);
+
+    this.avaliacaoEnvio.itens = itens;
+
+    this.avaliacaoService.postAvaliacao(this.avaliacaoEnvio).subscribe({
+      next: (imported) =>{
+        this.step = 6;
+        this.cdr.detectChanges();
+        this.alert.info(
+          `${imported.total} notas processadas!<br>
+          ${imported.sucesso} importadas com sucesso.<br>
+          ${imported.falhas} com falha.`
+        );
+      },
+      error: (err) => {
+        this.alert.error(err.error?.message ?? `Erro ao importar Notas!`);
+      }
+    });
+  }
+
+  public editar(index: number) {
+    this.indiceAtual = index;
+    this.step = 3;
+  }
+
+  public avaliacaoValida(item: any): boolean {
+    return item.criterios.every((c: any) => (c.nota >= 1 && c.nota <= this.dados.turma.notaMax));
+  }
+
+  private agruparAvaliacao(itens: AvaliacaoItem[]): AvaliacaoAgrupada[] {
+    const mapa = new Map<number, AvaliacaoAgrupada>();
+    itens.forEach(item => {
+      if (!mapa.has(item.avaliadoId)) {
+        mapa.set(item.avaliadoId, {
+          avaliadoId: item.avaliadoId,
+          avaliado: item.avaliado,
+          criterios: []
+        });
+      }
+      mapa.get(item.avaliadoId)!.criterios.push({
+        criterioId: item.criterioId,
+        criterioNome: this.criterios.find(c => c.id == item.criterioId)?.nome ?? '',
+        nota: item.nota
+      });
+    });
+
+    mapa.forEach(av => {
+      av.criterios.sort((a, b) => a.criterioId - b.criterioId)
+    })
+
+    return Array.from(mapa.values());
+  }
+
+  private desagruparAvaliacao(avaliacoes: AvaliacaoAgrupada[]): AvaliacaoItem[] {
+
+    return avaliacoes.flatMap(item =>
+      item.criterios.map(c => ({
+        avaliadoId: item.avaliadoId,
+        avaliado: item.avaliado,
+        criterioId: c.criterioId,
+        nota: c.nota
+      }))
+    );
+  }
+}
