@@ -1,8 +1,8 @@
 import { BootstrapContext, bootstrapApplication } from '@angular/platform-browser';
 import { mergeApplicationConfig } from '@angular/core';
-import { App } from './app/app';
-import { serverConfig } from './app/app.config.server';
-import { appConfig } from './app/app.config';
+import { App } from '@app/app';
+import { serverConfig } from '@core/config/app.config.server';
+import { appConfig } from '@core/config/app.config';
 
 
 const bootstrap = (context: BootstrapContext) =>
