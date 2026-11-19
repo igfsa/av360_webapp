@@ -70,19 +70,25 @@ public class APIContext(DbContextOptions<APIContext> options) : DbContext(option
         _ = modelBuilder.Entity<Criterio>()
             .Property(c => c.Nome)
             .HasMaxLength(100);
+            
+        _ = modelBuilder.Entity<Criterio>()
+            .HasOne(c => c.Professor)
+            .WithMany(p => p.Criterios)
+            .HasForeignKey(c => c.ProfessorId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         _ = modelBuilder.Entity<Criterio>()
             .HasData(
-                new Criterio(id: 1, nome: "Nível de Participação"),
-                new Criterio(id: 2, nome: "Pontualidade na Entrega de Tarefas"),
-                new Criterio(id: 3, nome: "Capacidade de Trabalhar em Equipe"),
-                new Criterio(id: 4, nome: "Controle Emocional"),
-                new Criterio(id: 5, nome: "Disposição para Compartilhar Tarefas"),
-                new Criterio(id: 6, nome: "Respeito às Individualidades"),
-                new Criterio(id: 7, nome: "Responsabilidade"),
-                new Criterio(id: 8, nome: "Criatividade"),
-                new Criterio(id: 9, nome: "Conhecimento Teórico") 
-                );
+                new Criterio(id: 1, nome: "Nível de Participação", nativo: true),
+                new Criterio(id: 2, nome: "Pontualidade na Entrega de Tarefas", nativo: true),
+                new Criterio(id: 3, nome: "Capacidade de Trabalhar em Equipe", nativo: true),
+                new Criterio(id: 4, nome: "Controle Emocional", nativo: true),
+                new Criterio(id: 5, nome: "Disposição para Compartilhar Tarefas", nativo: true),
+                new Criterio(id: 6, nome: "Respeito às Individualidades", nativo: true),
+                new Criterio(id: 7, nome: "Responsabilidade", nativo: true),
+                new Criterio(id: 8, nome: "Criatividade", nativo: true),
+                new Criterio(id: 9, nome: "Conhecimento Teórico", nativo: true) 
+            );
 
         _ = modelBuilder.Entity<Grupo>()
             .Property(g => g.Nome)

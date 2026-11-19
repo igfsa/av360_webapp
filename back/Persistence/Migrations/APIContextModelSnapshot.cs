@@ -110,14 +110,25 @@ namespace Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("Nativo")
+                        .HasColumnType("boolean")
+                        .HasColumnName("nativo");
+
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("nome");
 
+                    b.Property<int?>("ProfessorId")
+                        .HasColumnType("integer")
+                        .HasColumnName("professor_id");
+
                     b.HasKey("Id")
                         .HasName("pk_criterios");
+
+                    b.HasIndex("ProfessorId")
+                        .HasDatabaseName("ix_criterios_professor_id");
 
                     b.ToTable("criterios", (string)null);
 
@@ -125,46 +136,55 @@ namespace Persistence.Migrations
                         new
                         {
                             Id = 1,
+                            Nativo = true,
                             Nome = "Nível de Participação"
                         },
                         new
                         {
                             Id = 2,
+                            Nativo = true,
                             Nome = "Pontualidade na Entrega de Tarefas"
                         },
                         new
                         {
                             Id = 3,
+                            Nativo = true,
                             Nome = "Capacidade de Trabalhar em Equipe"
                         },
                         new
                         {
                             Id = 4,
+                            Nativo = true,
                             Nome = "Controle Emocional"
                         },
                         new
                         {
                             Id = 5,
+                            Nativo = true,
                             Nome = "Disposição para Compartilhar Tarefas"
                         },
                         new
                         {
                             Id = 6,
+                            Nativo = true,
                             Nome = "Respeito às Individualidades"
                         },
                         new
                         {
                             Id = 7,
+                            Nativo = true,
                             Nome = "Responsabilidade"
                         },
                         new
                         {
                             Id = 8,
+                            Nativo = true,
                             Nome = "Criatividade"
                         },
                         new
                         {
                             Id = 9,
+                            Nativo = true,
                             Nome = "Conhecimento Teórico"
                         });
                 });
@@ -754,6 +774,17 @@ namespace Persistence.Migrations
                         .HasConstraintName("fk_criterio_turma_turmas_turmas_id");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Criterio", b =>
+                {
+                    b.HasOne("Domain.Entities.Professor", "Professor")
+                        .WithMany("Criterios")
+                        .HasForeignKey("ProfessorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_criterios_professores_professor_id");
+
+                    b.Navigation("Professor");
+                });
+
             modelBuilder.Entity("Domain.Entities.Grupo", b =>
                 {
                     b.HasOne("Domain.Entities.Turma", "Turma")
@@ -948,6 +979,8 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Professor", b =>
                 {
+                    b.Navigation("Criterios");
+
                     b.Navigation("RefreshTokens");
 
                     b.Navigation("Turmas");

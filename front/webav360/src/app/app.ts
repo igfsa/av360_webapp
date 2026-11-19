@@ -3,8 +3,8 @@ import { RouterOutlet } from '@angular/router';
 
 import { ScrollTopModule } from 'primeng/scrolltop';
 
-import { NavComponent } from './Components/nav/nav.component';
-import { AuthService } from './auth/auth.service';
+import { NavComponent } from './shared/components/nav/nav.component';
+import { AuthService } from './core/auth/auth.service';
 
 @Component({
   selector: 'app-root',
