@@ -13,6 +13,7 @@ public class CriterioPersist(APIContext context) : ICriterioPersist
     public async Task<Criterio[]> GetAllCriteriosAsync()
     {
         return await _context.Criterios
+            .Include(c => c.Professor)
             .OrderBy(a => a.Nome)
             .ToArrayAsync();
     }

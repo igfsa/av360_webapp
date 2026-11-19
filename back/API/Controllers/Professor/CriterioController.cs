@@ -19,10 +19,10 @@ public class CriterioController(
 
     [Authorize(Roles = "Admin")]
     [HttpGet]
-    [ActionName("GetAllCriterios")]
-    public async Task<ActionResult<IEnumerable<CriterioDTO>>> Get()
+    [ActionName("GetAllCriteriosAdm")]
+    public async Task<ActionResult<IEnumerable<CriterioAdmDTO>>> Get()
     {
-        var criterios = await _criterioService.GetCriterios();
+        var criterios = await _criterioService.GetCriteriosAdm();
         return Ok(criterios);
     }
 
@@ -64,6 +64,18 @@ public class CriterioController(
         await _criterioNotifier.CriterioAtualizado(criterio.Id);
         return Ok(criterio);
     }
+    
+    [Authorize(Roles = "Admin")]
+    [Authorize]
+    [HttpPost]
+    [ActionName("PostCriterioAdm")]
+    public async Task<ActionResult<CriterioDTO>> PostAdm(CriterioDTO model)
+    {
+        var criterio = await _criterioService.AddAdm(model);
+
+        await _criterioNotifier.CriterioAtualizado(criterio.Id);
+        return Ok(criterio);
+    }
 
     [Authorize]
     [HttpPut("{id:int}")]
@@ -72,6 +84,17 @@ public class CriterioController(
     {
         await _acessoService.GarantirCriterioAsync(id);
         var criterio = await _criterioService.Update(id, model);
+
+        await _criterioNotifier.CriterioAtualizado(model.Id);
+        return Ok(criterio);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPut("{id:int}")]
+    [ActionName("PutCriterioAdm")]
+    public async Task<ActionResult> PutAdm(int id, CriterioDTO model)
+    {
+        var criterio = await _criterioService.UpdateAdm(id, model);
 
         await _criterioNotifier.CriterioAtualizado(model.Id);
         return Ok(criterio);

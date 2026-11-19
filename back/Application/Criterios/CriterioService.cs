@@ -28,20 +28,6 @@ public class CriterioService(IGeralPersist geralPersist,
     private readonly ILogger _logger = logger;
 
     #region get
-    public async Task<IEnumerable<CriterioDTO>> GetCriterios()
-    {
-        try
-        {
-            var criterios = await _criterioPersist.GetAllCriteriosAsync()
-                ?? throw new NotFoundException("Nenhum critério encontrado");
-
-            return _mapper.Map<IEnumerable<CriterioDTO>>(criterios);
-        }
-        catch
-        {
-            throw;
-        }
-    }
     public async Task<IEnumerable<CriterioDTO>> GetCriteriosProfessor()
     {
         try
@@ -87,6 +73,34 @@ public class CriterioService(IGeralPersist geralPersist,
                 .First().Key)
             .OrderBy(n => n, StringComparer.CurrentCultureIgnoreCase)];
     }
+    public async Task<IEnumerable<CriterioAdmDTO>> GetCriteriosAdm()
+    {
+        try
+        {
+            var criterios = await _criterioPersist.GetAllCriteriosAsync()
+                ?? throw new NotFoundException("Nenhum critério encontrado");
+
+            List<CriterioAdmDTO> criteriosAdm;
+
+            criteriosAdm = [.. criterios
+                .Select(n => {
+                    return new CriterioAdmDTO
+                    {
+                        Id = n.Id,
+                        Nome = n.Nome,
+                        Nativo = n.Nativo,
+                        ProfessorId = n.ProfessorId,
+                        ProfessorNome = n.Professor?.Nome
+                    };
+                })
+                .OrderBy(n => n.Nome)];
+            return criteriosAdm;
+        }
+        catch
+        {
+            throw;
+        }
+    }
     #endregion
     #region add
     public async Task<CriterioDTO> Add(CriterioDTO model)
@@ -97,7 +111,29 @@ public class CriterioService(IGeralPersist geralPersist,
                 ?? throw new NotFoundException("Professor não encontrado");
             var criterio = new Criterio(
                 nome: model.Nome,
-                professor: professor
+                professor: professor,
+                nativo: false
+            );
+            _geralPersist.Add(criterio);
+
+            _ = await _geralPersist.SaveChangesAsync();
+            var CriterioRetorno = await _criterioPersist.GetCriterioIdAsync(criterio.Id);
+            return _mapper.Map<CriterioDTO>(CriterioRetorno);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao criar Critério: {model.Nome}", model.Nome);
+            throw;
+        }
+    }
+    public async Task<CriterioDTO> AddAdm(CriterioDTO model)
+    {
+        try
+        {
+            var criterio = new Criterio(
+                nome: model.Nome,
+                professor: null,
+                nativo: true
             );
             _geralPersist.Add(criterio);
 
@@ -120,6 +156,24 @@ public class CriterioService(IGeralPersist geralPersist,
             var criterio = await _criterioPersist.GetCriterioIdAsync(criterioId)
                 ?? throw new NotFoundException("Critério não encontrado");
             criterio.AtualizarCriterio(model.Nome);
+
+            _ = await _geralPersist.SaveChangesAsync();
+            var criterioRetorno = await _criterioPersist.GetCriterioIdAsync(criterioId);
+            return _mapper.Map<CriterioDTO>(criterioRetorno);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao atualizar Critério: {criterioId}", criterioId);
+            throw;
+        }
+    }
+    public async Task<CriterioDTO> UpdateAdm(int criterioId, CriterioDTO model)
+    {
+        try
+        {
+            var criterio = await _criterioPersist.GetCriterioIdAsync(criterioId)
+                ?? throw new NotFoundException("Critério não encontrado");
+            criterio.AtualizarCriterioAdm(model.Nome);
 
             _ = await _geralPersist.SaveChangesAsync();
             var criterioRetorno = await _criterioPersist.GetCriterioIdAsync(criterioId);

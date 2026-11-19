@@ -4,10 +4,12 @@ namespace Application.Contracts;
 
 public interface ICriterioService
 {
-    Task<IEnumerable<CriterioDTO>> GetCriterios();
     Task<IEnumerable<CriterioDTO>> GetCriteriosProfessor();
+    Task<IEnumerable<CriterioAdmDTO>> GetCriteriosAdm();
     Task<CriterioDTO> Add(CriterioDTO model);
+    Task<CriterioDTO> AddAdm(CriterioDTO model);
     Task<CriterioDTO> Update(int criterioId, CriterioDTO model);
+    Task<CriterioDTO> UpdateAdm(int criterioId, CriterioDTO model);
     Task<IEnumerable<CriterioDTO>> GetCriteriosTurma(int turmaId);
     Task<IEnumerable<string>> GetCriteriosSugestoes();
 }
